@@ -2,9 +2,8 @@ from sys  import exit as SYSEXIT
 from copy import deepcopy
 
 # функции инициализации
-def initCell(value, error): return {'value':value, 'error':error}
 def getCells_fromList(values:list, errors=False):   # errors – значение по умолчанию для всех ячеек
-    return [initCell(val, errors) for val in values]
+    return [Cell(val, errors) for val in values]
 
 # надкласс с общими функциями для Table() и CellTable()
 class TableTemplate():
@@ -25,23 +24,25 @@ class Table(TableTemplate):             # общий класс, можно ко
 class CellTable(TableTemplate):
     # общий класс, ВОЗМОЖНО подойдёт для других программ
     # это таблица, в которой каждая ячейка – это словарь [[{value:'', error:true/false}, ...], ...]
-    def __init__(self, table:list, errors=False):  # values – таблица[[]], errors – значение по умолчанию для всех ячеек
+    def __init__(self, table:list, errors=False):  # table – таблица[[]], errors – значение по умолчанию для всех ячеек
         self.data = [getCells_fromList(row, errors) for row in table]
+class Cell():
+    def __init__(self, value, error=False):
+        self.value = value
+        self.error = error
 
 # это таблица, представленная в виде словаря {столбец: {title:CellObj, cells:[CellObj,...]},...}
 class TableDict():
     def __init__(self, tObj:Table, errors=False):  # errors – значение по умолчанию для всех ячеек
         self.columns = {}
         tObj = deepcopy(tObj)
-        print(tObj.data)
         tObj.rotate()
         for r in range(len(tObj.data)):
             self.columns[str(r)] = TableColumn(tObj.data[r], errors)
 class TableColumn():
     def __init__(self, values:list, errors=False, title:str=None):
-        print(values)
         if title == None: title = values.pop(0) # pop удаляет элемент 0 и возвращает его
-        self.title = initCell         (title,  errors)
+        self.title = Cell             (title,  errors)
         self.cells = getCells_fromList(values, errors)
 
 # защита от запуска модуля

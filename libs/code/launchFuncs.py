@@ -7,11 +7,11 @@ import stringFuncs    as strF
 class launchScript():
     def __init__(self, book, type:str, log, errors):
         # запоминаем базовые переменные
-        self.type        = type
-        self.log         = log       # потом заменим на класс Log
-        self.errors      = errors    # потом заменим на класс Errors
-        self.fullRange   = LT[type]['fullRange']
-        self.toTD        = LT[type]['toTD']   # будем работать с TableDict (true) или же с CellTable (false)
+        self.type      = type
+        self.log       = log                # потом заменим на класс Log
+        self.errors    = errors             # потом заменим на класс Errors
+        self.fullRange = LT[type]['fullRange']
+        self.toTD      = LT[type]['toTD']   # будем работать с TableDict (true) или же с CellTable (false)
 
         # создаём объекты для последующей обработки
         self.file     = Excel(book, self.fullRange)
@@ -19,6 +19,7 @@ class launchScript():
         if self.toTD: self.unkTD = TableDict     (self.file.table)
         else:         self.table = CellTable     (self.file.table.data)
     def searchTitleRow(self, table):
+    def searchTitleRow(self, table:list):   # values – таблица[[]]
         for r in range(len(table)):
             if strF.findSubList(table[r][0], ('Уникальных: ', 'Ошибок: ')) != 0: return r
         return 0
