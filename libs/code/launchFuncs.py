@@ -14,7 +14,7 @@ class launchScript():
 
         # создаём объекты для последующей обработки
         self.file      = Excel(book, self.fullRange)
-        self.table     = True if self.toTD else CellTable(self.file.table)  # потом заменить первый True
+        self.table     = True if self.toTD else CellTable(self.file.table.data) # потом заменить первый True
 
 # защита от запуска модуля
 if __name__ == '__main__':

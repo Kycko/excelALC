@@ -8,8 +8,12 @@ class Table():  # общий класс, можно копировать без 
 class CellTable():
     # общий класс, ВОЗМОЖНО подойдёт для других программ
     # это таблица, в которой каждая ячейка – это словарь [[{value:'', error:true/false}, ...], ...]
-    def __init__(self, table:Table):
-        pass
+    def __init__(self, values:list, errors=False):  # values – таблица [[]], errors – значение по умолчанию для всех ячеек
+        self.data = []
+        for row in values:
+            self.data.append([])
+            for cell in row:
+                self.data[-1].append({'value':cell, 'error':errors})
 
 # защита от запуска модуля
 if __name__ == '__main__':
