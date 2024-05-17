@@ -16,14 +16,14 @@ class exBooks():    # Excel books
 
         try:    self.cur = xw.books.active.name
         except: self.cur = ''
-    def getFile(self, file):
+    def getFile(self, file:str):
         self.update()
         for book in self.books:
             if book.name == file: return book
         return None
 
 class Excel():  # общий класс, можно копировать без изменений в другие программы
-    def __init__(self, book, fullRange=True):
+    def __init__(self, book:xw.Book, fullRange=True):
         # если fullRange=False, считываем выделенный диапазон
         self.file  = book
         self.sheet = book.sheets.active
