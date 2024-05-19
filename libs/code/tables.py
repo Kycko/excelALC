@@ -1,5 +1,6 @@
-from sys  import exit as SYSEXIT
-from copy import deepcopy
+from   sys     import exit as SYSEXIT
+from   copy    import deepcopy
+import stringFuncs as strF
 
 # функции инициализации
 def getCells_fromList(values:list, errors=False):   # errors – значение по умолчанию для всех ячеек
@@ -33,17 +34,23 @@ class Cell():
 
 # это таблица, представленная в виде словаря {столбец: {title:CellObj, cells:[CellObj,...]},...}
 class TableDict():
-    def __init__(self, tObj:Table, errors=False):  # errors – значение по умолчанию для всех ячеек
-        self.columns = {}
-        tObj = deepcopy(tObj)
-        tObj.rotate()
-        for r in range(len(tObj.data)):
-            self.columns[str(r)] = TableColumn(tObj.data[r], errors)
+    def __init__(self, tObj:Table=None, errors=False):
+        # если tObj=None, создаём пустой объект без колонок; errors – значение по умолчанию для всех ячеек
+        self.columns = {}   # основное хранилище столбцов (объектов TableColumn)
+        if tObj is not None:
+            tObj = deepcopy(tObj)
+            tObj.rotate()
+            for r in range(len(tObj.data)):
+                self.columns[str(r)] = TableColumn(tObj.data[r], errors, initPos=r)
+    def searchTitle(self, title:str, fullText=True, lower=True):
+        for key, column in self.columns.items():
+            if strF.findSub(column.title.value, title, 'bool', fullText, lower): return key
 class TableColumn():
-    def __init__(self, values:list, errors=False, title:str=None):
-        if title == None: title = values.pop(0) # pop удаляет элемент 0 и возвращает его
-        self.title = Cell             (title,  errors)
-        self.cells = getCells_fromList(values, errors)
+    def __init__(self, values:list, errors=False, title:str=None, initPos:int=None):
+        if title is None:          title = values.pop(0)    # pop удаляет элемент 0 и возвращает его
+        self.title   = Cell             (title,  errors)
+        self.cells   = getCells_fromList(values, errors)
+        self.initPos = initPos
 
 # защита от запуска модуля
 if __name__ == '__main__':
