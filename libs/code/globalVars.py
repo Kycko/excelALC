@@ -1,5 +1,6 @@
-from sys     import exit as SYSEXIT
-from excelRW import exBooks
+from sys          import exit as SYSEXIT
+from excelRW      import exBooks
+from userSettings import userCfg
 
 # базовые переменные приложения
 app = {'version': 'v.016',
@@ -26,7 +27,7 @@ launchTypes  = {'allChecks'  : {'fullRange': True, 'toTD': True},
                 'checkTitles': {'fullRange': True, 'toTD': True}}
 
 # прочее
-# config  = userCfg(files['config'])
+config  = userCfg(files['config'])
 exBooks = exBooks()
 
 # защита от запуска модуля

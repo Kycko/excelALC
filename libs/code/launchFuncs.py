@@ -22,7 +22,7 @@ class launchScript():
             self.unkTD = TableDict(self.file.table)
             self.init_curTD()
         else: self.table = CellTable(self.file.table.data)
-    def searchTitleRow(self, table:list):   # values – таблица[[]]
+    def searchTitleRow(self, table:list):   # table – таблица[[]]
         for r in range(len(table)):
             if strF.findSubList(table[r][0], ('Уникальных: ', 'Ошибок: ')) != 0: return r
         return 0
@@ -37,7 +37,7 @@ class launchScript():
                 keys.append((unkKey, libKey))
 
         for item in keys: self.move_fromUnkTD_toCurTD(item[0], item[1])
-    def move_fromUnkTD_toCurTD(self, unkKey, curKey):
+    def move_fromUnkTD_toCurTD(self, unkKey:str, curKey:str):
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
 # защита от запуска модуля
