@@ -71,12 +71,17 @@ class Window(TBS.Window):
 # фреймы основного окна (FR=frame)
 class FRleft(FRtemplate):
     def build(self):
-        self.FRfile    = FRfile   (self.app, self)
-        self.FRactions = FRactions(self.app, self)
-        self.FRbottom  = FRbottom (self.app, self)
-        self.FRfile   .pack(fill='x', pady=2)
-        self.FRactions.pack(fill='x', padx=10, pady=2)
-        self.FRbottom .pack(fill='x', side='bottom', pady=5)
+        self.FRfile    = FRfile      (self.app, self)
+        tabs           = TBS.Notebook(self)
+        downFrame      = FRbottom    (self.app, self)
+        self.FRfile   .pack          (fill='x', pady=2)
+        tabs          .pack          (fill='x', padx=7,        pady=2)
+        downFrame     .pack          (fill='x', side='bottom', pady=5)
+
+        for type in ('main', 'script'):
+            frTab = FRactions(self.app, tabs, type)
+            frTab.pack       (fill='x')
+            tabs.add(frTab, text=S.layout['main']['tabs'][type], padding=7)
 class FRfile(FRtemplate):
     def __init__(self, app, master):
         super().__init__(app, master)
@@ -105,11 +110,15 @@ class FRfile(FRtemplate):
         if hasattr(self.app, 'FRright') and self.app.FRright.winfo_exists():
             self.app.FRright.setBtnState()
 class FRactions(FRtemplate):
+    def __init__(self, app, master, type:str):
+        self.type = type
+        super().__init__(app, master)
     def build(self):
         for key, val in S.layout['actions'].items():
             bootstyle = 'primary'
             if   key == 'allChecks': bootstyle = 'success'
-            Btemplate(self, text=val['btn'], width=45, command=lambda k=key:self.app.actionClicked(k), bootstyle=bootstyle).pack(pady=5)
+            if val['type'] == self.type:
+                Btemplate(self, text=val['btn'], width=45, command=lambda k=key:self.app.actionClicked(k), bootstyle=bootstyle).pack(pady=5)
 class FRbottom(FRtemplate):
     def build(self):
         self.FRtheme = FRtheme  (self.app, self)
