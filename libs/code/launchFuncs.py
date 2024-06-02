@@ -7,7 +7,7 @@ import stringFuncs    as strF
 
 class launchScript():
     # инициализация
-    def __init__(self, book, type:str, log, errors):
+    def __init__(self, book, type:str, log, errors):    # здесь log и errors – это фреймы
         # запоминаем базовые переменные
         self.type      = type
         self.log       = log                # потом заменим на класс Log
