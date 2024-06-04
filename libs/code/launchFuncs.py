@@ -15,7 +15,8 @@ class launchScript():
         self.fullRange = LT[type]['fullRange']
         self.toTD      = LT[type]['toTD']   # будем работать с TableDict (true) или же с CellTable (false)
 
-        # создаём объекты для последующей обработки
+        self.getData(book)  # получаем данные
+    def getData(self, book):
         self.file     = Excel(book, self.fullRange)
         self.file.table.cutUp(self.searchTitleRow(self.file.table.data))
         if self.toTD:
