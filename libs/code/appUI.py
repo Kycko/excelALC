@@ -63,8 +63,8 @@ class Window(TBS.Window):
     def buildRunUI(self):
         self.FRleft .destroy()
         self.FRright.destroy()
-        self.FRlog    = FRlog   (self, self.FRroot, S.layout['actions'][self.FRright.type]['lfl'])
-        self.FRerrors = FRerrors(self, self.FRroot, S.layout['run']    ['lflErrors'])
+        self.FRlog    = FRlog   (self, self.FRroot, S.layout['run']['log'])
+        self.FRerrors = FRerrors(self, self.FRroot, S.layout['run']['errors'])
         self.FRlog   .pack      (fill='both', expand=True, side='left' , padx=5)
         self.FRerrors.pack      (fill='both', expand=True, side='right', padx=5)
 
@@ -140,9 +140,11 @@ class FRtheme(FRtemplate):
         cb.pack(expand=True)
 class FRright(LFRtemplate):
     def build(self):
+        descr           = TBS.Label   (self,     text=S.layout['actions'][self.type]['descr'], wraplength=320)
         self.FRsettings = FRactionsCfg(self.app, self)
         self.btn        = Btemplate   (self, command=lambda t=self.type:self.app.launch(t), bootstyle='success')
-        self.FRsettings.pack(fill='x', padx=8,  pady=9)
+        descr          .pack(fill='x', padx=8,  pady=5)
+        self.FRsettings.pack(fill='x', padx=8)
         self.btn       .pack(fill='x', padx=22, pady=12, side='bottom')
         self.setBtnState()
     def setBtnState(self):
@@ -152,7 +154,7 @@ class FRactionsCfg(FRtemplate):
     def build(self):
         for group in ('forAll', self.master.type):  # self.master.type = например, 'checkTitles'
             if group in S.layout['actionsCfg'].keys():
-                if group != 'forAll': TBS.Separator(self).pack(fill='x', padx=2, pady=6)    # разделитель только после 1-й группы
+                TBS .Separator (self ).pack(fill='x', padx=2, pady=6)
                 self.buildGroup(group)
     def buildGroup(self, group:str):
         for type, strings in S.layout['actionsCfg'][group].items():
