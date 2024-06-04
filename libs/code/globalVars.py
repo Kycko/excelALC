@@ -5,7 +5,7 @@ from userSettings import userCfg
 # базовые переменные приложения
 app = {'version': 'v.016',
        'title'  : 'excelALC',
-       'themes' : ('minty', 'superhero'),               # светлая и тёмная темы
+       'themes' : ('flatly', 'superhero'),              # светлая и тёмная темы
        'size'   : (700, 470)}                           # при необходимости добавим в другой переменной размеры диалоговых окон
 app   ['TV']    = app['title'] + ' ' + app['version']   # название главного окна
 

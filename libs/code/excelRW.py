@@ -9,12 +9,12 @@ class exBooks():    # Excel books
     def update(self):
         self.books     = []
         self.bookNames = []
-        if xw.apps.count and xw.books.count:
+
+        try:
+            self.cur  = xw.books.active.name
             for book in xw.books:
                 self.books    .append(book)
                 self.bookNames.append(book.name)
-
-        try:    self.cur = xw.books.active.name
         except: self.cur = ''
     def getFile(self, file:str):
         self.update()
