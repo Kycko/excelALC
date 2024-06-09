@@ -5,13 +5,14 @@ from   tables     import CellTable, TableDict
 import libClasses     as lib
 import stringFuncs    as strF
 
+# основной класс, запуск проверок
 class launchScript():
     # инициализация
     def __init__(self, book, type:str, log, errors):    # здесь log и errors – это фреймы
         # запоминаем базовые переменные
         self.type      = type
-        self.log       = log                # потом заменим на класс Log
-        self.errors    = errors             # потом заменим на класс Errors
+        self.log       = Log   (log)
+        self.errors    = Errors(errors)
         self.fullRange = LT[type]['fullRange']
         self.toTD      = LT[type]['toTD']   # будем работать с TableDict (true) или же с CellTable (false)
 
@@ -40,6 +41,17 @@ class launchScript():
         for item in keys: self.move_fromUnkTD_toCurTD(item[0], item[1])
     def move_fromUnkTD_toCurTD(self, unkKey:str, curKey:str):
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
+
+# журнал и ошибки
+class Log():    # общие функции классов Log() и Errors()
+    def __init__(self, UI): # здесь UI = FRlog/FRerrors (фреймы)
+        self.log = []
+        self.UI  = UI
+    def add(self):
+        pass
+class Errors(Log):
+    def suggest(self):
+        pass
 
 # защита от запуска модуля
 if __name__ == '__main__':

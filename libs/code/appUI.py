@@ -168,17 +168,15 @@ class FRactionsCfg(FRtemplate):
             cb.pack(padx=5, pady=5, expand=True, anchor='w')
 
 # фреймы выполнения скриптов
-class FRlog(LFRtemplate):
+class FRlog(LFRtemplate):   # общие функции FRlog и FRerrors
     def build(self):
         self.frame = TBS.Frame(self)
         self.frame.pack(fill='both', expand=True, padx=5, pady=5)
-        self.log = []
     def add(self):
         pass
-class FRerrors(LFRtemplate):
-    def build(self):
-        self.frame = TBS.Frame(self)
-        self.frame.pack(fill='both', expand=True, padx=5, pady=5)
+class FRerrors(FRlog):
+    def suggest(self):
+        pass
 
 # защита от запуска модуля
 if __name__ == '__main__':
