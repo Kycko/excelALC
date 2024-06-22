@@ -52,6 +52,10 @@ class TableColumn():
         self.cells   = getCells_fromList(values, errors)
         self.initPos = initPos
 
+        # для вывода в шапке таблицы
+        self.unique  = None
+        self.errors  = len(values) if errors else 0
+
 # защита от запуска модуля
 if __name__ == '__main__':
     print  ("This is module, please don't execute.")
