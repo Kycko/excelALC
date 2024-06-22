@@ -55,6 +55,13 @@ layout = {
     }
 layout['actionsCfg']['allChecks'] = layout['actionsCfg']['checkTitles']
 
+# записи в журнале
+log = {'readFile': 'Прочитана таблица: %1, 1 заголовок + %2.'}  # %1 – столбцы, %2 – строки
+
+# словарь разных окончаний слов
+words_byCount = {'столбцы': {'1':'столбец', '2-4':'столбца', 'many':'столбцов'},
+                 'строки' : {'1':'строка' , '2-4':'строки' , 'many':'строк'   }}
+
 # защита от запуска модуля
 if __name__ == '__main__':
     print  ("This is module, please don't execute.")

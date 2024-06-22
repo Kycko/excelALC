@@ -1,13 +1,13 @@
 from   sys        import exit        as SYSEXIT
+from   strings    import log         as sLog
 from   globalVars import launchTypes as LT
 from   excelRW    import Excel
 from   tables     import CellTable, TableDict
-import libClasses     as lib
 import stringFuncs    as strF
+import libClasses     as lib
 
 # основной класс, запуск проверок
 class launchScript():
-    # инициализация
     def __init__(self, book, type:str, log, errors):    # здесь log и errors – это фреймы
         # запоминаем базовые переменные
         self.type      = type
@@ -20,6 +20,7 @@ class launchScript():
     def getData(self, book):
         self.file     = Excel(book, self.fullRange)
         self.file.table.cutUp(self.searchTitleRow(self.file.table.data))
+        self.log       .add  ('readFile',         self.file.table.data)
         if self.toTD:
             self.unkTD = TableDict(self.file.table)
             self.init_curTD()
@@ -47,8 +48,19 @@ class Log():    # общие функции классов Log() и Errors()
     def __init__(self, UI): # здесь UI = FRlog/FRerrors (фреймы)
         self.log = []
         self.UI  = UI
-    def add(self):
-        pass
+    def add(self, type:str, params=None):
+        # в params можно передать любые объекты, необходимые для получения доп. данных
+        new = self.getType(type, params)
+        self. log .append (new)
+    def getType(self, type:str, params=None):
+        # для Errors() сделать отдельную функцию
+        final     = sLog[type]
+        if  type == 'readFile':
+            rows  = len(params) - 1  # считаем без заголовка
+            cols  = len(params[0])
+            final = final.replace('%1', str(cols)+' '+strF.getEnding_forCount('столбцы', cols))
+            final = final.replace('%2', str(rows)+' '+strF.getEnding_forCount('строки' , rows))
+        return final
 class Errors(Log):
     def suggest(self):
         pass
