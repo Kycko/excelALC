@@ -6,9 +6,9 @@ def getEnding_forCount(words:dict, count:int):
     # примеры words есть в words_byCount (модуль strings)
     ten   = count % 10  # остаток деления
     hundr = count % 100 # остаток деления
-    if   ten >  4 or hundr in (11, 12, 13): return words['many']
-    elif ten == 1:                          return words['1']
-    else:                                   return words['2-4']
+    if   ten == 0 or ten > 4 or hundr in (11, 12, 13): return words['many']
+    elif ten == 1:                                     return words['1']
+    else:                                              return words['2-4']
 
 # поиск
 def findSubList(string:str, list:list, type='index', fullText=False, lower=True):

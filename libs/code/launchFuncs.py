@@ -1,20 +1,21 @@
-from   sys        import exit        as SYSEXIT
-from   globalVars import launchTypes as LT
-from   excelRW    import Excel
-from   tables     import CellTable, TableDict
-import strings        as S
-import stringFuncs    as strF
-import libClasses     as lib
+from   sys         import exit as SYSEXIT
+from   excelRW     import Excel
+from   tables      import CellTable, TableDict
+from   globalFuncs import write_toFile
+import globalVars      as G
+import strings         as S
+import stringFuncs     as strF
+import libClasses      as lib
 
 # основной класс, запуск проверок
 class launchScript():
     def __init__(self, book, type:str, log, errors):    # здесь log и errors – это фреймы
         # запоминаем базовые переменные
         self.type      = type
-        self.log       = Log   (log)
-        self.errors    = Errors(errors)
-        self.fullRange = LT[type]['fullRange']
-        self.toTD      = LT[type]['toTD']   # будем работать с TableDict (true) или же с CellTable (false)
+        self.log       = Log   (log   , 'log')
+        self.errors    = Errors(errors, 'errors')
+        self.fullRange = G.launchTypes[type]['fullRange']
+        self.toTD      = G.launchTypes[type]['toTD']    # будем работать с TableDict (true) или же с CellTable (false)
 
         self.getData(book)  # получаем данные
     def getData(self, book):
@@ -45,14 +46,18 @@ class launchScript():
 
 # журнал и ошибки
 class Log():    # общие функции классов Log() и Errors()
-    def __init__(self, UI): # здесь UI = FRlog/FRerrors (фреймы)
-        # self.log = [] # удалить? Вроде не нужно
-        self.UI  = UI
+    # основные
+    def __init__(self, UI, type:str):   # здесь UI = FRlog/FRerrors (фреймы)
+        self.log  = []
+        self.UI   = UI
+        self.file = G.files[type]
+        write_toFile([], self.file)
     def add(self, type:str, params=None):
         # в params можно передать любые объекты, необходимые для получения доп. данных
         new = self.getType(type, params)
+        self .log .append (new)
+        write_toFile      (new, self.file, True)
         self .UI  .add    (new)
-        # self .log .append (new)   # удалить? Вроде не нужно
     def getType(self, type:str, params=None):
         # для Errors() сделать отдельную функцию
         final     = S.log[type]

@@ -2,10 +2,16 @@ from sys import exit as SYSEXIT
 
 # глобальные
 def readFile(file:str):
-    with   open(file, 'r') as f: list = [line.strip() for line in f]
+    with   open(file, 'r', encoding='utf-8') as f: list = [line.strip() for line in f]
     return list
-def write_toFile(list:list, file:str):
-    with open(file, 'w') as f:
+def write_toFile(list:list, file:str, justAdd=False):
+    # если justAdd=True, предыдущие данные останутся в файле
+    if justAdd:
+        mode = 'a'
+        list = [list]
+    else: mode = 'w'
+
+    with open(file, mode, encoding='utf-8') as f:
         for line in list: f.write(f"{line}\n")
 def get_initSettings(): return {'main': {'darkTheme': checkWinTheme()}} # светлая/тёмная тема приложения
 def getIB(type:str, index:int): # IB = index/boolean
