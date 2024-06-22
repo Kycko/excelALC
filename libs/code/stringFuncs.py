@@ -1,15 +1,14 @@
 from sys         import exit as SYSEXIT
 from globalFuncs import getIB
-from strings     import words_byCount
 
 # получение правильного окончания в зависимости от количества
-def getEnding_forCount(word:str, count:int):
+def getEnding_forCount(words:dict, count:int):
+    # примеры words есть в words_byCount (модуль strings)
     ten   = count % 10  # остаток деления
     hundr = count % 100 # остаток деления
-    if   ten >  4 or hundr in (11, 12, 13): key = 'many'
-    elif ten == 1:                          key = '1'
-    else:                                   key = '2-4'
-    return words_byCount[word][key]
+    if   ten >  4 or hundr in (11, 12, 13): return words['many']
+    elif ten == 1:                          return words['1']
+    else:                                   return words['2-4']
 
 # поиск
 def findSubList(string:str, list:list, type='index', fullText=False, lower=True):

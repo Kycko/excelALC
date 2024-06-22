@@ -1,8 +1,8 @@
 from   sys        import exit        as SYSEXIT
-from   strings    import log         as sLog
 from   globalVars import launchTypes as LT
 from   excelRW    import Excel
 from   tables     import CellTable, TableDict
+import strings        as S
 import stringFuncs    as strF
 import libClasses     as lib
 
@@ -46,20 +46,21 @@ class launchScript():
 # журнал и ошибки
 class Log():    # общие функции классов Log() и Errors()
     def __init__(self, UI): # здесь UI = FRlog/FRerrors (фреймы)
-        self.log = []
+        # self.log = [] # удалить? Вроде не нужно
         self.UI  = UI
     def add(self, type:str, params=None):
         # в params можно передать любые объекты, необходимые для получения доп. данных
         new = self.getType(type, params)
-        self. log .append (new)
+        self .UI  .add    (new)
+        # self .log .append (new)   # удалить? Вроде не нужно
     def getType(self, type:str, params=None):
         # для Errors() сделать отдельную функцию
-        final     = sLog[type]
+        final     = S.log[type]
         if  type == 'readFile':
             rows  = len(params) - 1  # считаем без заголовка
             cols  = len(params[0])
-            final = final.replace('%1', str(cols)+' '+strF.getEnding_forCount('столбцы', cols))
-            final = final.replace('%2', str(rows)+' '+strF.getEnding_forCount('строки' , rows))
+            final = final.replace('%1', str(cols)+' '+strF.getEnding_forCount(S.words_byCount['столбцы'], cols))
+            final = final.replace('%2', str(rows)+' '+strF.getEnding_forCount(S.words_byCount['строки' ], rows))
         return final
 class Errors(Log):
     def suggest(self):
