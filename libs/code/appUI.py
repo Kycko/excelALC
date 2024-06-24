@@ -19,10 +19,10 @@ class FRtemplate(TBS.Frame):
         super().__init__(master)
         self.build()
 class LFRtemplate(TBS.Labelframe):
-    def __init__(self, app, master, text:str, type:str=None, width:int=None):
+    def __init__(self, app, master, text:str, type:str=None):
         self.app  = app     # для вызова функций основного окна
         self.type = type
-        super().__init__(master, text=text, width=width)
+        super().__init__(master, text=text)
         self.build()
 
 # окно программы
@@ -63,10 +63,10 @@ class Window(TBS.Window):
     def buildRunUI(self):
         self.FRleft .destroy()
         self.FRright.destroy()
-        self.FRlog    = FRlog   (self, self.FRroot, S.layout['run']['log'], width=350)
+        self.FRlog    = FRlog   (self, self.FRroot, S.layout['run']['log'])
         self.FRerrors = FRerrors(self, self.FRroot, S.layout['run']['errors'])
-        self.FRlog   .pack      (fill='both',              side='left' , padx=6)
-        self.FRerrors.pack      (fill='both', expand=True, side='right', padx=6)
+        self.FRlog   .pack      (fill='both', expand=True, side='left' , padx=5)
+        self.FRerrors.pack      (fill='both', expand=True, side='right', padx=5)
 
 # фреймы основного окна (FR=frame)
 class FRleft(FRtemplate):

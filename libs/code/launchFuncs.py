@@ -18,10 +18,15 @@ class launchScript():
         self.toTD      = G.launchTypes[type]['toTD']    # будем работать с TableDict (true) или же с CellTable (false)
 
         self.getData(book)  # получаем данные
+        if type[:5] == 'check' and type != 'checkTitles': self.launch()      # основной алгоритм проверки
+    def launch(self):
+        pass
+
     def getData(self, book):
         self.file     = Excel(book, self.fullRange)
         self.file.table.cutUp(self.searchTitleRow(self.file.table.data))
-        self.log       .add  ('readFile',         self.file.table.data)
+        self.log .add('readFile', {'table':self.file.table.data, 'range':self.fullRange})
+
         if self.toTD:
             self.unkTD = TableDict(self.file.table)
             self.init_curTD()
@@ -60,10 +65,10 @@ class Log():    # общие функции классов Log() и Errors()
         self .UI  .add    (new)
     def getType(self, type:str, params=None):
         # для Errors() сделать отдельную функцию
-        final     = S.log[type]
+        final     = S.log[type]['full' if params['range'] else 'range']
         if  type == 'readFile':
-            rows  = len(params) - 1  # считаем без заголовка
-            cols  = len(params[0])
+            rows  = len(params['table']) - 1*(params['range'])   # считаем без заголовка
+            cols  = len(params['table'][0])
             final = final.replace('%1', str(cols)+' '+strF.getEnding_forCount(S.words_byCount['столбцы'], cols))
             final = final.replace('%2', str(rows)+' '+strF.getEnding_forCount(S.words_byCount['строки' ], rows))
         return final
