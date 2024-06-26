@@ -37,6 +37,79 @@ colValues = {'city'            : ['Регион и город'                  
              'leadOwner'       : ['Ответственный'                        , 'leadOwner'       , True ,  1         ,  0        ,  False        ],
              'leadAvail'       : ['Доступен для всех'                    , 'leadAvail'       , True ,  1         ,  0        ,  False        ]}
 
+# автоисправления и предложения по исправлению {тип_поля:{что:на_что, ...}, ...}
+# в autocorr замена происходит только при полном совпадении (с lowercase())
+autocorr = {
+    'cat'  : {'Goods.Animals'               : 'Животные',
+              'Goods.AudioVideo'            : 'Аудио и видео',
+              'Goods.Business'              : 'Готовый бизнес и оборудование',
+              'Goods.CommtransSpareParts'   : 'Запчасти для прочего транспорта',
+              'Goods.Construction'          : 'Ремонт и строительство',
+              'Goods.ConstructionRenovation': 'Ремонт и строительство',
+              'Goods.DomesticAppliances'    : 'Бытовая техника',
+              'Goods.Electronics'           : 'Бытовая электроника',
+              'Goods.Fashion'               : 'Одежда, обувь, аксессуары',
+              'Goods.Food'                  : 'Продукты питания',
+              'Goods.Furniture'             : 'Мебель и интерьер',
+              'Goods.GoodsForBusiness'      : 'Оборудование для бизнеса',
+              'Goods.GoodsForChildren'      : 'Товары для детей и игрушки',
+              'Goods.GoodsForPets'          : 'Товары для животных',
+              'Goods.HealthAndBeauty'       : 'Красота и здоровье',
+              'Goods.Hobby'                 : 'Хобби и отдых',
+              'Goods.HomeAndGarden'         : 'Для дома и дачи',
+              'Goods.InformationTechnology' : 'Товары для компьютера',
+              'Goods.LifeStyle'             : 'Личные вещи',
+              'Goods.Smartphones'           : 'Телефоны',
+              'Goods.SpareParts'            : 'Запчасти и аксессуары',
+              'Goods.SparePartsServices'    : 'Автосервис',
+              'Goods.Sports'                : 'Спорт и отдых',
+              'Goods.Telecom'               : 'Бытовая электроника',
+              'Goods.TiresAndWheels'        : 'Шины, диски и колёса',
+              'Goods.Undefined'             : 'Личные вещи',
+              'Animals'                     : 'Животные',
+              'AudioVideo'                  : 'Аудио и видео',
+              'Business'                    : 'Готовый бизнес и оборудование',
+              'CommtransSpareParts'         : 'Запчасти для прочего транспорта',
+              'Construction'                : 'Ремонт и строительство',
+              'ConstructionRenovation'      : 'Ремонт и строительство',
+              'DomesticAppliances'          : 'Бытовая техника',
+              'Electronics'                 : 'Бытовая электроника',
+              'Fashion'                     : 'Одежда, обувь, аксессуары',
+              'Food'                        : 'Продукты питания',
+              'Furniture'                   : 'Мебель и интерьер',
+              'GoodsForBusiness'            : 'Оборудование для бизнеса',
+              'GoodsForChildren'            : 'Товары для детей и игрушки',
+              'GoodsForPets'                : 'Товары для животных',
+              'HealthAndBeauty'             : 'Красота и здоровье',
+              'Hobby'                       : 'Хобби и отдых',
+              'HomeAndGarden'               : 'Для дома и дачи',
+              'InformationTechnology'       : 'Товары для компьютера',
+              'LifeStyle'                   : 'Личные вещи',
+              'Smartphones'                 : 'Телефоны',
+              'SpareParts'                  : 'Запчасти и аксессуары',
+              'SparePartsServices'          : 'Автосервис',
+              'Sports'                      : 'Спорт и отдых',
+              'Telecom'                     : 'Бытовая электроника',
+              'TiresAndWheels'              : 'Шины, диски и колёса',
+              'Undefined'                   : 'Личные вещи'},
+    'city' : {'Орёл'     : 'Орел',
+              'Undefined': 'Другие регионы России',
+              'Минск'    : 'Другие регионы России',
+              'Пинск'    : 'Другие регионы России'},
+    'phone': {''         : '79999999999',
+              'None'     : '79999999999'},
+    'title': {'category' : 'Категория',
+              'city'     : 'Регион и город',
+              'проект'   : 'Наименование проекта'}
+    }
+# sugg показываются, если ЧАСТЬ строки равна (с lowercase()) ключу из этого словаря
+sugg = {
+    'title': {'ID'           : ('Авито-аккаунт'   , 'ID TAM'),
+              'mail'         : ('Рабочий e-mail'  , 'Частный e-mail'),
+              'name'         : ('Имя', 'Фамилия'  , 'Название компании'),
+              'phone'        : ('Основной телефон', 'Другой телефон', 'Добавочный телефон')}
+    }
+
 # защита от запуска модуля
 if __name__ == '__main__':
     print  ("This is module, please don't execute.")

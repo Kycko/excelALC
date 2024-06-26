@@ -10,18 +10,33 @@ import libClasses      as lib
 # основной класс, запуск проверок
 class launchScript():
     def __init__(self, book, type:str, log, errors):    # здесь log и errors – это фреймы
+        params = G.launchTypes[type]
+
         # запоминаем базовые переменные
-        self.type      = type
-        self.log       = Log   (log   , 'log')
-        self.errors    = Errors(errors, 'errors')
-        self.fullRange = G.launchTypes[type]['fullRange']
-        self.toTD      = G.launchTypes[type]['toTD']    # будем работать с TableDict (true) или же с CellTable (false)
+        self.type       = type
+        self.log        = Log   (log   , 'log')
+        self.errors     = Errors(errors, 'errors')
+        self.fullRange  = params['fullRange']
+        self.toTD       = params['toTD'] # будем работать с TableDict (true) или же с CellTable (false)
+        if params['getSuggParam']: self.justVerify = not G.config.get(type + ':suggestErrors')
 
         self.getData(book)  # получаем данные
-        if type[:5] == 'check' and type != 'checkTitles': self.launch()      # основной алгоритм проверки
-    def launch(self):
-        pass
+        if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data)   # проверяем выделенный диапазон
 
+    # основные алгоритмы проверки
+    def rangeChecker(self, table):
+        # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
+        # т. е. table – это всегда [[Cell, ...], ...]
+        errors = {} # {'initValue':ErrorObj, ...}
+
+        # autocorr и поиск всех ошибок
+        for r in range(len(table)):
+            for c in range(len(table[r])):
+                cell    = table[r][c]
+                tempVal = cell.value
+                if not self.justVerify: tempVal = прописываем autocorr
+
+    # чтение данных из таблицы
     def getData(self, book):
         self.file     = Excel(book, self.fullRange)
         self.file.table.cutUp(self.searchTitleRow(self.file.table.data))
@@ -75,6 +90,12 @@ class Log():    # общие функции классов Log() и Errors()
 class Errors(Log):
     def suggest(self):
         pass
+class ErrorObj():
+    def __init__(self, initValue:str):
+        self.initVal = initValue
+        self.newVal  = None
+        self.fixed   = False
+        self.pos     = []   # список всех позиций этой ошибки в диапазоне проверки [{'r':row, 'c':col}, ...]
 
 # защита от запуска модуля
 if __name__ == '__main__':

@@ -24,7 +24,7 @@ class Table(TableTemplate):             # общий класс, можно ко
         self.data = values
 class CellTable(TableTemplate):
     # общий класс, ВОЗМОЖНО подойдёт для других программ
-    # это таблица, в которой каждая ячейка – это словарь [[{value:'', error:true/false}, ...], ...]
+    # это таблица, в которой каждая ячейка – это объект Cell [[CellObj, ...], ...]
     def __init__(self, table:list, errors=False):  # table – таблица[[]], errors – значение по умолчанию для всех ячеек
         self.data = [getCells_fromList(row, errors) for row in table]
 class Cell():

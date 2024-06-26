@@ -23,9 +23,11 @@ pics    = {'filesUpdate'  : picsDir      + 'filesUpdate.png',   # нельзя �
                                        'padx': 0}}}
 
 # параметры по типам скриптов
-launchTypes  = {'allChecks'  : {'fullRange': True,  'toTD': True},
-                'checkTitles': {'fullRange': True,  'toTD': True},
-                'checkEmails': {'fullRange': False, 'toTD': False}}
+# getSuggParam = надо ли прочитать из userCfg настройку suggestErrors
+# ACtype (нужен не везде) = тип проверки для autocorr & suggest
+launchTypes  = {'allChecks'  : {'fullRange':True,  'toTD':True , 'launch':'allChecks'   , 'getSuggParam':True},
+                'checkTitles': {'fullRange':True,  'toTD':True , 'launch':'checkTitles' , 'getSuggParam':True, 'ACtype':'title'},
+                'checkEmails': {'fullRange':False, 'toTD':False, 'launch':'rangeChecker', 'getSuggParam':True, 'ACtype':'mail'}}
 
 # прочее
 config  = userCfg(files['config'])
