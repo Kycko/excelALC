@@ -21,10 +21,10 @@ class launchScript():
         if params['getSuggParam']: self.justVerify = not G.config.get(type + ':suggestErrors')
 
         self.getData(book)  # получаем данные
-        if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data)   # проверяем выделенный диапазон
+        if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data, params['AStype']) # проверяем выделенный диапазон
 
     # основные алгоритмы проверки
-    def rangeChecker(self, table):
+    def rangeChecker(self, table, type):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell, ...], ...]
         errors = {} # {'initValue':ErrorObj, ...}
@@ -34,7 +34,18 @@ class launchScript():
             for c in range(len(table[r])):
                 cell    = table[r][c]
                 tempVal = cell.value
-                if not self.justVerify: tempVal = прописываем autocorr
+                if not self.justVerify: tempVal = self.autocorr(type, tempVal)
+
+                VAL = self.validate_andCapitalize(type, tempVal)  # ДАЛЕЕ ПИШЕМ ЭТУ ФУНКЦИЮ
+
+    # работа с ошибками
+    def autocorr(self, type:str, value:str):
+        if  type == 'region':
+            # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
+            AC = lib.autocorr.get(type,value)
+            if AC['fixed']: return AC['value']
+            #else:           value = STR_autocorrCity(value)   ДОПИСАТЬ
+        return lib.autocorr.get(type,value)['value']
 
     # чтение данных из таблицы
     def getData(self, book):

@@ -1,7 +1,8 @@
 from   sys import exit as SYSEXIT
 import libData         as D
-import stringFuncs     as strF
-# во всех библиотеках основное хранилище – self.data {}
+import listFuncs       as listF
+import stringFuncs     as  strF
+# во всех библиотеках основное хранилище – self.data{}
 
 # общие функции
 def readDictTable(keys:list, values:dict):  # например, для чтения libColumns
@@ -11,16 +12,31 @@ def readDictTable(keys:list, values:dict):  # например, для чтен�
         for i in range(len(keys)): final[column][keys[i]] = params[i]
     return final
 
+# шаблоны классов
+class AStemplate(): # autocorr & sugg
+    def __init__(self, libData:dict):
+        self.data = libData
+
 # классы
 class libColumns():
     def __init__(self):
         self.data = readDictTable(D.colKeys, D.colValues)
-    def getKey_byTitle(self, title:str, fullText=False, lower=False):   # возвращает, например, ключ 'city' по заголовку 'Регион и город'
+    def getKey_byTitle(self, title:str, fullText=False, lower=False):   # возвращает, например, ключ 'region' по заголовку 'Регион и город'
         for key, params in self.data.items():
             if strF.findSub(params['title'], title, 'bool', fullText, lower): return key
+class libAutocorr(AStemplate):
+    def get(self, type:str, value:str):
+        if type in self.data.keys():
+            key = listF.searchStr(self.data[type].keys(), value)
+            if key is not None: return {'fixed':True,  'value':self.data[type][key]}
+        return                         {'fixed':False, 'value':value}
+class libSugg(AStemplate):
+    pass
 
 # аналог глобальных переменных для чтения всех библиотек
-columns = libColumns()
+columns  = libColumns ()
+autocorr = libAutocorr(D.autocorr)
+sugg     = libSugg    (D.sugg)
 
 # защита от запуска модуля
 if __name__ == '__main__':
