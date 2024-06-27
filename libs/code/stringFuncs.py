@@ -1,6 +1,7 @@
-from sys         import exit as SYSEXIT
-from globalFuncs import getIB
-from globalVars  import allHyphens, ruSymbols
+from   sys         import exit as SYSEXIT
+from   globalFuncs import getIB
+import globalVars  as G
+import listFuncs   as listF
 
 # получение правильного окончания в зависимости от количества
 def getEnding_forCount(words:dict, count:int):
@@ -12,6 +13,21 @@ def getEnding_forCount(words:dict, count:int):
     else:                                               return words['2-4']
 
 # проверка и исправление данных
+def autocorrCell(type:str, value:str):
+    if type == 'mail': return ACmail(value)
+def ACmail(value:str):
+    value = value.lower()
+    RPL   = {'from': ('​','–','—','|',';','; ',', ',',,'),  # RPL = replace
+                'to'  : ('','-','-',',',',',',' ,',' ,',' )}
+    for i in range(len(RPL['from'])): value = value.replace(RPL['from'],RPL['to'])
+
+    list = value.split(',')
+    for i in range(len(list)):
+        parts = list[i].split('@')
+        if 'gmail' in parts[-1]: parts[-1] = 'gmail.com'
+        list[i] = '@'.join(parts)
+
+    return ','.join(listF.rmDoublesStr(list))
 def validateCell(type:str, value:str):
     if type in ('phone', 'mail', 'website'):
         # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ НЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
@@ -26,22 +42,22 @@ def checkPhone(phone:str):
     if phone[1]   in '67': return False # казахские номера
     return True
 def checkMail(mail:str):
-    if mail             == ''     : return True
-    if mail .count('@') != 1      : return False
-    if findSubList(mail,ruSymbols): return False
+    if mail             == ''       : return True
+    if mail .count('@') != 1        : return False
+    if findSubList(mail,G.ruSymbols): return False
 
     name, domain = mail.split('@')
-    if not     '.' in      domain: return False
-    if        '..' in      domain: return False
-    if domain[-2:] in ('.c','.r'): return False # аналог endswith()
-    if name        in  allHyphens: return False
-    if findSubList(mail, ('​',':','|','/','’',' ','<','>','[',']','.@','@.','@-.'), 'bool', False, False): return False # первый символ – пробел нулевой ширины
+    if not     '.' in       domain: return False
+    if        '..' in       domain: return False
+    if domain[-2:] in  ('.c','.r'): return False # аналог endswith()
+    if name        in G.allHyphens: return False
+    if findSubList(mail, (':','|','/','’',' ','<','>','[',']','.@','@.','@-.'), 'bool', False, False): return False
     return True
 def checkWebsite(site:str):
     if site       ==   '': return True
     if not    '.' in site: return False
     if site.endswith('/'): return False
-    if findSubList(site, ('​',' ','@','|'),   'bool', False, False)     : return False  # первый символ – пробел нулевой ширины
+    if findSubList(site, (' ','@','|'),   'bool', False, False)     : return False
     if findSubList(site, ('http://', 'https://', 'www.'), 'index') == 0: return False
     return True
 

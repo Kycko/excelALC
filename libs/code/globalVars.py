@@ -30,8 +30,8 @@ launchTypes = {'allChecks'  : {'fullRange':True,  'toTD':True , 'launch':'allChe
                'checkPhones': {'fullRange':False, 'toTD':False, 'launch':'rangeChecker', 'getSuggParam':True, 'AStype':'phone'},
                'checkEmails': {'fullRange':False, 'toTD':False, 'launch':'rangeChecker', 'getSuggParam':True, 'AStype':'mail'}}
 # ↓ ПОТОМ СВЕРИТЬ, ЗДЕСЬ ДОЛЖНЫ БЫТЬ ВСЕ НУЖНЫЕ ТИПЫ ↓
-AStypes = {'title': {'readLib'  : True,   # список подходящих вариантов будет прочитан из библиотеки
-                     'checkList': True,   # валидация путём проверки, есть ли value в списке допустимых (extra)
+AStypes = {'title': {'readLib'  : True, # список подходящих вариантов будет прочитан из библиотеки
+                     'checkList': True, # валидация путём проверки, есть ли value в списке допустимых (extra)
                      'suggMsg'  : {'acceptBlank':False, 'gend':'neutral'}}, # для диалога с предложением исправить
            'mail' : {'readLib'  : False,
                      'checkList': False,

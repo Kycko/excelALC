@@ -34,6 +34,8 @@ class Excel():  # общий класс, можно копировать без 
         return self.sheet.used_range if self.range is None else self.range
     def read(self):
         self.table = Table(self.getRange().options(ndim=2).value)   # ndim=2 позволяет всегда получать двумерный массив
+        self.table.stringAll()
+        self.table.trimAll  ()
 
 # защита от запуска модуля
 if __name__ == '__main__':

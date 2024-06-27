@@ -22,6 +22,16 @@ class TableTemplate():
 class Table(TableTemplate):             # общий класс, можно копировать без изменений в другие программы
     def __init__(self, values:list):    # values – таблица[[]]
         self.data = values
+    def stringAll(self):
+        # конвертирует каждую ячейку таблицы в строку
+        for r in range(len(self.data)):
+            for c in range(len(self.data[r])):
+                self.data[r][c] = str(self.data[r][c])
+    def trimAll(self):
+        # делает .trim() и удаляет плохие символы (напр., мягкие пробелы)
+        for r in range(len(self.data)):
+            for c in range(len(self.data[r])):
+                self.data[r][c] = self.data[r][c].strip().replace('​','')
 class CellTable(TableTemplate):
     # общий класс, ВОЗМОЖНО подойдёт для других программ
     # это таблица, в которой каждая ячейка – это объект Cell [[CellObj, ...], ...]

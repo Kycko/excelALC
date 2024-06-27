@@ -41,7 +41,8 @@ class launchScript():
 
     # работа с ошибками
     def autocorr(self, type:str, value:str):
-        if  type == 'region':
+        value    = strF.autocorrCell(type, value)   # выполнится только для некоторых type
+        if type == 'region':
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
             if AC['fixed']: return AC['value']
@@ -55,8 +56,8 @@ class launchScript():
 
         if params['checkList']:
             found          = listF.searchStr(extra, value, 'item', True, not self.justVerify)
-            final['valid'] = found is not None
-            if not self.justVerify and final['valid']: final['value'] = found
+            final['valid'] = bool(len(found))
+            if not self.justVerify and final['valid']: final['value'] = found[0]
         else: final['valid'] = strF.validateCell(type, final['value'])
         return final
 

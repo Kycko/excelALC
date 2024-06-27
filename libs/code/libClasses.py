@@ -30,9 +30,9 @@ class libColumns():
 class libAutocorr(AStemplate):
     def get(self, type:str, value:str):
         if type in self.data.keys():
-            key = listF.searchStr(self.data[type].keys(), value)
-            if key is not None: return {'fixed':True,  'value':self.data[type][key]}
-        return                         {'fixed':False, 'value':value}
+            keys = listF.searchStr(self.data[type].keys(), value)
+            if len(keys): return {'fixed':True,  'value':self.data[type][keys[0]]}
+        return                   {'fixed':False, 'value':value}
 class libSugg(AStemplate):
     pass
 
