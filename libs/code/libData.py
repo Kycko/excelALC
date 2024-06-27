@@ -9,7 +9,7 @@ colValues = {'region'          : ['Регион и город'                  
              'coreLT'          : ['Направление клиента'                  , 'coreLT'          , False,  1         ,  0        ,  False        ],
              'microCat'        : ['Микрокатегория'                       , 'microCat'        , False,  2         ,  0        ,  False        ],
              'clientStatus'    : ['Статус клиента'                       , 'clientStatus'    , False,  2         ,  0        ,  False        ],
-             'clientSpends'    : ['Траты клиента в месяц'                , 'clientSpends'    , False,  99999     ,  0        ,  False        ],
+             'clientSpends'    : ['Траты клиента в месяц'                , 'clientSpends'    , False,  99999     ,  0        ,  False        ], # type заменить на numbers any?
              'manager'         : ['Ответственный менеджер в сделке'      , 'manager'         , False,  2         ,  0        ,  False        ],
              'leadName'        : ['Название лида'                        , 'leadName'        , True ,  1         ,  0        ,  False        ],
              'projName'        : ['Наименование проекта'                 , 'projName'        , True ,  1         ,  0        ,  False        ],

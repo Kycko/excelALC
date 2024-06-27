@@ -11,6 +11,8 @@ def readDictTable(keys:list, values:dict):  # например, для чтен�
         final[column] = {}
         for i in range(len(keys)): final[column][keys[i]] = params[i]
     return final
+def getValidationList(type:str):
+    if type == 'title': return columns.vList
 
 # шаблоны классов
 class AStemplate(): # autocorr & sugg
@@ -20,7 +22,8 @@ class AStemplate(): # autocorr & sugg
 # классы
 class libColumns():
     def __init__(self):
-        self.data = readDictTable(D.colKeys, D.colValues)
+        self.data  = readDictTable(D.colKeys, D.colValues)
+        self.vList = [params['title'] for params in self.data.values()] # vList = validation list, список допустимых значений
     def getKey_byTitle(self, title:str, fullText=False, lower=False):   # возвращает, например, ключ 'region' по заголовку 'Регион и город'
         for key, params in self.data.items():
             if strF.findSub(params['title'], title, 'bool', fullText, lower): return key

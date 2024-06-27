@@ -5,6 +5,7 @@ from   globalFuncs import write_toFile
 import globalVars      as G
 import strings         as S
 import stringFuncs     as strF
+import listFuncs       as listF
 import libClasses      as lib
 
 # основной класс, запуск проверок
@@ -36,7 +37,7 @@ class launchScript():
                 tempVal = cell.value
                 if not self.justVerify: tempVal = self.autocorr(type, tempVal)
 
-                VAL = self.validate_andCapitalize(type, tempVal)  # ДАЛЕЕ ПИШЕМ ЭТУ ФУНКЦИЮ
+                VAL = self.validate_andCapitalize(type, tempVal)  # ДАЛЕЕ ПИШЕМ ЗДЕСЬ
 
     # работа с ошибками
     def autocorr(self, type:str, value:str):
@@ -46,6 +47,18 @@ class launchScript():
             if AC['fixed']: return AC['value']
             #else:           value = STR_autocorrCity(value)   ДОПИСАТЬ
         return lib.autocorr.get(type,value)['value']
+    def validate_andCapitalize(self, type:str, value:str, extra=None):
+        # в extra можно передать любые необходимые доп. данные
+        params = G.AStypes[type]
+        if params['readLib']: extra = lib.getValidationList(type)
+        final  = {'valid':None, 'value':value}
+
+        if params['checkList']:
+            found          = listF.searchStr(extra, value, 'item', True, not self.justVerify)
+            final['valid'] = found is not None
+            if not self.justVerify and final['valid']: final['value'] = found
+        else: final['valid'] = strF.validateCell(type, final['value'])
+        return final
 
     # чтение данных из таблицы
     def getData(self, book):
@@ -59,7 +72,7 @@ class launchScript():
         else: self.table = CellTable(self.file.table.data)
     def searchTitleRow(self, table:list):   # table – таблица[[]]
         for r in range(len(table)):
-            if strF.findSubList(table[r][0], ('Уникальных: ', 'Ошибок: ')) != 0: return r
+            if strF.findSubList(table[r][0], ('Уникальных: ', 'Ошибок: '), 'index') != 0: return r
         return 0
     def init_curTD(self):
         self.curTD = TableDict()

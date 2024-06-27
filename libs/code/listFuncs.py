@@ -14,14 +14,6 @@ def searchStr(list:list, txt:str, type='item', fullText=True, lower=True, getFir
     if getFirst: return None
     else:        return final
 
-""" 
-def inclStr(list:list, txt:str, fullText=True, lower=True):
-    # есть ли строка среди элементов списка
-    for item in list:
-        if strF.findSub(item, txt, 'bool', fullText, lower): return True
-    return False
- """
-
 # защита от запуска модуля
 if __name__ == '__main__':
     print  ("This is module, please don't execute.")

@@ -1,5 +1,6 @@
 from sys         import exit as SYSEXIT
 from globalFuncs import getIB
+from globalVars  import allHyphens, ruSymbols
 
 # получение правильного окончания в зависимости от количества
 def getEnding_forCount(words:dict, count:int):
@@ -10,8 +11,42 @@ def getEnding_forCount(words:dict, count:int):
     elif ten == 1:                                      return words['1']
     else:                                               return words['2-4']
 
+# проверка и исправление данных
+def validateCell(type:str, value:str):
+    if type in ('phone', 'mail', 'website'):
+        # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ НЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
+        for item in value.split(','):
+            if   type == 'phone'   and not checkPhone  (item): return False
+            elif type == 'mail'    and not checkMail   (item): return False
+            elif type == 'website' and not checkWebsite(item): return False
+    return True
+def checkPhone(phone:str):
+    if len(phone) != 11  : return False
+    if phone[0]   != '7' : return False
+    if phone[1]   in '67': return False # казахские номера
+    return True
+def checkMail(mail:str):
+    if mail             == ''     : return True
+    if mail .count('@') != 1      : return False
+    if findSubList(mail,ruSymbols): return False
+
+    name, domain = mail.split('@')
+    if not     '.' in      domain: return False
+    if        '..' in      domain: return False
+    if domain[-2:] in ('.c','.r'): return False # аналог endswith()
+    if name        in  allHyphens: return False
+    if findSubList(mail, ('​',':','|','/','’',' ','<','>','[',']','.@','@.','@-.'), 'bool', False, False): return False # первый символ – пробел нулевой ширины
+    return True
+def checkWebsite(site:str):
+    if site       ==   '': return True
+    if not    '.' in site: return False
+    if site.endswith('/'): return False
+    if findSubList(site, ('​',' ','@','|'),   'bool', False, False)     : return False  # первый символ – пробел нулевой ширины
+    if findSubList(site, ('http://', 'https://', 'www.'), 'index') == 0: return False
+    return True
+
 # поиск
-def findSubList(string:str, list:list, type='index', fullText=False, lower=True):
+def findSubList(string:str, list:list, type='bool', fullText=False, lower=True):
     # ищет в строке каждый элемент списка; type может быть 'index', 'bool' и 'item'
     # индекс – это позиция найденного в string, 'item' вернёт найденный элемент списка list
     for item in list:
