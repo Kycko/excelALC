@@ -15,8 +15,8 @@ class launchScript():
 
         # запоминаем базовые переменные
         self.type       = type
-        self.log        = Log   (log   , 'log')
-        self.errors     = Errors(errors, 'errors')
+        self.log        = Log   (log)
+        self.errors     = Errors(errors)
         self.fullRange  = params['fullRange']
         self.toTD       = params['toTD'] # будем работать с TableDict (true) или же с CellTable (false)
         self.justVerify = params['justVerify']
@@ -28,8 +28,8 @@ class launchScript():
     # основные алгоритмы проверки
     def rangeChecker(self, table, type):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
-        # т. е. table – это всегда [[Cell, ...], ...]
-        errors = {} # {'initValue'.lower():ErrorObj, ...}
+        # т. е. table – это всегда [[Cell,...],...]
+        errors = {} # {'initValue'.lower():ErrorObj,...}
 
         # autocorr и поиск всех ошибок
         for r in range(len(table)):
@@ -44,7 +44,8 @@ class launchScript():
                     low = cell.value.lower()
                     if low in errors.keys (): errors[low]  .addPos  (r,c)
                     else:                     errors[low] = ErrorObj(cell.value, r, c)
-        
+        if errors: self.errors.add(errors, type)
+
         # предложение исправить вручную и запись исправлений
         if self.suggErrors: self.sugg_invalidUD(errors, type)
         self.finalizeErrors(table, errors)
@@ -71,12 +72,12 @@ class launchScript():
         else: final['valid'] = strF.validateCell(type, final['value'])
         return final
     def sugg_invalidUD(self, errors:dict, type:str):
-        # errors = {'initValue'.lower():ErrorObj, ...}
+        # errors = {'initValue'.lower():ErrorObj,...}
         counter = {'cur':0, 'total':len(errors.keys())}
         for key,errObj in errors.items():
             counter['cur'] += 1
             suggList        = self.getSugg(type, key)
-            print(suggList)
+
             #stopWhile       = False
             #while not stopWhile:
 
@@ -87,8 +88,8 @@ class launchScript():
         # table=[[Cell,...],...]; errors={'initValue'.lower():ErrorObj,...}
         for err in errors.values():
             for pos in err.pos:
-                table[pos['r']][pos['c']].value =     err.value
-                table[pos['r']][pos['c']].error = not err.fixed
+                if err.fixed: table[pos['r']][pos['c']].value =     err.newVal
+                table              [pos['r']][pos['c']].error = not err.fixed
 
     # чтение данных из таблицы
     def getData(self, book):
@@ -119,21 +120,22 @@ class launchScript():
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
 # журнал и ошибки
-class Log():    # общие функции классов Log() и Errors()
-    # основные
-    def __init__(self, UI, type:str):   # здесь UI = FRlog/FRerrors (фреймы)
-        self.log  = []
+class LEtemplate(): # общие функции для Log() и Errors()
+    def __init__(self, UI, type='log'): # здесь UI = FRlog/FRerrors (фреймы)
         self.UI   = UI
         self.file = G.files[type]
         write_toFile([], self.file)
+        self.initStorage()
+class Log(LEtemplate):
+    def initStorage(self):
+        self.log = []
     def add(self, type:str, params=None):
         # в params можно передать любые объекты, необходимые для получения доп. данных
         new = self.getType(type, params)
-        self .log .append (new)
+        self.log  .append (new)
         write_toFile      (new, self.file, True)
-        self .UI  .add    (new)
+        self.UI.add       (new)
     def getType(self, type:str, params=None):
-        # для Errors() сделать отдельную функцию
         final     = S.log[type]['full' if params['range'] else 'range']
         if  type == 'readFile':
             rows  = len(params['table']) - 1*(params['range'])   # считаем без заголовка
@@ -141,14 +143,36 @@ class Log():    # общие функции классов Log() и Errors()
             final = final.replace('%1', str(cols)+' '+strF.getEnding_forCount(S.words_byCount['столбцы'], cols))
             final = final.replace('%2', str(rows)+' '+strF.getEnding_forCount(S.words_byCount['строки' ], rows))
         return final
-class Errors(Log):
+class ErrorLog(LEtemplate):
+    def initStorage(self):
+        self.storage = {}   # {type:{initLow:string,...},...}
+    def add(self, errors:dict, type:str):
+        # errors = {'initValue'.lower():ErrorObj,...}
+        if type not in self.storage.keys(): self.storage[type] = {}
+        for low,err in errors.items():
+            newEntry = '['+type+'] ['+str(len(err.pos))+' шт.] ' + err.initVal
+
+            self.storage[type][low] = newEntry
+            write_toFile(newEntry, self.file, True)
+            self.UI.add (type, low, newEntry)
+class Errors():
+    def __init__(self, UI):
+        self.storage = {}   # {type:{initLow:ErrorObj,...},...}
+        self.log     = ErrorLog(UI,'errors')
+    def add(self, errors:dict, type:str):
+        # errors = {'initValue'.lower():ErrorObj,...}
+        if type not in self.storage.keys(): self.storage[type] = {}
+        self.storage[type] .update(errors)
+        self.log.add(errors, type)
     def suggest(self):
         pass
+
 class ErrorObj():
-    def __init__(self, value:str, row:int, col:int):
-        self.value = value
-        self.fixed = False
-        self.pos   = [{'r':row, 'c':col}] # список всех позиций этой ошибки в диапазоне проверки [{'r':row, 'c':col}, ...]
+    def __init__(self, initValue:str, row:int, col:int):
+        self.initVal = initValue
+        self.newVal  = None
+        self.fixed   = False
+        self.pos     = [{'r':row, 'c':col}] # список всех позиций этой ошибки в диапазоне проверки [{'r':row, 'c':col},...]
     def addPos(self, row:int, col:int):
         self.pos.append({'r':row, 'c':col})
 

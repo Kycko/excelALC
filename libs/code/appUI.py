@@ -64,7 +64,7 @@ class Window(TBS.Window):
         self.FRleft .destroy()
         self.FRright.destroy()
         self.FRlog    = FRlog   (self, self.FRroot, S.layout['run']['log'])
-        self.FRerrors = FRerrors(self, self.FRroot, S.layout['run']['errors'])
+        self.FRerrors = FRerrors(self, self.FRroot)
         self.FRlog   .pack      (fill='both', expand=True, side='left' , padx=5)
         self.FRerrors.pack      (fill='both', expand=True, side='right', padx=5)
 
@@ -175,6 +175,13 @@ class FRlog(LFRtemplate):   # общие функции FRlog и FRerrors
     def add(self, string):
         TBS.Label(self.frame, text=string).pack(fill='x')
 class FRerrors(FRlog):
+    def __init__(self, app, master):
+        self.storage = {}   # {type:{initLow:LabelObj,...},...}
+        super().__init__(app, master, S.layout['run']['errors'])
+    def add(self, type, key, string):
+        if type not in self.storage.keys(): self.storage[type] = {}
+        self.storage[type][key] = TBS.Label(self.frame, text=string)
+        self.storage[type][key].pack(fill='x')
     def suggest(self):
         pass
 
