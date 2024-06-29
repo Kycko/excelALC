@@ -47,6 +47,7 @@ class launchScript():
         
         # предложение исправить вручную и запись исправлений
         if self.suggErrors: self.sugg_invalidUD(errors, type)
+        self.finalizeErrors(table, errors)
 
     # работа с ошибками
     def autocorr(self, type:str, value:str):
@@ -82,6 +83,12 @@ class launchScript():
     def getSugg(self, type:str, value:str):
         suggList = strF.getSugg(type, value)
         return suggList
+    def finalizeErrors(self, table:list, errors:dict):
+        # table=[[Cell,...],...]; errors={'initValue'.lower():ErrorObj,...}
+        for err in errors.values():
+            for pos in err.pos:
+                table[pos['r']][pos['c']].value =     err.value
+                table[pos['r']][pos['c']].error = not err.fixed
 
     # чтение данных из таблицы
     def getData(self, book):
@@ -138,11 +145,10 @@ class Errors(Log):
     def suggest(self):
         pass
 class ErrorObj():
-    def __init__(self, initValue:str, row:int, col:int):
-        self.initVal = initValue
-        self.newVal  = None
-        self.fixed   = False
-        self.pos     = [{'r':row, 'c':col}] # список всех позиций этой ошибки в диапазоне проверки [{'r':row, 'c':col}, ...]
+    def __init__(self, value:str, row:int, col:int):
+        self.value = value
+        self.fixed = False
+        self.pos   = [{'r':row, 'c':col}] # список всех позиций этой ошибки в диапазоне проверки [{'r':row, 'c':col}, ...]
     def addPos(self, row:int, col:int):
         self.pos.append({'r':row, 'c':col})
 
