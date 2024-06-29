@@ -15,11 +15,12 @@ def getEnding_forCount(words:dict, count:int):
 # проверка и исправление данных
 def autocorrCell(type:str, value:str):
     if type == 'mail': return ACmail(value)
+    else:              return        value
 def ACmail(value:str):
     value = value.lower()
     RPL   = {'from': ('​','–','—','|',';','; ',', ',',,'),  # RPL = replace
                 'to'  : ('','-','-',',',',',',' ,',' ,',' )}
-    for i in range(len(RPL['from'])): value = value.replace(RPL['from'],RPL['to'])
+    for i in range(len(RPL['from'])): value = value.replace(RPL['from'][i],RPL['to'][i])
 
     list = value.split(',')
     for i in range(len(list)):
@@ -28,6 +29,11 @@ def ACmail(value:str):
         list[i] = '@'.join(parts)
 
     return ','.join(listF.rmDoublesStr(list))
+def getSugg(type:str, value:str):
+    if type == 'mail':
+        new = value.replace(' ','')
+        if new != value and checkMail(new): return [new]
+    return []
 def validateCell(type:str, value:str):
     if type in ('phone', 'mail', 'website'):
         # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ НЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
@@ -51,7 +57,7 @@ def checkMail(mail:str):
     if        '..' in       domain: return False
     if domain[-2:] in  ('.c','.r'): return False # аналог endswith()
     if name        in G.allHyphens: return False
-    if findSubList(mail, (':','|','/','’',' ','<','>','[',']','.@','@.','@-.'), 'bool', False, False): return False
+    if findSubList(mail, (':','|','/','’',' ','<','>','[',']','.@','@.','@-.'), 'bool', False, False, False): return False
     return True
 def checkWebsite(site:str):
     if site       ==   '': return True
@@ -62,19 +68,19 @@ def checkWebsite(site:str):
     return True
 
 # поиск
-def findSubList(string:str, list:list, type='bool', fullText=False, lower=True):
+def findSubList(string:str, list:list, type='bool', fullText=False, lower=True, stripList=True):
     # ищет в строке каждый элемент списка; type может быть 'index', 'bool' и 'item'
     # индекс – это позиция найденного в string, 'item' вернёт найденный элемент списка list
     for item in list:
-        result = findSub(string, item, 'index', fullText, lower)
+        result = findSub(string, item, 'index', fullText, lower, stripList)
         if result >= 0: return item if type == 'item' else getIB(type, result)
     return None if type == 'item' else getIB(type, -1)
-def findSub(string:str, sub:str, type='index', fullText=False, lower=True):
+def findSub(string:str, sub:str, type='index', fullText=False, lower=True, stripSub=True):
     # type может быть 'index' или 'bool'
     # если fullText=True, проверяется равенство строк (но после .trim() + можно задать lower=True)
     # если lower   =True, все строки будут сравниваться через .toLowerCase()
-    string = string.strip()
-    sub    = sub   .strip()
+    string           = string.strip()
+    if stripSub: sub = sub   .strip()
 
     if fullText and len(string) != len(sub): return getIB(type, -1)
     if lower:

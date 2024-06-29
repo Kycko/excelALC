@@ -19,7 +19,8 @@ class launchScript():
         self.errors     = Errors(errors, 'errors')
         self.fullRange  = params['fullRange']
         self.toTD       = params['toTD'] # будем работать с TableDict (true) или же с CellTable (false)
-        if params['getSuggParam']: self.justVerify = not G.config.get(type + ':suggestErrors')
+        self.justVerify = params['justVerify']
+        if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
 
         self.getData(book)  # получаем данные
         if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data, params['AStype']) # проверяем выделенный диапазон
@@ -28,7 +29,7 @@ class launchScript():
     def rangeChecker(self, table, type):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell, ...], ...]
-        errors = {} # {'initValue':ErrorObj, ...}
+        errors = {} # {'initValue'.lower():ErrorObj, ...}
 
         # autocorr и поиск всех ошибок
         for r in range(len(table)):
@@ -37,17 +38,25 @@ class launchScript():
                 tempVal = cell.value
                 if not self.justVerify: tempVal = self.autocorr(type, tempVal)
 
-                VAL = self.validate_andCapitalize(type, tempVal)  # ДАЛЕЕ ПИШЕМ ЗДЕСЬ
+                VAL = self.validate_andCapitalize(type, tempVal)
+                if VAL['valid'] and not self.justVerify: cell.value = VAL['value']
+                else:
+                    low = cell.value.lower()
+                    if low in errors.keys (): errors[low]  .addPos  (r,c)
+                    else:                     errors[low] = ErrorObj(cell.value, r, c)
+        
+        # предложение исправить вручную и запись исправлений
+        if self.suggErrors: self.sugg_invalidUD(errors, type)
 
     # работа с ошибками
     def autocorr(self, type:str, value:str):
-        value    = strF.autocorrCell(type, value)   # выполнится только для некоторых type
+        value    = strF.autocorrCell(type, value)       # выполнится только для нужных type
         if type == 'region':
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
             if AC['fixed']: return AC['value']
             #else:           value = STR_autocorrCity(value)   ДОПИСАТЬ
-        return lib.autocorr.get(type,value)['value']
+        return lib.autocorr.get(type,value)['value']    # выполнится только для нужных type
     def validate_andCapitalize(self, type:str, value:str, extra=None):
         # в extra можно передать любые необходимые доп. данные
         params = G.AStypes[type]
@@ -60,6 +69,19 @@ class launchScript():
             if not self.justVerify and final['valid']: final['value'] = found[0]
         else: final['valid'] = strF.validateCell(type, final['value'])
         return final
+    def sugg_invalidUD(self, errors:dict, type:str):
+        # errors = {'initValue'.lower():ErrorObj, ...}
+        counter = {'cur':0, 'total':len(errors.keys())}
+        for key,errObj in errors.items():
+            counter['cur'] += 1
+            suggList        = self.getSugg(type, key)
+            print(suggList)
+            #stopWhile       = False
+            #while not stopWhile:
+
+    def getSugg(self, type:str, value:str):
+        suggList = strF.getSugg(type, value)
+        return suggList
 
     # чтение данных из таблицы
     def getData(self, book):
@@ -116,11 +138,13 @@ class Errors(Log):
     def suggest(self):
         pass
 class ErrorObj():
-    def __init__(self, initValue:str):
+    def __init__(self, initValue:str, row:int, col:int):
         self.initVal = initValue
         self.newVal  = None
         self.fixed   = False
-        self.pos     = []   # список всех позиций этой ошибки в диапазоне проверки [{'r':row, 'c':col}, ...]
+        self.pos     = [{'r':row, 'c':col}] # список всех позиций этой ошибки в диапазоне проверки [{'r':row, 'c':col}, ...]
+    def addPos(self, row:int, col:int):
+        self.pos.append({'r':row, 'c':col})
 
 # защита от запуска модуля
 if __name__ == '__main__':
