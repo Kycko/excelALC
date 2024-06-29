@@ -29,17 +29,17 @@ launchTypes = {'allChecks'  : {'fullRange':True,  'toTD':True , 'launch':'allChe
                'checkTitles': {'fullRange':True,  'toTD':True , 'launch':'checkTitles' , 'justVerify':False, 'getSuggParam':True, 'AStype':'title'},
                'checkPhones': {'fullRange':False, 'toTD':False, 'launch':'rangeChecker', 'justVerify':False, 'getSuggParam':True, 'AStype':'phone'},
                'checkEmails': {'fullRange':False, 'toTD':False, 'launch':'rangeChecker', 'justVerify':False, 'getSuggParam':True, 'AStype':'mail'}}
-# ↓ ПОТОМ СВЕРИТЬ, ЗДЕСЬ ДОЛЖНЫ БЫТЬ ВСЕ НУЖНЫЕ ТИПЫ ↓
-AStypes = {'title': {'readLib'  : True, # список подходящих вариантов будет прочитан из библиотеки
-                     'checkList': True, # валидация путём проверки, есть ли value в списке допустимых (extra)
-                     'suggMsg'  : {'acceptBlank':False, 'gend':'neutral'}}, # для диалога с предложением исправить
-           'mail' : {'readLib'  : False,
-                     'checkList': False,
-                     'suggMsg'  : {'acceptBlank':True,  'gend':'female'}}}
+
+# readLib    : прочитать подходящие варианты для валидации из библиотеки
+# checkList  : валидация путём проверки, есть ли value в списке допустимых (extra)
+# acceptBlank: для диалога с предложением исправить
+# ↓ !ВСЕ ЭТИ ТИПЫ ДОЛЖНЫ БЫТЬ В strings.suggMsg! ↓
+AStypes = {'title': {'readLib':True , 'checkList':True , 'acceptBlank':False},
+           'mail' : {'readLib':False, 'checkList':False, 'acceptBlank':True }}
 
 # прочее
-config    = userCfg(files['config'])
-exBooks   = exBooks()
+config  = userCfg(files['config'])
+exBooks = exBooks()
 
 # особые символы
 allHyphens = ('-','–','—')

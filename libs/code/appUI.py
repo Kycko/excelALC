@@ -7,6 +7,26 @@ import globalVars               as G
 from   globalFuncs          import sysExit
 from   launchFuncs          import launchScript
 
+# общие функции
+def suggInvalidUD(type:str, initVal:str, suggList:list, counter:dict):
+    commonStr = S.layout ['run']['suggUI']
+    typeStr   = S.suggMsg [type]
+    intro     = typeStr['title'] + ' ('+counter['cur']+' из '+counter['total']+').'
+    msg       = commonStr['msg']
+
+    # RPL = replace
+    RPL = {'1': commonStr['acceptBlank'] if G.AStypes[type]['acceptBlank'] else '',
+           '2': typeStr  ['curValue'],
+           '3': initVal}
+    for num,val in RPL: msg = msg.replace('$$'+num, val)
+
+    if suggList:
+        msg += commonStr['offers']
+        for sugg in suggList: msg += '• '+sugg+'\n'
+        msg += '\n'
+
+    ОСТАЛОСЬ ВЫВЕСТИ САМО СООБЩЕНИЕ
+
 # шаблоны моих классов (B=button, FR=frame, LFR=labelFrame)
 class Btemplate(TBS.Button):
     def __init__(self, master, text=None, image=None, width=None, bootstyle='primary', command=None):

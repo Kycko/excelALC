@@ -1,4 +1,5 @@
 from   sys         import exit as SYSEXIT
+from   appUI       import suggInvalidUD
 from   excelRW     import Excel
 from   tables      import CellTable, TableDict
 from   globalFuncs import write_toFile
@@ -48,7 +49,7 @@ class launchScript():
         if errors: self.errors.add(errors, type)
 
         # предложение исправить вручную и запись исправлений
-        if self.suggErrors: self.sugg_invalidUD(errors, type)
+        if self.suggErrors: self.suggInvalidUD(errors, type)
         self.finalizeErrors(table, errors)
 
     # работа с ошибками
@@ -63,7 +64,8 @@ class launchScript():
     def validate_andCapitalize(self, type:str, value:str, extra=None):
         # в extra можно передать любые необходимые доп. данные
         params = G.AStypes[type]
-        if params['readLib']: extra = lib.getValidationList(type)
+        # ↓ передаём в extra suggList из appUI.suggInvalidUD()
+        if extra is None and params['readLib']: extra = lib.getValidationList(type)
         final  = {'valid':None, 'value':value}
 
         if params['checkList']:
@@ -72,15 +74,17 @@ class launchScript():
             if not self.justVerify and final['valid']: final['value'] = found[0]
         else: final['valid'] = strF.validateCell(type, final['value'])
         return final
-    def sugg_invalidUD(self, errors:dict, type:str):
+    def suggInvalidUD(self, errors:dict, type:str):
         # errors = {'initValue'.lower():ErrorObj,...}
         counter = {'cur':0, 'total':len(errors.keys())}
         for key,errObj in errors.items():
             counter['cur'] += 1
             suggList        = self.getSugg(type, key)
 
-            #stopWhile       = False
-            #while not stopWhile:
+            stopWhile = False
+            while not stopWhile:
+                resp = suggInvalidUD(type, errObj.initVal, suggList, counter)
+                #if resp['OKclicked']:
 
     def getSugg(self, type:str, value:str):
         suggList = strF.getSugg(type, value)
