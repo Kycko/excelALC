@@ -15,7 +15,8 @@ class launchScript():
 
         # запоминаем базовые переменные
         self.type       = type
-        self.log        = Log   (log)
+        self.log        = Log(log)
+        self.log.add    ('launch', type)
         self.errors     = Errors(errors)
         self.fullRange  = params['fullRange']
         self.toTD       = params['toTD'] # будем работать с TableDict (true) или же с CellTable (false)
@@ -127,8 +128,7 @@ class LEtemplate(): # общие функции для Log() и Errors()
         write_toFile([], self.file)
         self.initStorage()
 class Log(LEtemplate):
-    def initStorage(self):
-        self.log = []
+    def initStorage(self): self.log = []
     def add(self, type:str, params=None):
         # в params можно передать любые объекты, необходимые для получения доп. данных
         new = self.getType(type, params)
@@ -136,16 +136,16 @@ class Log(LEtemplate):
         write_toFile      (new, self.file, True)
         self.UI.add       (new)
     def getType(self, type:str, params=None):
-        final     = S.log[type]['full' if params['range'] else 'range']
-        if  type == 'readFile':
-            rows  = len(params['table']) - 1*(params['range'])   # считаем без заголовка
-            cols  = len(params['table'][0])
+        if   type == 'launch'  : final = '[core] ' + S.layout['actions'][params]['log']
+        elif type == 'readFile':
+            final = S.log[type]['full' if params['range'] else 'range']
+            rows  = len(params ['table']) - 1*(params['range']) # считаем без заголовка
+            cols  = len(params ['table'][0])
             final = final.replace('%1', str(cols)+' '+strF.getEnding_forCount(S.words_byCount['столбцы'], cols))
             final = final.replace('%2', str(rows)+' '+strF.getEnding_forCount(S.words_byCount['строки' ], rows))
         return final
 class ErrorLog(LEtemplate):
-    def initStorage(self):
-        self.storage = {}   # {type:{initLow:string,...},...}
+    def initStorage(self): self.storage = {}    # {type:{initLow:string,...},...}
     def add(self, errors:dict, type:str):
         # errors = {'initValue'.lower():ErrorObj,...}
         if type not in self.storage.keys(): self.storage[type] = {}
