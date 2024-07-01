@@ -1,4 +1,5 @@
-from   sys          import exit as SYSEXIT
+from   sys                  import exit      as SYSEXIT
+from   tkinter.simpledialog import SimpleDialog
 from   tkinter              import BooleanVar
 import ttkbootstrap             as TBS
 from   ttkbootstrap.tooltip import ToolTip
@@ -6,26 +7,6 @@ import strings                  as S
 import globalVars               as G
 from   globalFuncs          import sysExit
 from   launchFuncs          import launchScript
-
-# общие функции
-def suggInvalidUD(type:str, initVal:str, suggList:list, counter:dict):
-    commonStr = S.layout ['run']['suggUI']
-    typeStr   = S.suggMsg [type]
-    intro     = typeStr['title'] + ' ('+counter['cur']+' из '+counter['total']+').'
-    msg       = commonStr['msg']
-
-    # RPL = replace
-    RPL = {'1': commonStr['acceptBlank'] if G.AStypes[type]['acceptBlank'] else '',
-           '2': typeStr  ['curValue'],
-           '3': initVal}
-    for num,val in RPL: msg = msg.replace('$$'+num, val)
-
-    if suggList:
-        msg += commonStr['offers']
-        for sugg in suggList: msg += '• '+sugg+'\n'
-        msg += '\n'
-
-    ОСТАЛОСЬ ВЫВЕСТИ САМО СООБЩЕНИЕ
 
 # шаблоны моих классов (B=button, FR=frame, LFR=labelFrame)
 class Btemplate(TBS.Button):
@@ -79,7 +60,7 @@ class Window(TBS.Window):
             self.FRright.btn.configure(text=S.layout['main']['btn']['launch']['cantLaunch'], state='disabled')
         else:
             self.buildRunUI()
-            launchScript   (book, type, self.FRlog, self.FRerrors)
+            launchScript   (self, book, type, self.FRlog, self.FRerrors)
     def buildRunUI(self):
         self.FRleft .destroy()
         self.FRright.destroy()
@@ -87,6 +68,24 @@ class Window(TBS.Window):
         self.FRerrors = FRerrors(self, self.FRroot)
         self.FRlog   .pack      (fill='both', expand=True, side='left' , padx=5)
         self.FRerrors.pack      (fill='both', expand=True, side='right', padx=5)
+    def suggInvalidUD(self, type:str, initVal:str, suggList:list, counter:dict):
+        commonStr = S.layout ['run']['suggUI']
+        typeStr   = S.suggMsg [type]
+        intro     = typeStr['title'] + ' ('+str(counter['cur'])+' из '+str(counter['total'])+').'
+        msg       = commonStr['msg']
+
+        # RPL = replace
+        RPL = {'1': commonStr['acceptBlank'] if G.AStypes[type]['acceptBlank'] else '',
+               '2': typeStr  ['curValue'],
+               '3': initVal}
+        for num,val in RPL.items(): msg = msg.replace('$$'+num, val)
+
+        if suggList:
+            msg += commonStr['offers']
+            for sugg in suggList: msg += '• '+sugg+'\n'
+            msg += '\n'
+
+        d =  SimpleDialog(self, 'titleee')
 
 # фреймы основного окна (FR=frame)
 class FRleft(FRtemplate):

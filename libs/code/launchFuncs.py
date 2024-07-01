@@ -1,5 +1,4 @@
 from   sys         import exit as SYSEXIT
-from   appUI       import suggInvalidUD
 from   excelRW     import Excel
 from   tables      import CellTable, TableDict
 from   globalFuncs import write_toFile
@@ -11,10 +10,11 @@ import libClasses      as lib
 
 # основной класс, запуск проверок
 class launchScript():
-    def __init__(self, book, type:str, log, errors):    # здесь log и errors – это фреймы
+    def __init__(self, app, book, type:str, log, errors):    # здесь log и errors – это фреймы
         params = G.launchTypes[type]
 
         # запоминаем базовые переменные
+        self.app        = app   # для вызова функций основного окна
         self.type       = type
         self.log        = Log(log)
         self.log.add    ('launch', type)
@@ -81,10 +81,8 @@ class launchScript():
             counter['cur'] += 1
             suggList        = self.getSugg(type, key)
 
-            stopWhile = False
-            while not stopWhile:
-                resp = suggInvalidUD(type, errObj.initVal, suggList, counter)
-                #if resp['OKclicked']:
+            resp = self.app.suggInvalidUD(type, errObj.initVal, suggList, counter)
+            print(resp)
 
     def getSugg(self, type:str, value:str):
         suggList = strF.getSugg(type, value)
