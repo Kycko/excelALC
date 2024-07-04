@@ -3,7 +3,7 @@ from appUI import Window
 # корневой класс: из него запускаются UI и код других модулей
 class Root():
     def __init__(self):
-        self.UI = Window()
+        self.UI = Window(self)
         self.UI.mainloop()
 
 # защита от запуска модуля

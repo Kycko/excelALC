@@ -16,7 +16,8 @@ class Btemplate(TBS.Button):
 # окно программы
 class Window(TBS.Window):
     # конструкторы интерфейса
-    def __init__(self):
+    def __init__(self,app):
+        self.app = app  # для вызова функций класса Root() при нажатии кнопок
         super().__init__(title     = G.app['TV'],
                          themename = G.app['themes'][G.config.get('main:darkTheme')],
                          size      = G.app['size'],
@@ -24,20 +25,20 @@ class Window(TBS.Window):
         self.place_window_center()  # расположить в центре экрана
         self.buildInitUI()
     def buildInitUI(self):
-        self.frRoot = TBS.Frame(self)
+        self.frRight = None # сначала это: он читается в self.loadExcelList()
+        self.frRoot  = TBS.Frame(self)
         self.frRoot.pack(fill='both',expand=True,padx=10,pady=10)
         self.buildFrame ('mainLeft' ,self.frRoot)
     def buildFrame(self,type:str,parent,params=None):
-        # parent не всегда TBS.Frame; params нужен для buildTabs()
-        if type == 'mainRight': self.frRight = TBS.Frame(parent)
-        else:                   frMain       = TBS.Frame(parent)    # основной фрейм
-
+        # frMain = TBS.Frame либо TBS.Labelframe
         if   type == 'mainLeft':
+            frMain = TBS.Frame(parent)
             frMain.pack(fill='both',side='left',padx=5)
             self.buildFrame('MLfiles' ,frMain)  # выбор файла
             self.buildTabs            (frMain)  # кнопки запуска
             self.buildFrame('MLbottom',frMain)  # тема и закрытие программы
         elif type == 'MLfiles':
+            frMain =   TBS.Frame(parent)
             frMain.pack(fill='x',pady=2)
 
             lbl           = TBS.Label   (frMain,text =S.layout['main']['lbl']['selectFile'])
@@ -54,7 +55,8 @@ class Window(TBS.Window):
             self     .loadExcelList ()
             self.fileList.focus_set ()
         elif type == 'MLtab':
-            frMain.pack(fill='x')
+            frMain = TBS.Frame(parent)
+            frMain.pack       (fill='x')
             parent.add(frMain,text=S.layout['main']['tabs'][params],padding=7)
             for key,val in S.layout['actions'].items():
                 bootstyle = 'success' if key == 'allChecks' else 'primary'
@@ -66,6 +68,7 @@ class Window(TBS.Window):
                               bootstyle = bootstyle
                               ).pack(pady=5)
         elif type == 'MLbottom':
+            frMain = TBS.Frame(parent)
             frMain.pack(fill='x',side='bottom',pady=5)
             self.buildFrame('MLtheme',frMain)
             Btemplate(frMain,
@@ -75,7 +78,8 @@ class Window(TBS.Window):
                       bootstyle = 'danger'
                       ).pack(side='left',padx=18)
         elif type == 'MLtheme':
-            frMain.pack(side='left')
+            frMain = TBS.Frame(parent)
+            frMain.pack  (side='left')
 
             for icon in G.pics['themeSelector'].values():
                 pic       = TBS.PhotoImage(file=icon['pic'])
@@ -88,10 +92,39 @@ class Window(TBS.Window):
                                  bootstyle = 'round-toggle')
             ToolTip(cb,text=S.layout['main']['tt']['selectTheme'])
             cb.pack(expand=True)
+        elif type == 'mainRight':
+            # в params передан тип (напр., 'checkEmails')
+            strings = S.layout['actions'][params]
+            frMain  = TBS.Labelframe(parent,text=strings['lfl'])
+            frMain.pack (fill='both',expand=True,padx=6,pady=6,side='right')
+            TBS   .Label(frMain, text=strings['descr']).pack(fill='x',padx=8,pady=5)
+            self  .buildFrame('MRconfig',frMain,params)
+            self  .launchBtn = Btemplate(frMain,command=lambda t=params:self.app.launch(t),bootstyle='success')
+            self  .launchBtn.pack       (fill='x',padx=22,pady=12,side='bottom')
+            self  .setLaunchBtnState()
+            return frMain   # только в mainRight, чтобы записать в self.frRight['frame']
+        elif type == 'MRconfig':
+            # в params передан тип (напр., 'checkEmails')
+            frMain = TBS.Frame(parent)
+            frMain .pack (fill='x',padx=8)
+            for group in ('forAll',params):
+                if group in S.layout['actionsCfg'].keys():
+                    TBS .Separator(frMain).pack(fill='x',padx=2,pady=6)
+                    self.buildActionsCfgGroup  (frMain  ,params,group)
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
             for type in ('main','script'): self.buildFrame('MLtab',tabs,type)
+    def buildActionsCfgGroup(self,parent:TBS.Frame,type:str,group:str):
+        for param,strings in S.layout['actionsCfg'][group].items():
+            sType = type+':'+param  # например, 'checkTitles:newSheet'
+            cb    = TBS.Checkbutton(parent,
+                                    text      = strings['lbl'],
+                                    variable  = BooleanVar    (value=G.config.get(sType)),
+                                    command   = lambda t=sType:self.switchBoolSetting(t),
+                                    bootstyle = 'round-toggle')
+            ToolTip(cb,text=strings['tt'])
+            cb.pack(padx=5,pady=5,expand=True,anchor='w')
 
     # вспомогательные
     def loadExcelList(self):
@@ -102,24 +135,22 @@ class Window(TBS.Window):
         else:
             self.fileList.set      (S.layout['main']['msg']['noFilesFound'])
             self.fileList.configure(state='disabled')
-        if hasattr(self,'frRight') and self.frRight.winfo_exists():
-            self.frRight.setBtnState()
+        if self.frRight is not None: self.setLaunchBtnState()
 
-    # нажатия кнопок и переключателей
-""" 
-    def switchBoolSetting(self, param:str):
+    # кнопки и переключатели
+    def switchBoolSetting(self,param:str):
         newVal = not G.config.get(param)
-        G.config.set(param, newVal)
+        G.config.set(param,newVal)
         if param == 'main:darkTheme': self.style.theme_use(G.app['themes'][newVal])
     def actionClicked(self,type:str):
-        sameClicked = False # если нажата та же кнопка, которая уже была выбрана, не открывать повторно
-        if hasattr(self,'frRight'): # если правый фрейм существует
-            sameClicked = self.frRight.winfo_exists() and type == self.frRight.type   А ЗДЕСЬ ЧТО?
-            self.FRright.destroy()
-        if not sameClicked:
-            self.FRright = FRright(self, self.FRroot, S.layout['actions'][type]['lfl'], type)
-            self.FRright.pack     (fill='both', expand=True, padx=6, pady=6,  side='right')
- """
+        if    self.frRight is not None: self.frRight['frame'].destroy()
+        if    self.frRight is not None and type == self.frRight['type']:    # выбран тот же тип проверки
+              self.frRight = None
+        else: self.frRight = {'type':type, 'frame':self.buildFrame('mainRight',self.frRoot,type)}
+    def setLaunchBtnState(self):
+        if G.exBooks.cur: self.launchBtn.configure(text=S.layout['main']['btn']['launch']['ready']    ,state='normal')
+        else:             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['notChosen'],state='disabled')
+
 # защита от запуска модуля
 if __name__ == '__main__':
     print  ("This is module, please don't execute.")
