@@ -29,6 +29,8 @@ class Window(TBS.Window):
         self.frRoot  = TBS.Frame(self)
         self.frRoot.pack(fill='both',expand=True,padx=10,pady=10)
         self.buildFrame ('mainLeft' ,self.frRoot)
+    def buildRunUI(self):
+        pass
     def buildFrame(self,type:str,parent,params=None):
         # frMain = TBS.Frame либо TBS.Labelframe
         if   type == 'mainLeft':
@@ -99,7 +101,7 @@ class Window(TBS.Window):
             frMain.pack (fill='both',expand=True,padx=6,pady=6,side='right')
             TBS   .Label(frMain, text=strings['descr']).pack(fill='x',padx=8,pady=5)
             self  .buildFrame('MRconfig',frMain,params)
-            self  .launchBtn = Btemplate(frMain,command=lambda t=params:self.app.launch(t),bootstyle='success')
+            self  .launchBtn = Btemplate(frMain,command=lambda t=params:self.launchClicked(t),bootstyle='success')
             self  .launchBtn.pack       (fill='x',padx=22,pady=12,side='bottom')
             self  .setLaunchBtnState()
             return frMain   # только в mainRight, чтобы записать в self.frRight['frame']
@@ -142,14 +144,21 @@ class Window(TBS.Window):
         newVal = not G.config.get(param)
         G.config.set(param,newVal)
         if param == 'main:darkTheme': self.style.theme_use(G.app['themes'][newVal])
+    def setLaunchBtnState(self):
+        if G.exBooks.cur: self.launchBtn.configure(text=S.layout['main']['btn']['launch']['ready']    ,state='normal')
+        else:             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['notChosen'],state='disabled')
     def actionClicked(self,type:str):
         if    self.frRight is not None: self.frRight['frame'].destroy()
         if    self.frRight is not None and type == self.frRight['type']:    # выбран тот же тип проверки
               self.frRight = None
         else: self.frRight = {'type':type, 'frame':self.buildFrame('mainRight',self.frRoot,type)}
-    def setLaunchBtnState(self):
-        if G.exBooks.cur: self.launchBtn.configure(text=S.layout['main']['btn']['launch']['ready']    ,state='normal')
-        else:             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['notChosen'],state='disabled')
+    def launchClicked(self,type:str):   # это запуск проверок
+        book     = G.exBooks.getFile(self.fileList.get())
+        if book == None:
+            self.launchBtn.configure(text=S.layout['main']['btn']['launch']['cantLaunch'],state='disabled')
+        else:
+            self.buildRunUI()
+            self.app.launch(book,type)
 
 # защита от запуска модуля
 if __name__ == '__main__':
