@@ -23,14 +23,13 @@ class Window(TBS.Window):
                          size      = G.app['size'],
                          minsize   = G.app['size'])
         self.place_window_center()  # расположить в центре экрана
-        self.buildInitUI()
-    def buildInitUI(self):
+        self.buildUI()
+    def buildUI(self,runUI=False):  # runUI = выбор файла и скрипта (False) или окно выполнения (True)
+        if hasattr(self,'frRoot'): self.frRoot.destroy()
         self.frRight = None # сначала это: он читается в self.loadExcelList()
         self.frRoot  = TBS.Frame(self)
         self.frRoot.pack(fill='both',expand=True,padx=10,pady=10)
-        self.buildFrame ('mainLeft' ,self.frRoot)
-    def buildRunUI(self):
-        pass
+        self.buildFrame (('mainLeft','mainRun')[runUI],self.frRoot)
     def buildFrame(self,type:str,parent,params=None):
         # frMain = TBS.Frame либо TBS.Labelframe
         if   type == 'mainLeft':
@@ -113,6 +112,21 @@ class Window(TBS.Window):
                 if group in S.layout['actionsCfg'].keys():
                     TBS .Separator(frMain).pack(fill='x',padx=2,pady=6)
                     self.buildActionsCfgGroup  (frMain  ,params,group)
+        elif type == 'mainRun':
+            frErrors = TBS.Frame(parent)
+            frErrors.pack(fill='y',side='right',padx=5)
+            self.buildFrame('runLog'   ,parent)     # основной журнал выполнения
+            self.buildFrame('runSugg'  ,frErrors)   # предложения по исправлению ошибок
+            self.buildFrame('runErrors',frErrors)   # список текущих ошибок
+        elif type == 'runLog':
+            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['mainLog'])
+            frMain.pack(fill='both',expand=True,side='left',padx=5,pady=4)
+        elif type == 'runSugg':
+            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
+            frMain.pack(fill='x',pady=5)
+        elif type == 'runErrors':
+            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['errors'])
+            frMain.pack(fill='both',expand=True,pady=5)
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
@@ -157,7 +171,7 @@ class Window(TBS.Window):
         if book == None:
             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['cantLaunch'],state='disabled')
         else:
-            self.buildRunUI()
+            self   .buildUI(True)
             self.app.launch(book,type)
 
 # защита от запуска модуля
