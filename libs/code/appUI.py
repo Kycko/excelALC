@@ -24,7 +24,7 @@ class Window(TBS.Window):
                          minsize   = G.app['size'])
         self.place_window_center()  # расположить в центре экрана
         self.buildUI()
-    def buildUI(self,runUI=False):  # runUI = выбор файла и скрипта (False) или окно выполнения (True)
+    def buildUI(self,runUI=False):  # runUI = окно выбора (False) или окно выполнения (True)
         if hasattr(self,'frRoot'): self.frRoot.destroy()
         self.frRight = None # сначала это: он читается в self.loadExcelList()
         self.frRoot  = TBS.Frame(self)
@@ -119,14 +119,16 @@ class Window(TBS.Window):
             self.buildFrame('runSugg'  ,frErrors)   # предложения по исправлению ошибок
             self.buildFrame('runErrors',frErrors)   # список текущих ошибок
         elif type == 'runLog':
-            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['mainLog'])
-            frMain.pack(fill='both',expand=True,side='left',padx=5,pady=4)
+            frMain     = TBS.Labelframe(parent,text=S.layout['run']['lfl']['mainLog'])  # labelFrame
+            self.frLog = TBS.Frame     (frMain) # внутренний фрейм с нужными отступами
+            frMain    .pack(fill='both',expand=True,side='left',padx=5 ,pady=4)
+            self.frLog.pack(fill='both',expand=True,            padx=10,pady=5)
         elif type == 'runSugg':
-            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
+            frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
             frMain.pack(fill='x',pady=5)
         elif type == 'runErrors':
-            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['errors'])
-            frMain.pack(fill='both',expand=True,pady=5)
+            self.frErrors = TBS.Labelframe(parent,text=S.layout['run']['lfl']['errors'])
+            self.frErrors.pack(fill='both',expand=True,pady=5)
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
@@ -143,7 +145,8 @@ class Window(TBS.Window):
             cb.pack(padx=5,pady=5,expand=True,anchor='w')
 
     # вспомогательные
-    def loadExcelList(self):
+    def log(self,string:str): TBS.Label(self.frLog,text=string).pack(fill='x')
+    def loadExcelList (self):
         G.exBooks.update()
         if G.exBooks.cur:   # Excel открыт, и не только стартовый экран
             self.fileList.configure(values=G.exBooks.bookNames,state='readonly')
