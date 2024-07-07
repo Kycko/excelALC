@@ -1,10 +1,13 @@
-from   sys          import exit as SYSEXIT
-from   tkinter              import BooleanVar
-import ttkbootstrap             as TBS
-from   ttkbootstrap.tooltip import ToolTip
-import globalVars               as G
-import strings                  as S
-from   globalFuncs          import sysExit
+from   sys                  import exit as SYSEXIT
+from   tkinter                      import BooleanVar
+import ttkbootstrap                     as TBS
+from   ttkbootstrap.tooltip         import ToolTip
+from   ttkbootstrap.dialogs.dialogs import Messagebox
+import globalVars                       as G
+import strings                          as S
+from   globalFuncs                  import sysExit
+
+def cantReadLib(): Messagebox.ok(S.layout['main']['msg']['cantReadLib'],G.app['TV'])
 
 class Btemplate(TBS.Button):    # шаблон кнопки
     def __init__(self,master,text=None,image=None,width=None,bootstyle='primary',command=None):

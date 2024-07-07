@@ -1,7 +1,7 @@
 from   sys import exit as SYSEXIT
-from   appUI       import Window
 from   globalFuncs import write_toFile
 import globalVars      as G
+import appUI
 from   excelRW     import Excel
 from   tables      import CellTable,TableDict
 import strings         as S
@@ -11,9 +11,10 @@ import libClasses      as lib
 # корневой класс: из него запускаются UI и код других модулей
 class Root():
     def __init__(self):
-        self.UI = Window(self)
-        self.UI.mainloop()
-
+        if lib.ready:
+            self.UI = appUI.Window(self)
+            self.UI.mainloop()
+        else: appUI.cantReadLib()
     # основные функции
     def launch(self,book,type:str):
         # book – это сам объект книги из xlwings; type = например, 'checkEmails'
@@ -45,7 +46,7 @@ class Root():
             self.unkTD = TableDict(self.file.table)
             self.init_curTD()
         else: self.table = CellTable(self.file.table.data)
-    def searchTitleRow(self,table:list):    # table – таблица[[]]
+    def searchTitleRow(self,table:list):    # table = таблица[[]]
         for r in range(len(table)):
             if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
         return 0
@@ -65,7 +66,7 @@ class Root():
 
 # журнал и ошибки
 class Log():
-    def __init__(self,UI:Window):
+    def __init__(self,UI:appUI.Window):
         self.UI   = UI
         self.file = G.files['log']
         write_toFile([],self.file)
