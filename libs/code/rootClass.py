@@ -18,13 +18,13 @@ class Root():
 
         # запоминаем базовые переменные
         self.type       = type
-        self.log        = Log(self.UI)
-        self.log.add   ('launch',type)
-        #self.errors     = Errors(errors)
-        #self.fullRange  = params['fullRange']
-        #self.toTD       = params['toTD'] # будем работать с TableDict (true) или же с CellTable (false)
-        #self.justVerify = params['justVerify']
-        #if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
+        self.errors     = Errors(self.UI.errors)
+        self.log        = Log   (self.UI)
+        self.log.add('launch',type)
+        self.fullRange  = params['fullRange']
+        self.toTD       = params['toTD'] # будем работать с TableDict (True) или же с CellTable (False)
+        self.justVerify = params['justVerify']
+        if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
 
         #self.getData(book)  # получаем данные
         #if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data, params['AStype']) # проверяем выделенный диапазон
@@ -57,6 +57,12 @@ class Log():
         elif type == 'errorsFound':
             final = S.log[type].replace('$$1',params['type']).replace('$$2',str(params['count']))
         return final
+class Errors():
+    def __init__(self,UI):  # UI = класс appUI.Errors()
+        self.storage = {}   # {type:{initLow:ErrorObj,...},...}
+        self.UI      = UI
+        self.file    = G.files['errors']
+        write_toFile([],self.file)
 
 # защита от запуска модуля
 if __name__ == '__main__':

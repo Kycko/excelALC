@@ -119,7 +119,7 @@ class Window(TBS.Window):
             self.buildFrame('runSugg'  ,frErrors)   # предложения по исправлению ошибок
             self.buildFrame('runErrors',frErrors)   # список текущих ошибок
         elif type == 'runLog':
-            frMain     = TBS.Labelframe(parent,text=S.layout['run']['lfl']['mainLog'])  # labelFrame
+            frMain     = TBS.Labelframe(parent,text=S.layout['run']['lfl']['mainLog'])
             self.frLog = TBS.Frame     (frMain) # внутренний фрейм с нужными отступами
             frMain    .pack(fill='both',expand=True,side='left',padx=5 ,pady=4)
             self.frLog.pack(fill='both',expand=True,            padx=10,pady=5)
@@ -127,8 +127,9 @@ class Window(TBS.Window):
             frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
             frMain.pack(fill='x',pady=5)
         elif type == 'runErrors':
-            self.frErrors = TBS.Labelframe(parent,text=S.layout['run']['lfl']['errors'])
-            self.frErrors.pack(fill='both',expand=True,pady=5)
+            frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['errors'])
+            frMain.pack(fill='both',expand=True,pady=5)
+            self.errors = Errors(frMain)
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
@@ -176,6 +177,12 @@ class Window(TBS.Window):
         else:
             self   .buildUI(True)
             self.app.launch(book,type)
+
+class Errors():
+    def __init__(self,parent:TBS.Labelframe):
+        self.storage = {}                   # {type:{initLow:TBS.Label,...},...}
+        self.frame   = TBS.Frame(parent)    # внутренний фрейм с нужными отступами
+        self.frame.pack(fill='both',expand=True,padx=10,pady=5)
 
 # защита от запуска модуля
 if __name__ == '__main__':
