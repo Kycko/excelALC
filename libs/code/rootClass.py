@@ -2,8 +2,11 @@ from   sys import exit as SYSEXIT
 from   appUI       import Window
 from   globalFuncs import write_toFile
 import globalVars      as G
+from   excelRW     import Excel
+from   tables      import CellTable,TableDict
 import strings         as S
 import stringFuncs     as strF
+import libClasses      as lib
 
 # корневой класс: из него запускаются UI и код других модулей
 class Root():
@@ -26,8 +29,39 @@ class Root():
         self.justVerify = params['justVerify']
         if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
 
-        #self.getData(book)  # получаем данные
+        self.getData(book)  # получаем данные
         #if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data, params['AStype']) # проверяем выделенный диапазон
+
+    # чтение данных из таблицы
+    def getData(self,book): # book – это сам объект книги из xlwings
+        self.file     = Excel(book,self.fullRange)
+        self.file.table.cutUp(self.searchTitleRow(self.file.table.data))
+        self.log .add('readSheet',         self.file.sheet.name)
+        self.log .add('readFile' ,{'table':self.file.table.data,
+                                   'range':self.fullRange,
+                                   'addr' :self.file.dataRange.address})
+
+        if self.toTD:
+            self.unkTD = TableDict(self.file.table)
+            self.init_curTD()
+        else: self.table = CellTable(self.file.table.data)
+    def searchTitleRow(self,table:list):    # table – таблица[[]]
+        for r in range(len(table)):
+            if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
+        return 0
+    def init_curTD(self):
+        self.curTD = TableDict()
+        keys       = [] # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
+
+        for libKey,params in lib.columns.data.items():
+            unkKey = self.unkTD.searchTitle(params['title'])
+            if unkKey is not None:
+                self.unkTD.columns[unkKey].title.value = params['title']    # чтобы была правильная капитализация заголовка
+                keys.append((unkKey,libKey))
+
+        for item in keys: self.move_fromUnkTD_toCurTD(item[0],item[1])
+    def move_fromUnkTD_toCurTD(self,unkKey:str,curKey:str):
+        self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
 # журнал и ошибки
 class Log():

@@ -6,15 +6,12 @@ import globalVars               as G
 import strings                  as S
 from   globalFuncs          import sysExit
 
-# шаблоны моих классов (B=button)
-class Btemplate(TBS.Button):
+class Btemplate(TBS.Button):    # шаблон кнопки
     def __init__(self,master,text=None,image=None,width=None,bootstyle='primary',command=None):
         super().__init__(master=master,command=command,text=text,image=image,width=width,bootstyle=bootstyle)
         self   .bind    ('<KeyPress-Return>',  command) # обрабатывает оба Enter'а (+numpad)
         self   .bind    ('<KeyPress-space>',   command)
-
-# окно программы
-class Window(TBS.Window):
+class Window(TBS.Window):       # окно программы
     # конструкторы интерфейса
     def __init__(self,app):
         self.app = app  # для вызова функций класса Root() при нажатии кнопок
@@ -177,8 +174,7 @@ class Window(TBS.Window):
         else:
             self   .buildUI(True)
             self.app.launch(book,type)
-
-class Errors():
+class Errors(): # фрейм ошибок
     def __init__(self,parent:TBS.Labelframe):
         self.storage = {}                   # {type:{initLow:TBS.Label,...},...}
         self.frame   = TBS.Frame(parent)    # внутренний фрейм с нужными отступами
