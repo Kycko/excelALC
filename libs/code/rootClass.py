@@ -15,6 +15,7 @@ class Root():
             self.UI = appUI.Window(self)
             self.UI.mainloop()
         else: appUI.cantReadLib()
+
     # основные функции
     def launch(self,book,type:str):
         # book – это сам объект книги из xlwings; type = например, 'checkEmails'
@@ -31,7 +32,45 @@ class Root():
         if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
 
         self.getData(book)  # получаем данные
-        #if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data, params['AStype']) # проверяем выделенный диапазон
+        if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data,params['AStype'])  # проверяем выделенный диапазон
+
+    # основные алгоритмы проверки
+    def rangeChecker(self,table:list,type:str):
+        # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
+        # т. е. table – это всегда [[Cell,...],...]
+        errors = {} # {initLow:ErrorObj,...}
+
+        # autocorr и поиск всех ошибок
+        for r in range(len(table)):
+            for c in range(len(table[r])):
+                cell    = table[r][c]
+                tempVal = cell.value
+                if not self.justVerify: tempVal = self.autocorr(type,tempVal)
+
+                VAL = self.validate_andCapitalize(type, tempVal)
+                if VAL['valid'] and not self.justVerify:
+                    if tempVal != cell.value:
+                        self.log.add('ACsuccess', {'type':type, 'from':cell.value, 'to':tempVal})
+                        cell.value = VAL['value']
+                else:
+                    low = cell.value.lower()
+                    if low in errors.keys (): errors[low]  .addPos  (r,c)
+                    else:                     errors[low] = ErrorObj(cell.value, r, c)
+        if errors: self.errors.add(errors, type, self.log)
+
+        # предложение исправить вручную и запись исправлений
+        if self.suggErrors: self.suggInvalidUD(errors, type)
+        self.finalizeErrors(table, errors)
+
+    # работа с ошибками
+    def autocorr(self,type:str,value:str):
+        value    = strF.autocorrCell(type,value)    # выполнится только для нужных type
+        if type == 'region':
+            # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
+            AC = lib.autocorr.get(type,value)
+            if AC['fixed']: return AC['value']
+            #else:           value = STR_autocorrCity(value)   ДОПИСАТЬ
+        return lib.autocorr.get(type,value)['value']    # выполнится только для нужных type
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings

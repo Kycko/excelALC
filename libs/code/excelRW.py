@@ -31,8 +31,8 @@ class Excel():  # общий класс, можно копировать без 
         # вернёт либо used_range (весь диапазон с данными), либо выбранный диапазон
         return self.sheet.used_range if self.range is None else self.range
     def read(self):
-        self.dataRange = self.getRange()                                # нужен в т. ч. для лога
-        self.table     = Table(self.dataRange.options(ndim=2).value)    # ndim=2 всегда даёт двумерный массив
+        self.dataRange = self.getRange()                                        # нужен в т. ч. для лога
+        self.table     = Table(self.dataRange.options(ndim=2,empty='').value)   # ndim=2 всегда даёт двумерный массив
         self.table.stringAll  ()
         self.table.trimAll    ()
 

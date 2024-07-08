@@ -17,11 +17,14 @@ def inclStr(list:list,txt:str,fullText=True,lower=True):
     return False
 
 # изменение
-def rmDoublesStr(oldList,lower=False):
+def rmDoublesStr(oldList:list,lower=False):
     newList = []
     for item in oldList:
         if not inclStr(newList,item,True,lower): newList.append(item)
     return newList
+def rmBlankStr(list:list):
+    while '' in list: list.remove('')
+    return list
 
 # защита от запуска модуля
 if __name__ == '__main__':
