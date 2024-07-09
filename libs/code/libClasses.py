@@ -1,22 +1,25 @@
 from   sys import exit as SYSEXIT
+import xlwings         as xw
+import globalVars      as G
+from   excelRW     import Excel
 import libReading      as libR
 import stringFuncs     as strF
 import listFuncs       as listF
 
 # шаблоны классов
 class AStemplate(): # autocorr & sugg
-    def __init__(self,table:list,vList=False):  # table = таблица[[]]
+    def __init__(self,table,vList=False):   # table = объект tables.Table()
         # vList: будет несколько 'to'[] (True для sugg) или только один (False для autocorr)
-        self.data = libR.parseAS(table,vList)
+        self.data = libR.parseAS(table.data,vList)
     def get(self,type:str,value:str):
         if type in self.data.keys(): return listF.searchStr(self.data[type].keys(),value)
         else:                        return []
 
 # классы библиотек
 class Columns():
-    def __init__(self,table:list):  # table = таблица[[]]
+    def __init__(self,table):   # table = объект tables.Table()
         # vList = validation list, список допустимых значений
-        self.data = libR.parseDoubleDict(table)
+        self.data = libR.parseDoubleDict(table.data)
         self.vList = [params['title'] for params in self.data.values()]
     def getKey_byTitle(self,title:str,fullText=False,lower=False):
         # возвращает, например, ключ 'region' по заголовку 'Регион и город'
@@ -32,10 +35,11 @@ class Sugg(AStemplate):
 
 # создаём библиотеки, аналог глобальных переменных
 try:
-        raw      = libR.readFile()
-        columns  = Columns (raw['columns'])
-        autocorr = Autocorr(raw['autocorr'],False)
-        sugg     = Sugg    (raw['sugg']    ,True)
+        with xw.Book(G.files['lib']) as book: raw = Excel(book,'shAll',('toStrings'))
+        columns  = Columns (raw.data['columns'] ['table'])
+        autocorr = Autocorr(raw.data['autocorr']['table'],False)
+        sugg     = Sugg    (raw.data['sugg']    ['table'],True)
+        del raw # удаляем из памяти
         ready    = True
 except: ready    = False
 

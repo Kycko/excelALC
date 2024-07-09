@@ -26,10 +26,12 @@ pics    = {'filesUpdate'  : picsDir     +'filesUpdate.png', # нельзя зд�
 # параметры по типам скриптов
 # getSuggParam = надо ли прочитать из userCfg настройку suggestErrors
 # AStype (нужен не везде) = тип проверки для autocorr & suggest
-launchTypes = {'allChecks'  :{'fullRange':True, 'toTD':True ,'launch':'allChecks'   ,'justVerify':False,'getSuggParam':True},
-               'checkTitles':{'fullRange':True, 'toTD':True ,'launch':'checkTitles' ,'justVerify':False,'getSuggParam':True,'AStype':'title'},
-               'checkPhones':{'fullRange':False,'toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'phone'},
-               'checkEmails':{'fullRange':False,'toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'mail'}}
+launchTypes = {
+    'allChecks'  :{'readRange':'shActive', 'toTD':True ,'launch':'allChecks'   ,'justVerify':False,'getSuggParam':True},
+    'checkTitles':{'readRange':'shActive', 'toTD':True ,'launch':'checkTitles' ,'justVerify':False,'getSuggParam':True,'AStype':'title'},
+    'checkPhones':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'phone'},
+    'checkEmails':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'mail'}
+    }
 
 # readLib    : прочитать подходящие варианты для валидации из библиотеки
 # checkList  : валидация путём проверки, есть ли value в списке допустимых (extra)

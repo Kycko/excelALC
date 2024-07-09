@@ -1,15 +1,5 @@
 from   sys import exit as SYSEXIT
-import globalVars      as G
 import listFuncs       as listF
-import xlwings         as xw
-
-# читаем справочник
-def readFile():
-    final = {}
-    with xw.Book(G.files['lib']) as book:
-        for sheet in book.sheets:
-            final[sheet.name] = sheet.used_range.options(ndim=2,empty='').value  # ndim=2 всегда даёт двумерный массив
-    return final
 
 # преобразуем данные из справочника в словари и списки
 def parseDoubleDict(table:list):    # table = таблица[[]]
@@ -40,7 +30,6 @@ def parseAS(table:list,vList=False):
             if not len(rTo): rTo = ['']
         else: rTo = row[0]
         final[rType][rFrom] = rTo
-        print(rTo)
     return final
 
 # защита от запуска модуля

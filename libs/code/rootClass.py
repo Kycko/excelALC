@@ -26,7 +26,7 @@ class Root():
         self.errors     = Errors(self.UI.errors)
         self.log        = Log   (self.UI)
         self.log.add('launch',type)
-        self.fullRange  = params['fullRange']
+        self.readRange  = params['readRange']
         self.toTD       = params['toTD'] # будем работать с TableDict (True) или же с CellTable (False)
         self.justVerify = params['justVerify']
         if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
@@ -74,17 +74,19 @@ class Root():
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
-        self.file     = Excel(book,self.fullRange)
-        self.file.table.cutUp(self.searchTitleRow(self.file.table.data))
-        self.log .add('readSheet',         self.file.sheet.name)
-        self.log .add('readFile' ,{'table':self.file.table.data,
-                                   'range':self.fullRange,
-                                   'addr' :self.file.dataRange.address})
+        self.file = Excel(book,self.readRange)
 
-        if self.toTD:
-            self.unkTD = TableDict(self.file.table)
-            self.init_curTD()
-        else: self.table = CellTable(self.file.table.data)
+        # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
+        for shName,tObj in self.file.data.items():
+            tObj['table'].cutUp(self.searchTitleRow(tObj['table'].data))
+            self.log .add('readSheet',shName)
+            self.log .add('readFile' ,{'tObj' :tObj,
+                                       'range':('range','full')[self.readRange == 'shActive']})
+
+            if self.toTD:
+                self.unkTD = TableDict(tObj['table'])
+                self.init_curTD()
+            else: self.table = CellTable(tObj['table'])
     def searchTitleRow(self,table:list):    # table = таблица[[]]
         for r in range(len(table)):
             if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
@@ -118,10 +120,10 @@ class Log():
         if   type == 'launch'   : final = '[core] ' + S.layout['actions'][params]['log']
         elif type == 'readSheet': final = S.log[type].replace('$$1',params)
         elif type == 'readFile':
-            final = S.log[type]['full' if params['range'] else 'range']
-            rows  = len(params ['table']) - 1*(params['range']) # считаем без заголовка
-            cols  = len(params ['table'][0])
-            final = final.replace('$$1',params['addr'])
+            final =   S.log[type][params['range']]
+            rows  =           len(params['tObj']['table'].data) - 1*(params['range'] == 'full') # считаем без заголовка
+            cols  =           len(params['tObj']['table'].data[0])
+            final = final.replace('$$1',params['tObj']['addr'])
             final = final.replace('$$2',str(cols)+' '+strF.getEnding_forCount(S.words_byCount['столбцы'],cols))
             final = final.replace('$$3',str(rows)+' '+strF.getEnding_forCount(S.words_byCount['строки' ],rows))
         elif type == 'ACsuccess':

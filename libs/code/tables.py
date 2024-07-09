@@ -19,9 +19,11 @@ class TableTemplate():
         self.data = rotated
 
 # основные классы
-class Table(TableTemplate):         # общий класс, можно копировать без изменений в другие программы
-    def __init__(self,values:list): # values – таблица[[]]
+class Table(TableTemplate): # общий класс, можно копировать без изменений в другие программы
+    def __init__(self,values:list,initParams=('toStrings','trimAll')):  # values – таблица[[]]
         self.data = values
+        if 'toStrings' in initParams: self.stringAll()
+        if 'trimAll'   in initParams: self.trimAll  ()
     def stringAll(self):
         # конвертирует каждую ячейку таблицы в строку
         for r in range(len(self.data)):
@@ -35,8 +37,8 @@ class Table(TableTemplate):         # общий класс, можно копи
 class CellTable(TableTemplate):
     # общий класс, ВОЗМОЖНО подойдёт для других программ
     # это таблица, в которой каждая ячейка – это объект Cell [[CellObj,...],...]
-    def __init__(self,table:list,errors=False): # table – таблица[[]], errors – значение по умолчанию для всех ячеек
-        self.data = [getCells_fromList(row,errors) for row in table]
+    def __init__(self,tObj:Table,errors=False): # errors – значение по умолчанию для всех ячеек
+        self.data = [getCells_fromList(row,errors) for row in tObj.data]
 class Cell():
     def __init__(self,value,error=False):
         self.value = value
