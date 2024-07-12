@@ -37,9 +37,8 @@ class Root():
     def rangeChecker(self,table:list,type:str):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell,...],...]
-        errors = {} # {initLow:ErrorObj,...}
 
-        # autocorr и поиск всех ошибок
+        errors = {} # {initLow:ErrorObj,...}
         for r in range(len(table)):
             for c in range(len(table[r])):
                 cell    = table[r][c]
@@ -55,10 +54,11 @@ class Root():
                     low = cell.value.lower()
                     if low in errors.keys (): errors[low]  .addPos             ({'r':r,'c':c})
                     else:                     errors[low] = ErrorObj(cell.value,{'r':r,'c':c})
-        if errors: self.errors.add(errors,type,self.log)
 
-        if self.suggErrors: self.suggInvalidUD(errors, type)
-        self.finalizeErrors(table, errors)
+        if errors:
+            self.errors.add(errors,type,self.log)
+            if self.suggErrors: self.suggInvalidUD(errors,type)
+            self.finalizeErrors(table, errors)
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -82,6 +82,16 @@ class Root():
             if not self.justVerify and final['valid']: final['value'] = found[0]
         else: final['valid'] = strF.validateCell(type, final['value'])
         return final
+    def suggInvalidUD(self,errors:dict,type:str):   # errors = {initLow:ErrorObj,...}
+        counter = {'cur':0,'total':len(errors.keys())}
+        for key,errObj in errors.items():
+            counter['cur'] += 1
+            suggList = self   .getSugg      (type,errObj.initVal)
+            resp     = self.UI.suggInvalidUD(type,errObj.initVal,suggList,counter)
+            #if resp['OKclicked']:
+    def getSugg(self,type:str,value:str):
+        suggList = strF.getSugg(type,value)
+        return suggList
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings

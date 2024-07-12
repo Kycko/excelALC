@@ -113,23 +113,56 @@ class Window(TBS.Window):       # окно программы
                     TBS .Separator(frMain).pack(fill='x',padx=2,pady=6)
                     self.buildActionsCfgGroup  (frMain  ,params,group)
         elif type == 'mainRun':
-            frErrors = TBS.Frame(parent)
-            frErrors.pack(fill='y',side='right',padx=5)
-            self.buildFrame('runLog'   ,parent)     # основной журнал выполнения
-            self.buildFrame('runSugg'  ,frErrors)   # предложения по исправлению ошибок
-            self.buildFrame('runErrors',frErrors)   # список текущих ошибок
+            frMain = TBS.Frame(parent)
+            frMain.pack(fill='y',side='right',padx=5)
+            self.buildFrame('runLog'   ,parent) # основной журнал выполнения
+            self.buildFrame('runSugg'  ,frMain) # предложения по исправлению ошибок
+            self.buildFrame('runErrors',frMain) # список текущих ошибок
         elif type == 'runLog':
-            frMain     = TBS.Labelframe(parent,text=S.layout['run']['lfl']['mainLog'])
-            self.frLog = TBS.Frame     (frMain) # внутренний фрейм с нужными отступами
-            frMain    .pack(fill='both',expand=True,side='left',padx=5 ,pady=4)
-            self.frLog.pack(fill='both',expand=True,            padx=10,pady=5)
-        elif type == 'runSugg':
-            frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
-            frMain.pack(fill='x',pady=5)
+            frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['mainLog'])
+            frMain      .pack (fill='both',expand=True,side='left',padx=5 ,pady=4)
+            self.frLog = TBS.Frame(frMain)  # внутренний фрейм с нужными отступами
+            self.frLog.pack(fill='both',expand=True,padx=10,pady=5)
         elif type == 'runErrors':
             frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['errors'])
             frMain.pack(fill='both',expand=True,pady=5)
             self.errors = Errors(frMain)
+        elif type == 'runSugg':
+            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
+            frMain.pack(fill='x',pady=5)
+
+            self.buildFrame('runSugg_curVal',frMain)    # фрейм вывода текущего значения
+            TBS.Label(frMain,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
+            self.buildFrame('runSuggVars' ,frMain)      # фрейм для добавления кнопок выбора
+            self.buildFrame('runSuggEntry',frMain)      # фрейм с полем ручного ввода текста
+        elif type == 'runSugg_curVal':
+            frMain = TBS.Frame(parent)
+            frMain.pack     (fill='x')
+            TBS.Label(frMain,text=S.layout['run']['suggUI']['curValue']).pack(side='left')
+            self.lblSuggCurVal = TBS.Label(frMain,text='')   # label с текущим значением
+            self.lblSuggCurVal.pack(fill='x',side='right')
+        elif type == 'runSuggVars':
+            self.frSuggVars = TBS.Frame(parent)
+            self.frSuggVars.pack     (fill='x')
+        elif type == 'runSuggEntry':
+            frMain = TBS.Frame(parent)
+            frMain.pack     (fill='x')
+            TBS.Label(frMain,text=S.layout['run']['suggUI']['title']).pack(fill='x')
+            self.suggEntry = TBS.Entry(frMain)
+            self.suggEntry.pack(fill='x')
+            self.buildFrame('runSugg_entryButtons',frMain)  # кнопки ОК и Отмена
+            self.setSuggState(False)
+        elif type == 'runSugg_entryButtons':
+            frMain = TBS.Frame(parent)
+            frMain.pack     (fill='x')
+
+            self.suggBtns = []
+            for key,cfg in S.layout['run']['suggUI']['buttons'].items():
+                self.suggBtns.append(Btemplate(frMain,
+                                               text      = cfg['text'],
+                                               command   = lambda key=key:self.suggClicked(key),
+                                               bootstyle = 'success'))
+                self.suggBtns[-1].pack(side=cfg['side'])
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
@@ -156,6 +189,13 @@ class Window(TBS.Window):       # окно программы
             self.fileList.set      (S.layout['main']['msg']['noFilesFound'])
             self.fileList.configure(state='disabled')
         if self.frRight is not None: self.setLaunchBtnState()
+    def setSuggState(self,enabled:bool):
+        widgets     = [self.suggEntry]
+        widgets.extend(self.suggBtns)
+        for widget in widgets: widget.configure(state=('disabled','normal')[enabled])
+    def suggInvalidUD(self,type:str,initVal:str,suggList:list,counter:dict):
+        # counter = {'cur':,'total':}
+        pass
 
     # кнопки и переключатели
     def switchBoolSetting(self,param:str):
@@ -177,6 +217,8 @@ class Window(TBS.Window):       # окно программы
         else:
             self   .buildUI(True)
             self.app.launch(book,type)
+    def suggClicked(self,bttn:str):     # bttn = либо 'OK', либо 'cancel'
+        pass
 class Errors(): # фрейм ошибок
     def __init__(self,parent:TBS.Labelframe):
         self.storage = {}                   # {type:{initLow:TBS.Label,...},...}
