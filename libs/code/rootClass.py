@@ -6,6 +6,7 @@ from   excelRW     import Excel
 from   tables      import CellTable,TableDict
 import strings         as S
 import stringFuncs     as strF
+import listFuncs       as listF
 import libClasses      as lib
 
 # корневой класс: из него запускаются UI и код других модулей
@@ -15,8 +16,6 @@ class Root():
             self.UI = appUI.Window(self)
             self.UI.mainloop()
         else: appUI.cantReadLib()
-
-    # основные функции
     def launch(self,book,type:str):
         # book – это сам объект книги из xlwings; type = например, 'checkEmails'
         params = G.launchTypes[type]
@@ -47,18 +46,17 @@ class Root():
                 tempVal = cell.value
                 if not self.justVerify: tempVal = self.autocorr(type,tempVal)
 
-                VAL = self.validate_andCapitalize(type, tempVal)
-                if VAL['valid'] and not self.justVerify:
-                    if tempVal != cell.value:
-                        self.log.add('ACsuccess', {'type':type, 'from':cell.value, 'to':tempVal})
+                VAL = self.validate_andCapitalize(type,tempVal)
+                if VAL['valid']:
+                    if not self.justVerify and tempVal != cell.value:
+                        self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':tempVal})
                         cell.value = VAL['value']
                 else:
                     low = cell.value.lower()
-                    if low in errors.keys (): errors[low]  .addPos  (r,c)
-                    else:                     errors[low] = ErrorObj(cell.value, r, c)
-        if errors: self.errors.add(errors, type, self.log)
+                    if low in errors.keys (): errors[low]  .addPos             ({'r':r,'c':c})
+                    else:                     errors[low] = ErrorObj(cell.value,{'r':r,'c':c})
+        if errors: self.errors.add(errors,type,self.log)
 
-        # предложение исправить вручную и запись исправлений
         if self.suggErrors: self.suggInvalidUD(errors, type)
         self.finalizeErrors(table, errors)
 
@@ -71,6 +69,19 @@ class Root():
             if AC['fixed']: return AC['value']
             #else:           value = STR_autocorrCity(value)   ДОПИСАТЬ
         return lib.autocorr.get(type,value)['value']    # выполнится только для нужных type
+    def validate_andCapitalize(self,type:str,value:str,extra=None):
+        # в extra можно передать любые необходимые доп. данные
+        params = G.AStypes[type]
+        # ↓ передаём в extra suggList из appUI.suggInvalidUD()
+        if extra is None and params['readLib']: extra = lib.getValidationList(type)
+        final  = {'valid':None, 'value':value}
+
+        if params['checkList']:
+            found          = listF.searchStr(extra,value,'item',True,not self.justVerify)
+            final['valid'] = bool(len(found))
+            if not self.justVerify and final['valid']: final['value'] = found[0]
+        else: final['valid'] = strF.validateCell(type, final['value'])
+        return final
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -106,7 +117,7 @@ class Root():
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
 # журнал и ошибки
-class Log():
+class Log():        # журнал
     def __init__(self,UI:appUI.Window):
         self.UI   = UI
         self.file = G.files['log']
@@ -133,12 +144,27 @@ class Log():
         elif type == 'errorsFound':
             final = S.log[type].replace('$$1',params['type']).replace('$$2',str(params['count']))
         return final
-class Errors():
-    def __init__(self,UI):  # UI = класс appUI.Errors()
+class Errors():     # хранилище ошибок
+    def __init__(self,UI):
         self.storage = {}   # {type:{initLow:ErrorObj,...},...}
-        self.UI      = UI
+        self.UI      = UI   # UI = класс appUI.Errors()
         self.file    = G.files['errors']
         write_toFile([],self.file)
+    def add(self,errors:dict,type:str,mainLog:Log): # errors = {initLow:ErrorObj,...}
+        if type not in   self.storage.keys(): self.storage[type] = {}
+        self.storage[type]   .update(errors)
+        for low,err in errors.items ():
+            newEntry = '['+type+'] ['+str(len(err.pos))+' шт.] ' + err.initVal
+            write_toFile(newEntry,self.file,True)
+            self.UI .add(type,low,newEntry)
+        mainLog.add('errorsFound',{'type':type,'count':len(errors.keys())})
+class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
+    def __init__(self,initValue:str,pos:dict):  # pos={'r':row,'c':col}
+        self.initVal = initValue
+        self.newVal  = None
+        self.fixed   = False
+        self.pos     = [pos]    # список всех позиций этой ошибки в диапазоне проверки [{'r':row,'c':col},...]
+    def addPos(self,pos:dict): self.pos.append(pos)
 
 # защита от запуска модуля
 if __name__ == '__main__':

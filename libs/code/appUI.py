@@ -182,6 +182,10 @@ class Errors(): # фрейм ошибок
         self.storage = {}                   # {type:{initLow:TBS.Label,...},...}
         self.frame   = TBS.Frame(parent)    # внутренний фрейм с нужными отступами
         self.frame.pack(fill='both',expand=True,padx=10,pady=5)
+    def add(self,type:str,low:str,text:str):
+        if type not in self.storage.keys(): self.storage[type] = {}
+        self.storage[type][low] = TBS.Label(self.frame,text=text)
+        self.storage[type][low].pack(fill='x')
 
 # защита от запуска модуля
 if __name__ == '__main__':

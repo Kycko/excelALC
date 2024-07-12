@@ -6,6 +6,10 @@ import libReading      as libR
 import stringFuncs     as strF
 import listFuncs       as listF
 
+# общие функции
+def getValidationList(type:str):
+    if type == 'title': return columns.vList
+
 # шаблоны классов
 class AStemplate(): # autocorr & sugg
     def __init__(self,table,vList=False):   # table = объект tables.Table()
@@ -19,7 +23,7 @@ class AStemplate(): # autocorr & sugg
 class Columns():
     def __init__(self,table):   # table = объект tables.Table()
         # vList = validation list, список допустимых значений
-        self.data = libR.parseDoubleDict(table.data)
+        self.data  = libR.parseDoubleDict(table.data)
         self.vList = [params['title'] for params in self.data.values()]
     def getKey_byTitle(self,title:str,fullText=False,lower=False):
         # возвращает, например, ключ 'region' по заголовку 'Регион и город'
@@ -35,7 +39,10 @@ class Sugg(AStemplate):
 
 # создаём библиотеки, аналог глобальных переменных
 try:
-        with xw.Book(G.files['lib']) as book: raw = Excel(book,'shAll',('toStrings'))
+        with xw.App(visible=False) as app:
+            book = xw.Book(G.files['lib'])
+            raw  = Excel(book,'shAll',('toStrings'))
+            book.close()    # иначе, если других окон Excel не открыто, останется пустое окно
         columns  = Columns (raw.data['columns'] ['table'])
         autocorr = Autocorr(raw.data['autocorr']['table'],False)
         sugg     = Sugg    (raw.data['sugg']    ['table'],True)

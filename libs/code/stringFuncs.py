@@ -36,7 +36,7 @@ def getSugg(type:str,value:str):
     return []
 def validateCell(type:str,value:str):
     if type in ('phone','mail','website'):
-        # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ НЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
+        # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
         for item in value.split(','):
             if   type == 'phone'   and not checkPhone  (item): return False
             elif type == 'mail'    and not checkMail   (item): return False
