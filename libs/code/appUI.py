@@ -128,9 +128,10 @@ class Window(TBS.Window):       # окно программы
             frMain.pack(fill='both',expand=True,pady=4)
             self.errors = Errors(frMain)
         elif type == 'runSugg':
-            frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
-            frMain.pack            (fill='x',pady=5)
-            frSugg = TBS.Frame(frMain)
+            self.suggLfl = TBS.Labelframe(parent)       # в нём будем писать счётчик ошибок
+            self.suggLfl.pack   (fill='x',pady=5)
+            self.setSuggTitle()
+            frSugg     = TBS.Frame(self.suggLfl)
             frSugg.pack(fill='x',padx=10,pady=5)
             self.suggWidgets = {}                       # все виджеты, которые надо включать/отключать
             self.buildFrame('runSugg_curVal',frSugg)    # фрейм вывода текущего значения
@@ -139,13 +140,9 @@ class Window(TBS.Window):       # окно программы
         elif type == 'runSugg_curVal':
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
-            TBS.Label(frMain,text=S.layout['run']['suggUI']['curValue']['lbl']).pack(side='left')
-            self.suggWidgets['curVal'] = Btemplate(
-                frMain,
-                text      = S.layout['run']['suggUI']['curValue']['btn'],
-                command   = self.suggCurClicked,
-                bootstyle = 'outline'
-                )
+            strings = S.layout['run']['suggUI']['curValue']
+            TBS.Label(frMain,text=strings['lbl']).pack(side='left')
+            self.suggWidgets['curVal'] = Btemplate(frMain,text=strings['btn'],bootstyle='outline')
             self.suggWidgets['curVal'].pack(fill='x',side='right')
         elif type == 'runSuggVars':
             self.frSuggVars = TBS.Frame(parent)
@@ -155,7 +152,7 @@ class Window(TBS.Window):       # окно программы
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
             TBS.Separator(frMain).pack(fill='x',pady=7)
-            TBS.Label(frMain,text=S.layout['run']['suggUI']['title']).pack(fill='x')
+            TBS.Label(frMain,text=S.layout['run']['suggUI']['lblEntry']).pack(fill='x')
             self.suggWidgets['entry']   = TBS.Entry(frMain)
             self.suggWidgets['entry'].pack(fill='x',pady=7)
             self.buildFrame('runSugg_entryButtons',frMain)  # кнопки ОК и Отмена
@@ -167,7 +164,7 @@ class Window(TBS.Window):       # окно программы
                 self.suggWidgets[key] = Btemplate(frMain,
                                                   text      = cfg['text'],
                                                   command   = lambda key=key:self.suggEntered(key),
-                                                  bootstyle = 'success')
+                                                  bootstyle = cfg['style'])
                 self.suggWidgets[key].pack(side='right',padx=cfg['padx'])
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
@@ -195,11 +192,20 @@ class Window(TBS.Window):       # окно программы
             self.fileList.set      (S.layout['main']['msg']['noFilesFound'])
             self.fileList.configure(state='disabled')
         if self.frRight is not None: self.setLaunchBtnState()
+    def setSuggTitle(self,counter:dict=None):   # counter = {'cur':,'total':}
+        if counter is None: numbers = ''
+        else:
+            numbers = S.layout['run']['suggUI']['counter']
+            numbers = numbers.replace('$$2',str(counter['cur'])).replace('$$3',str(counter['total']))
+        self.suggLfl.configure(text=S.layout['run']['lfl']['sugg'].replace('$$1',numbers))
     def setSuggState(self,enabled:bool):
         for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
     def suggInvalidUD(self,type:str,initVal:str,suggList:list,counter:dict):
         # counter = {'cur':,'total':}
-        pass
+        self.setSuggTitle(counter)
+        self.setSuggState(True)
+        self.suggWidgets['curVal'].configure(text=initVal,command=lambda s=initVal:self.suggCurClicked(s))
+        self.suggCurClicked(initVal)    # добавляем в entry текущее значение
 
     # кнопки и переключатели
     def switchBoolSetting(self,param:str):
@@ -221,8 +227,9 @@ class Window(TBS.Window):       # окно программы
         else:
             self   .buildUI(True)
             self.app.launch(book,type)
-    def suggCurClicked(self):
-        pass
+    def suggCurClicked(self,value):
+        self.suggWidgets['entry'].delete(0,TBS.END)
+        self.suggWidgets['entry'].insert(0,value)
     def suggEntered(self,bttn:str):     # bttn = либо 'ok', либо 'cancel'
         pass
 class Errors(): # фрейм ошибок
