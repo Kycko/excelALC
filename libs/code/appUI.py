@@ -125,44 +125,50 @@ class Window(TBS.Window):       # окно программы
             self.frLog.pack(fill='both',expand=True,padx=10,pady=5)
         elif type == 'runErrors':
             frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['errors'])
-            frMain.pack(fill='both',expand=True,pady=5)
+            frMain.pack(fill='both',expand=True,pady=4)
             self.errors = Errors(frMain)
         elif type == 'runSugg':
-            frMain  = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
-            frMain.pack(fill='x',pady=5)
-
-            self.buildFrame('runSugg_curVal',frMain)    # фрейм вывода текущего значения
-            TBS.Label(frMain,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
-            self.buildFrame('runSuggVars' ,frMain)      # фрейм для добавления кнопок выбора
-            self.buildFrame('runSuggEntry',frMain)      # фрейм с полем ручного ввода текста
+            frMain = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
+            frMain.pack            (fill='x',pady=5)
+            frSugg = TBS.Frame(frMain)
+            frSugg.pack(fill='x',padx=10,pady=5)
+            self.suggWidgets = {}                       # все виджеты, которые надо включать/отключать
+            self.buildFrame('runSugg_curVal',frSugg)    # фрейм вывода текущего значения
+            self.buildFrame('runSuggVars'   ,frSugg)    # фрейм для добавления кнопок выбора
+            self.buildFrame('runSuggEntry'  ,frSugg)    # фрейм с полем ручного ввода текста
         elif type == 'runSugg_curVal':
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
-            TBS.Label(frMain,text=S.layout['run']['suggUI']['curValue']).pack(side='left')
-            self.lblSuggCurVal = TBS.Label(frMain,text='')   # label с текущим значением
-            self.lblSuggCurVal.pack(fill='x',side='right')
+            TBS.Label(frMain,text=S.layout['run']['suggUI']['curValue']['lbl']).pack(side='left')
+            self.suggWidgets['curVal'] = Btemplate(
+                frMain,
+                text      = S.layout['run']['suggUI']['curValue']['btn'],
+                command   = self.suggCurClicked,
+                bootstyle = 'outline'
+                )
+            self.suggWidgets['curVal'].pack(fill='x',side='right')
         elif type == 'runSuggVars':
             self.frSuggVars = TBS.Frame(parent)
             self.frSuggVars.pack     (fill='x')
+            #TBS.Label(parent,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
         elif type == 'runSuggEntry':
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
+            TBS.Separator(frMain).pack(fill='x',pady=7)
             TBS.Label(frMain,text=S.layout['run']['suggUI']['title']).pack(fill='x')
-            self.suggEntry = TBS.Entry(frMain)
-            self.suggEntry.pack(fill='x')
+            self.suggWidgets['entry']   = TBS.Entry(frMain)
+            self.suggWidgets['entry'].pack(fill='x',pady=7)
             self.buildFrame('runSugg_entryButtons',frMain)  # кнопки ОК и Отмена
             self.setSuggState(False)
         elif type == 'runSugg_entryButtons':
             frMain = TBS.Frame(parent)
-            frMain.pack     (fill='x')
-
-            self.suggBtns = []
+            frMain.pack     (fill='x',pady=3)
             for key,cfg in S.layout['run']['suggUI']['buttons'].items():
-                self.suggBtns.append(Btemplate(frMain,
-                                               text      = cfg['text'],
-                                               command   = lambda key=key:self.suggClicked(key),
-                                               bootstyle = 'success'))
-                self.suggBtns[-1].pack(side=cfg['side'])
+                self.suggWidgets[key] = Btemplate(frMain,
+                                                  text      = cfg['text'],
+                                                  command   = lambda key=key:self.suggEntered(key),
+                                                  bootstyle = 'success')
+                self.suggWidgets[key].pack(side='right',padx=cfg['padx'])
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
@@ -190,9 +196,7 @@ class Window(TBS.Window):       # окно программы
             self.fileList.configure(state='disabled')
         if self.frRight is not None: self.setLaunchBtnState()
     def setSuggState(self,enabled:bool):
-        widgets     = [self.suggEntry]
-        widgets.extend(self.suggBtns)
-        for widget in widgets: widget.configure(state=('disabled','normal')[enabled])
+        for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
     def suggInvalidUD(self,type:str,initVal:str,suggList:list,counter:dict):
         # counter = {'cur':,'total':}
         pass
@@ -217,7 +221,9 @@ class Window(TBS.Window):       # окно программы
         else:
             self   .buildUI(True)
             self.app.launch(book,type)
-    def suggClicked(self,bttn:str):     # bttn = либо 'OK', либо 'cancel'
+    def suggCurClicked(self):
+        pass
+    def suggEntered(self,bttn:str):     # bttn = либо 'ok', либо 'cancel'
         pass
 class Errors(): # фрейм ошибок
     def __init__(self,parent:TBS.Labelframe):
