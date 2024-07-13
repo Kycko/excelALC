@@ -83,11 +83,17 @@ class Root():
         else: final['valid'] = strF.validateCell(type, final['value'])
         return final
     def suggInvalidUD(self,errors:dict,type:str):   # errors = {initLow:ErrorObj,...}
+        
+
         counter = {'cur':0,'total':len(errors.keys())}
+
         for key,errObj in errors.items():
             counter['cur'] += 1
             suggList = self   .getSugg      (type,errObj.initVal)
-            resp     = self.UI.suggInvalidUD(type,errObj.initVal,suggList,counter)
+
+            self.resp = None
+            self.UI.suggInvalidUD(type,errObj.initVal,suggList,counter)
+
             #if resp['OKclicked']:
     def getSugg(self,type:str,value:str):
         suggList = strF.getSugg(type,value)
@@ -173,6 +179,7 @@ class ErrorObj():   # объект одной ошибки, использует
         self.initVal = initValue
         self.newVal  = None
         self.fixed   = False
+        self.checked = False    # устанавливается True, когда пользователь введёт что-то новое или нажмёт "Отмена"
         self.pos     = [pos]    # список всех позиций этой ошибки в диапазоне проверки [{'r':row,'c':col},...]
     def addPos(self,pos:dict): self.pos.append(pos)
 

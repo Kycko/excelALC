@@ -135,8 +135,11 @@ class Window(TBS.Window):       # окно программы
             frSugg.pack(fill='x',padx=10,pady=5)
             self.suggWidgets = {}                       # все виджеты, которые надо включать/отключать
             self.buildFrame('runSugg_curVal',frSugg)    # фрейм вывода текущего значения
-            self.buildFrame('runSuggVars'   ,frSugg)    # фрейм для добавления кнопок выбора
-            self.buildFrame('runSuggEntry'  ,frSugg)    # фрейм с полем ручного ввода текста
+
+            self.frSuggMain = TBS.Frame(parent)  # чтобы фрейм предложений оставался при удалении данных
+            self.frSuggMain.pack     (fill='x')
+            self.buildFrame('runSuggVars' ,self.frSuggMain,[])  # фрейм для добавления кнопок выбора
+            self.buildFrame('runSuggEntry',frSugg)              # фрейм с полем ручного ввода текста
         elif type == 'runSugg_curVal':
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
@@ -145,9 +148,15 @@ class Window(TBS.Window):       # окно программы
             self.suggWidgets['curVal'] = Btemplate(frMain,text=strings['btn'],bootstyle='outline')
             self.suggWidgets['curVal'].pack(fill='x',side='right')
         elif type == 'runSuggVars':
+            if hasattr(self,'frSuggVars'): self.frSuggVars.destroy()
             self.frSuggVars = TBS.Frame(parent)
             self.frSuggVars.pack     (fill='x')
-            #TBS.Label(parent,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
+            if len(params): # здесь params = список[] предложений для исправления
+                TBS.Label(parent,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
+                for item in params: Btemplate(self.frSuggVars,
+                                              text    = item,
+                                              command = lambda s=item:self.suggVarClicked(s)
+                                              ).pack(fill='x')
         elif type == 'runSuggEntry':
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
@@ -205,6 +214,7 @@ class Window(TBS.Window):       # окно программы
         self.setSuggTitle(counter)
         self.setSuggState(True)
         self.suggWidgets['curVal'].configure(text=initVal,command=lambda s=initVal:self.suggCurClicked(s))
+        self.buildFrame('runSuggVars',self.frSuggMain,suggList)
         self.suggCurClicked(initVal)    # добавляем в entry текущее значение
 
     # кнопки и переключатели
