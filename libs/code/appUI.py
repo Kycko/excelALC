@@ -1,5 +1,6 @@
 from   sys                  import exit as SYSEXIT
-from   tkinter                      import BooleanVar
+from   tkinter                      import BooleanVar, Misc
+from typing import Literal
 import ttkbootstrap                     as TBS
 from   ttkbootstrap.tooltip         import ToolTip
 from   ttkbootstrap.dialogs.dialogs import Messagebox
@@ -9,12 +10,12 @@ from   globalFuncs                  import sysExit
 
 def cantReadLib(): Messagebox.ok(S.layout['main']['msg']['cantReadLib'],G.app['TV'])
 
-class Btemplate(TBS.Button):    # шаблон кнопки
+class Btemplate(TBS.Button):        # шаблон кнопки
     def __init__(self,master,text=None,image=None,width=None,bootstyle='primary',command=None):
         super().__init__(master=master,command=command,text=text,image=image,width=width,bootstyle=bootstyle)
         self   .bind    ('<KeyPress-Return>',  command) # обрабатывает оба Enter'а (+numpad)
         self   .bind    ('<KeyPress-space>',   command)
-class Window(TBS.Window):       # окно программы
+class Window(TBS.Window):           # окно программы
     # конструкторы интерфейса
     def __init__(self,app):
         self.app = app  # для вызова функций класса Root() при нажатии кнопок
@@ -110,8 +111,8 @@ class Window(TBS.Window):       # окно программы
             frMain .pack (fill='x',padx=8)
             for group in ('forAll',params):
                 if group in S.layout['actionsCfg'].keys():
-                    TBS .Separator(frMain).pack(fill='x',padx=2,pady=6)
-                    self.buildActionsCfgGroup  (frMain  ,params,group)
+                    self.buildSeparator      (frMain,padx=2,pady=6)
+                    self.buildActionsCfgGroup(frMain,params,group)
         elif type == 'mainRun':
             frMain = TBS.Frame(parent)
             frMain.pack(fill='y',side='right',padx=5)
@@ -136,7 +137,7 @@ class Window(TBS.Window):       # окно программы
             self.suggWidgets = {}                       # все виджеты, которые надо включать/отключать
             self.buildFrame('runSugg_curVal',frSugg)    # фрейм вывода текущего значения
 
-            self.frSuggMain = TBS.Frame(parent)  # чтобы фрейм предложений оставался при удалении данных
+            self.frSuggMain = TBS.Frame(frSugg)  # чтобы фрейм предложений оставался при удалении данных
             self.frSuggMain.pack     (fill='x')
             self.buildFrame('runSuggVars' ,self.frSuggMain,[])  # фрейм для добавления кнопок выбора
             self.buildFrame('runSuggEntry',frSugg)              # фрейм с полем ручного ввода текста
@@ -145,22 +146,24 @@ class Window(TBS.Window):       # окно программы
             frMain.pack     (fill='x')
             strings = S.layout['run']['suggUI']['curValue']
             TBS.Label(frMain,text=strings['lbl']).pack(side='left')
-            self.suggWidgets['curVal'] = Btemplate(frMain,text=strings['btn'],bootstyle='outline')
+            self.suggWidgets['curVal'] = Btemplate(frMain,text=strings['btn'],bootstyle='warning-outline')
             self.suggWidgets['curVal'].pack(fill='x',side='right')
         elif type == 'runSuggVars':
             if hasattr(self,'frSuggVars'): self.frSuggVars.destroy()
-            self.frSuggVars = TBS.Frame(parent)
-            self.frSuggVars.pack     (fill='x')
             if len(params): # здесь params = список[] предложений для исправления
-                TBS.Label(parent,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
+                self.frSuggVars = TBS.Frame(parent)
+                self.frSuggVars.pack     (fill='x')
+
+                self.buildSeparator(self.frSuggVars)
+                TBS.Label(self.frSuggVars,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
                 for item in params: Btemplate(self.frSuggVars,
                                               text    = item,
-                                              command = lambda s=item:self.suggVarClicked(s)
-                                              ).pack(fill='x')
+                                              command = lambda s=item:self.suggVarClicked(s),
+                                              bootstyle='info-outline').pack(fill='x',pady=4)
         elif type == 'runSuggEntry':
-            frMain = TBS.Frame(parent)
-            frMain.pack     (fill='x')
-            TBS.Separator(frMain).pack(fill='x',pady=7)
+            frMain = TBS.Frame (parent)
+            frMain.pack      (fill='x')
+            self.buildSeparator(frMain)
             TBS.Label(frMain,text=S.layout['run']['suggUI']['lblEntry']).pack(fill='x')
             self.suggWidgets['entry']   = TBS.Entry(frMain)
             self.suggWidgets['entry'].pack(fill='x',pady=7)
@@ -189,6 +192,7 @@ class Window(TBS.Window):       # окно программы
                                     bootstyle = 'round-toggle')
             ToolTip(cb,text=strings['tt'])
             cb.pack(padx=5,pady=5,expand=True,anchor='w')
+    def buildSeparator(self,parent,padx=0,pady=7): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
 
     # вспомогательные
     def log(self,string:str): TBS.Label(self.frLog,text=string).pack(fill='x')
@@ -214,9 +218,9 @@ class Window(TBS.Window):       # окно программы
     def suggInvalidUD(self,type:str,initVal:str,suggList:list,errorsLeft:int):
         self.setSuggTitle(errorsLeft)
         self.setSuggState(True)
-        self.suggWidgets ['curVal'].configure(text=initVal,command=lambda s=initVal:self.suggCurClicked(s))
+        self.suggWidgets ['curVal'].configure(text=initVal,command=lambda s=initVal:self.suggVarClicked(s))
         self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
-        self.suggCurClicked(initVal)    # добавляем в entry текущее значение
+        self.suggVarClicked(initVal)    # добавляем в entry текущее значение
 
     # кнопки и переключатели
     def switchBoolSetting(self,param:str):
@@ -238,7 +242,7 @@ class Window(TBS.Window):       # окно программы
         else:
             self   .buildUI(True)
             self.app.launch(book,type)
-    def suggCurClicked(self,value):
+    def suggVarClicked(self,value):
         self.suggWidgets['entry'].delete(0,TBS.END)
         self.suggWidgets['entry'].insert(0,value)
     def suggEntered(self,bttn:str):     # bttn = либо 'ok', либо 'cancel'
