@@ -29,7 +29,7 @@ def ACmail(value:str):
         list[i] = '@'.join(parts)
 
     return ','.join(listF.rmDoublesStr(list))
-def getSugg(type:str,value:str):
+def getSuggList(type:str,value:str):
     if type == 'mail':
         new = value.replace(' ','')
         if new != value and checkMail(new): return [new]

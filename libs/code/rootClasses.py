@@ -22,9 +22,9 @@ class Root():
 
         # запоминаем базовые переменные
         self.type       = type
-        self.errors     = Errors(self.UI.errors)
-        self.log        = Log   (self.UI)
+        self.log        = Log(self.UI)
         self.log.add('launch',type)
+        self.errors     = Errors(self.UI.errors,self.log)
         self.readRange  = params['readRange']
         self.toTD       = params['toTD'] # будем работать с TableDict (True) или же с CellTable (False)
         self.justVerify = params['justVerify']
@@ -51,11 +51,11 @@ class Root():
                         cell.value = VAL['value']
                 else:
                     low = cell.value.lower()
-                    if low in errors.keys (): errors[low]  .addPos             ({'r':r,'c':c})
-                    else:                     errors[low] = ErrorObj(cell.value,{'r':r,'c':c})
+                    if low in errors.keys (): errors[low]  .addPos                  ({'r':r,'c':c})
+                    else:                     errors[low] = ErrorObj(type,cell.value,{'r':r,'c':c})
         if errors:
-            self.errors.add(errors,type,self.log)
-            if self.suggErrors: self.nextSugg(type)
+            self.errors.add(errors,type)
+            if self.suggErrors: self.nextSugg()
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -79,14 +79,17 @@ class Root():
             if not self.justVerify and final['valid']: final['value'] = found[0]
         else: final['valid'] = strF.validateCell(type, final['value'])
         return final
-    def nextSugg(self,type:str):
+    def getSuggList(self,errObj):
+        suggList = strF.getSuggList(errObj.type,errObj.initVal)
+        return suggList
+    def nextSugg(self):
         queue = self.errors.suggQueue
         if queue:
-            suggList = self.getSugg(type,queue[0].initVal)
-            self.UI  .suggInvalidUD(type,queue[0].initVal,suggList,len(queue))
-    def getSugg(self,type:str,value:str):
-        suggList = strF.getSugg(type,value)
-        return suggList
+            suggList = self.getSuggList(queue[0])
+            self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
+    def suggFinalClicked(self,OKclicked:bool,newValue=''):
+        if self.errors.suggFinished(OKclicked,newValue): self.nextSugg()
+        else:                                self.UI.setSuggState(False)
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -148,14 +151,19 @@ class Log():        # журнал
             final = final      .replace('$$3',params['to'])
         elif type == 'errorsFound':
             final = S.log[type].replace('$$1',params['type']).replace('$$2',str(params['count']))
+        elif type == 'suggAccepted':
+            final = S.log[type].replace('$$1',params.type)  # здесь params = ErrorObj()
+            final = final      .replace('$$2',params.initVal)
+            final = final      .replace('$$3',params. newVal)
         return final
 class Errors():     # хранилище ошибок
-    def __init__(self,UI):
-        self.storage = {}   # {type:{initLow:ErrorObj,...},...}
-        self.UI      = UI   # UI = класс appUI.Errors()
+    def __init__(self,UI,mainLog:Log):
+        self.storage = {}       # {type:{initLow:ErrorObj,...},...}
+        self.UI      = UI       # UI = класс appUI.Errors()
+        self.mainLog = mainLog  # основной журнал Root().log
         self.file    = G.files['errors']
         write_toFile([],self.file)
-    def add(self,errors:dict,type:str,mainLog:Log): # errors = {initLow:ErrorObj,...}
+    def add(self,errors:dict,type:str): # errors = {initLow:ErrorObj,...}
         if type not in self.storage.keys(): self.storage[type] = {}
         self.storage[type] .update(errors)
         self.suggQueue = list(errors.values())  # очередь предложений для исправления; после проверки элемент удаляется
@@ -163,15 +171,24 @@ class Errors():     # хранилище ошибок
             newEntry   = '['+type+'] ['+str(len(err.pos))+' шт.] ' + err.initVal
             write_toFile(newEntry,self.file,True)
             self.UI .add(type,low,newEntry)
-        mainLog.add('errorsFound',{'type':type,'count':len(errors.keys())})
+        self.mainLog.add('errorsFound',{'type':type,'count':len(errors.keys())})
+    def suggFinished(self,OKclicked:bool,newValue:str):
+        curError = self.suggQueue.pop(0)
+        curError.suggFinished(OKclicked,newValue)
+        if OKclicked: self.mainLog.add('suggAccepted',curError)
+        self.UI.rm(curError)
+        return self.suggQueue
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
-    def __init__(self,initValue:str,pos:dict):  # pos={'r':row,'c':col}
+    def __init__(self,type:str,initValue:str,pos:dict): # pos={'r':row,'c':col}
+        self.type    = type # тип ошибки, один из G.AStypes
         self.initVal = initValue
-        self.newVal  = None
+        self. newVal = None
         self.fixed   = False
-        self.checked = False    # устанавливается True, когда пользователь введёт что-то новое или нажмёт "Отмена"
         self.pos     = [pos]    # список всех позиций этой ошибки в диапазоне проверки [{'r':row,'c':col},...]
     def addPos(self,pos:dict): self.pos.append(pos)
+    def suggFinished(self,fixed:bool,newVal:str):
+        self.fixed  = fixed
+        self.newVal = newVal
 
 # защита от запуска модуля
 if __name__ == '__main__':

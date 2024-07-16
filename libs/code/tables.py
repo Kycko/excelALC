@@ -58,7 +58,7 @@ class TableDict():
         for key,column in self.columns.items():
             if strF.findSub(column.title.value,title,'bool',fullText,lower): return key
 class TableColumn():
-    def __init__(self,values:list,errors=False,title:str=None,initPos:int=None):
+    def __init__(self,values:list,errors=False,title=None,initPos:int=None):
         if title is None:         title = values.pop(0) # pop удаляет элемент 0 и возвращает его
         self.title   = Cell             (title, errors)
         self.cells   = getCells_fromList(values,errors)

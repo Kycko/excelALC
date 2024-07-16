@@ -10,11 +10,6 @@ from   globalFuncs                  import sysExit
 
 def cantReadLib(): Messagebox.ok(S.layout['main']['msg']['cantReadLib'],G.app['TV'])
 
-class Btemplate(TBS.Button):        # шаблон кнопки
-    def __init__(self,master,text=None,image=None,width=None,bootstyle='primary',command=None):
-        super().__init__(master=master,command=command,text=text,image=image,width=width,bootstyle=bootstyle)
-        self   .bind    ('<KeyPress-Return>',  command) # обрабатывает оба Enter'а (+numpad)
-        self   .bind    ('<KeyPress-space>',   command)
 class Window(TBS.Window):           # окно программы
     # конструкторы интерфейса
     def __init__(self,app):
@@ -47,7 +42,7 @@ class Window(TBS.Window):           # окно программы
             self.fileList = TBS.Combobox(frMain,width=33,bootstyle='success')
 
             pic           = TBS.PhotoImage(file=G.pics['filesUpdate'])
-            btn           = Btemplate(frMain,image=pic,command=self.loadExcelList,bootstyle='link')
+            btn           = TBS.Button(frMain,image=pic,command=self.loadExcelList,bootstyle='link')
             btn.image     = pic # баг tkinter'a, нужно указать повторно
             ToolTip(btn,text=S.layout['main']['tt']['filesUpdate'])
 
@@ -63,7 +58,7 @@ class Window(TBS.Window):           # окно программы
             for key,val in S.layout['actions'].items():
                 bootstyle = 'success' if key == 'allChecks' else 'primary'
                 if val['type'] == params:
-                    Btemplate(frMain,
+                    TBS.Button(frMain,
                               text      = val['btn'],
                               width     = 45,
                               command   = lambda k=key:self.actionClicked(k),
@@ -73,7 +68,7 @@ class Window(TBS.Window):           # окно программы
             frMain = TBS.Frame(parent)
             frMain.pack(fill='x',side='bottom',pady=5)
             self.buildFrame('MLtheme',frMain)
-            Btemplate(frMain,
+            TBS.Button(frMain,
                       text      = S.layout['main']['btn']['closeApp'],
                       width     = 29,
                       command   = sysExit,
@@ -101,7 +96,7 @@ class Window(TBS.Window):           # окно программы
             frMain.pack (fill='both',expand=True,padx=6,pady=6,side='right')
             TBS   .Label(frMain, text=strings['descr']).pack(fill='x',padx=8,pady=5)
             self  .buildFrame('MRconfig',frMain,params)
-            self  .launchBtn = Btemplate(frMain,command=lambda t=params:self.launchClicked(t),bootstyle='success')
+            self  .launchBtn = TBS.Button(frMain,command=lambda t=params:self.launchClicked(t),bootstyle='success')
             self  .launchBtn.pack       (fill='x',padx=22,pady=12,side='bottom')
             self  .setLaunchBtnState()
             return frMain   # только в mainRight, чтобы записать в self.frRight['frame']
@@ -146,7 +141,7 @@ class Window(TBS.Window):           # окно программы
             frMain.pack     (fill='x')
             strings = S.layout['run']['suggUI']['curValue']
             TBS.Label(frMain,text=strings['lbl']).pack(side='left')
-            self.suggWidgets['curVal'] = Btemplate(frMain,text=strings['btn'],bootstyle='warning-outline')
+            self.suggWidgets['curVal'] = TBS.Button(frMain,text=strings['btn'],bootstyle='warning-outline')
             self.suggWidgets['curVal'].pack(fill='x',side='right')
         elif type == 'runSuggVars':
             if hasattr(self,'frSuggVars'): self.frSuggVars.destroy()
@@ -156,7 +151,7 @@ class Window(TBS.Window):           # окно программы
 
                 self.buildSeparator(self.frSuggVars)
                 TBS.Label(self.frSuggVars,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
-                for item in params: Btemplate(self.frSuggVars,
+                for item in params: TBS.Button(self.frSuggVars,
                                               text    = item,
                                               command = lambda s=item:self.suggVarClicked(s),
                                               bootstyle='info-outline').pack(fill='x',pady=4)
@@ -173,9 +168,9 @@ class Window(TBS.Window):           # окно программы
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x',pady=3)
             for key,cfg in S.layout['run']['suggUI']['buttons'].items():
-                self.suggWidgets[key] = Btemplate(frMain,
+                self.suggWidgets[key] = TBS.Button(frMain,
                                                   text      = cfg['text'],
-                                                  command   = lambda key=key:self.suggEntered(key),
+                                                  command   = lambda key=key:self.suggFinalClicked(key),
                                                   bootstyle = cfg['style'])
                 self.suggWidgets[key].pack(side='right',padx=cfg['padx'])
     def buildTabs(self,parent:TBS.Frame):
@@ -214,13 +209,15 @@ class Window(TBS.Window):           # окно программы
 
         self.suggLfl.configure(text=S.layout['run']['lfl']['sugg'].replace('$$1',count))
     def setSuggState(self,enabled:bool):
+        if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
         for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
-    def suggInvalidUD(self,type:str,initVal:str,suggList:list,errorsLeft:int):
+    def suggInvalidUD(self,errObj,suggList:list,errorsLeft:int):
+        self.curError = errObj
         self.setSuggTitle(errorsLeft)
         self.setSuggState(True)
-        self.suggWidgets ['curVal'].configure(text=initVal,command=lambda s=initVal:self.suggVarClicked(s))
+        self.suggWidgets ['curVal'].configure(text=errObj.initVal,command=lambda s=errObj.initVal:self.suggVarClicked(s))
         self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
-        self.suggVarClicked(initVal)    # добавляем в entry текущее значение
+        self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
 
     # кнопки и переключатели
     def switchBoolSetting(self,param:str):
@@ -245,8 +242,12 @@ class Window(TBS.Window):           # окно программы
     def suggVarClicked(self,value):
         self.suggWidgets['entry'].delete(0,TBS.END)
         self.suggWidgets['entry'].insert(0,value)
-    def suggEntered(self,bttn:str):     # bttn = либо 'ok', либо 'cancel'
-        pass
+    def suggFinalClicked(self,btn:str):       # btn = либо 'ok', либо 'cancel'
+        if btn == 'ok':
+            VAL =      self.app.validate_andCapitalize(self.curError.type,self.suggWidgets['entry'].get())
+            if VAL['valid']: self.app.suggFinalClicked(True,VAL['value'])
+            else:            self  .suggInvalidEntered()
+        else:                self.app.suggFinalClicked(False)
 class Errors(): # фрейм ошибок
     def __init__(self,parent:TBS.Labelframe):
         self.storage = {}                   # {type:{initLow:TBS.Label,...},...}
@@ -256,6 +257,8 @@ class Errors(): # фрейм ошибок
         if type not in self.storage.keys(): self.storage[type] = {}
         self.storage[type][low] = TBS.Label(self.frame,text=text)
         self.storage[type][low].pack(fill='x')
+    def rm(self,errObj):    # ErrorObj() из модуля rootClasses
+        self.storage[errObj.type].pop(errObj.initVal.lower()).destroy() # .pop() удаляет ключ и возвращает значение
 
 # защита от запуска модуля
 if __name__ == '__main__':
