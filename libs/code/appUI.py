@@ -201,20 +201,21 @@ class Window(TBS.Window):       # окно программы
             self.fileList.set      (S.layout['main']['msg']['noFilesFound'])
             self.fileList.configure(state='disabled')
         if self.frRight is not None: self.setLaunchBtnState()
-    def setSuggTitle(self,counter:dict=None):   # counter = {'cur':,'total':}
-        if counter is None: numbers = ''
-        else:
-            numbers = S.layout['run']['suggUI']['counter']
-            numbers = numbers.replace('$$2',str(counter['cur'])).replace('$$3',str(counter['total']))
-        self.suggLfl.configure(text=S.layout['run']['lfl']['sugg'].replace('$$1',numbers))
+    def setSuggTitle(self,errorsLeft=0):
+        if errorsLeft:
+            strings = S.layout['run']['suggUI']['errorsLeft']
+            if errorsLeft == 1: count = strings['one']
+            else:               count = strings['many'].replace('$$2',str(errorsLeft))
+        else: count = ''
+
+        self.suggLfl.configure(text=S.layout['run']['lfl']['sugg'].replace('$$1',count))
     def setSuggState(self,enabled:bool):
         for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
-    def suggInvalidUD(self,type:str,initVal:str,suggList:list,counter:dict):
-        # counter = {'cur':,'total':}
-        self.setSuggTitle(counter)
+    def suggInvalidUD(self,type:str,initVal:str,suggList:list,errorsLeft:int):
+        self.setSuggTitle(errorsLeft)
         self.setSuggState(True)
-        self.suggWidgets['curVal'].configure(text=initVal,command=lambda s=initVal:self.suggCurClicked(s))
-        self.buildFrame('runSuggVars',self.frSuggMain,suggList)
+        self.suggWidgets ['curVal'].configure(text=initVal,command=lambda s=initVal:self.suggCurClicked(s))
+        self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
         self.suggCurClicked(initVal)    # добавляем в entry текущее значение
 
     # кнопки и переключатели
