@@ -132,21 +132,32 @@ class Window(TBS.Window):   # окно программы
             frMain.pack(fill='both',expand=True,pady=4)
             self.errors = Errors(frMain)
         elif type == 'runSugg':
-            self.suggLfl = TBS.Labelframe(parent)       # в нём будем писать счётчик ошибок
+            self.suggLfl = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
             self.suggLfl.pack   (fill='x',pady=5)
-            self.setSuggTitle()
-            frSugg     = TBS.Frame(self.suggLfl)
-            frSugg.pack(fill='x',padx=10,pady=5)
+            frSugg      = TBS.Frame(self.suggLfl)
+            frSugg.pack (fill='x',padx=10,pady=2)
+            self.buildFrame('runSuggType',frSugg)
             self.suggWidgets = {}                       # все виджеты, которые надо включать/отключать
             self.buildFrame('runSugg_curVal',frSugg)    # фрейм вывода текущего значения
 
             self.frSuggMain = TBS.Frame(frSugg)  # чтобы фрейм предложений оставался при удалении данных
             self.frSuggMain.pack     (fill='x')
+            # ↓ чтобы фрейм предложений сжимался после удаления всех предложений
+            TBS.Frame(self.frSuggMain,height=1,width=1).pack(fill='x')
             self.buildFrame('runSuggVars' ,self.frSuggMain,[])  # фрейм для добавления кнопок выбора
             self.buildFrame('runSuggEntry',frSugg)              # фрейм с полем ручного ввода текста
-        elif type == 'runSugg_curVal':
+        elif type == 'runSuggType':
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
+            TBS.Label(frMain,
+                      foreground = G.colors['lightYellow'],
+                      text       = S.layout['run']['suggUI']['errType']
+                      ).pack(side='left')
+            self.lblSuggType = TBS.Label(frMain,foreground=G.colors['lightYellow'])
+            self.lblSuggType.pack (side='left')
+        elif type == 'runSugg_curVal':
+            frMain =   TBS.Frame(parent)
+            frMain.pack(fill='x',pady=5)
             strings = S.layout['run']['suggUI']['curValue']
             TBS.Label(frMain,text=strings['lbl']).pack(side='left')
             self.suggWidgets['curVal'] = TBS.Button(frMain,text=strings['btn'],bootstyle='warning-outline')
@@ -166,7 +177,7 @@ class Window(TBS.Window):   # окно программы
         elif type == 'runSuggEntry':
             frMain = TBS.Frame (parent)
             frMain.pack      (fill='x')
-            self.buildSeparator(frMain)
+            self.buildSeparator(frMain,pady=7)
             TBS.Label(frMain,text=S.layout['run']['suggUI']['lblEntry']).pack(fill='x')
 
             self.suggWidgets['entry']   = TBS.Entry(frMain)
@@ -179,7 +190,7 @@ class Window(TBS.Window):   # окно программы
         elif type == 'runSugg_entryButtons':
             frMain =   TBS.Frame(parent)
             frMain.pack(fill='x',pady=3)
-            self.lblInvalidUD = TBS.Label(frMain,foreground=G.errColor)
+            self.lblInvalidUD = TBS.Label(frMain,foreground=G.colors['lightRed'])
             self.lblInvalidUD.pack(side='left')
             for key,cfg in S.layout['run']['suggUI']['buttons'].items():
                 self.suggWidgets[key] = TBS.Button(frMain,
@@ -201,7 +212,7 @@ class Window(TBS.Window):   # окно программы
                                     bootstyle = 'round-toggle')
             ToolTip(cb,text=strings['tt'])
             cb.pack(padx=5,pady=5,expand=True,anchor='w')
-    def buildSeparator(self,parent,padx=0,pady=7): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
+    def buildSeparator(self,parent,padx=0,pady=3): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
 
     # вспомогательные
     def log(self,string:str): TBS.Label(self.frLog,text=string).pack(fill='x')
@@ -215,16 +226,14 @@ class Window(TBS.Window):   # окно программы
             self.fileList.configure(state='disabled')
         if self.frRight is not None: self.setLaunchBtnState()
     def setSuggTitle(self,errorsLeft=0):
-        if errorsLeft:
-            strings = S.layout['run']['suggUI']['errorsLeft']
-            if errorsLeft == 1: count = strings['one']
-            else:               count = strings['many'].replace('$$2',str(errorsLeft))
-        else: count = ''
-
-        self.suggLfl.configure(text=S.layout['run']['lfl']['sugg'].replace('$$1',count))
+        strings = S.layout ['run']['suggUI']['errorsLeft']
+        if errorsLeft == 1: count = strings['one']
+        else:               count = strings['many'].replace('$$2',str(errorsLeft))
+        self.lblSuggType.configure(text=S.suggMsg[self.curError.type]+count)
     def setSuggState(self,enabled:bool):
         if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
         for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
+        if not enabled: self.lblSuggType.configure(text='')
     def setSuggErrorState(self,error:bool):
         self.lblInvalidUD.configure(text = S.layout['run']['suggUI']['lblInvalid'] if error else '')
     def suggInvalidUD(self,errObj,suggList:list,errorsLeft:int):

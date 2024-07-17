@@ -10,7 +10,8 @@ app = {'version': 'v.050',
 app   ['TV']    = app['title']+' '+app['version']   # название главного окна
 
 # цвета
-errColor = '#EF6C32'
+colors = {'lightYellow':'#FED36B',
+          'lightRed'   :'#EF6C32'}
 
 # файлы
 picsDir = 'libs/pics/'
