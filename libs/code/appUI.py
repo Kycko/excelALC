@@ -9,7 +9,7 @@ from   globalFuncs                  import sysExit
 
 def cantReadLib(): Messagebox.ok(S.layout['main']['msg']['cantReadLib'],G.app['TV'])
 
-class Window(TBS.Window):           # окно программы
+class Window(TBS.Window):   # окно программы
     # конструкторы интерфейса
     def __init__(self,app):
         self.app = app  # для вызова функций класса Root() при нажатии кнопок
@@ -168,8 +168,12 @@ class Window(TBS.Window):           # окно программы
             frMain.pack      (fill='x')
             self.buildSeparator(frMain)
             TBS.Label(frMain,text=S.layout['run']['suggUI']['lblEntry']).pack(fill='x')
+
             self.suggWidgets['entry']   = TBS.Entry(frMain)
             self.suggWidgets['entry'].pack(fill='x',pady=7)
+            for key in ('<Key-Return>','<KP_Enter>'):
+                self.suggWidgets['entry'].bind(key,lambda event:self.suggFinalClicked('ok'))
+
             self.buildFrame('runSugg_entryButtons',frMain)  # кнопки ОК и Отмена
             self.setSuggState(False)
         elif type == 'runSugg_entryButtons':
