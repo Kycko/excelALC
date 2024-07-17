@@ -9,12 +9,15 @@ app = {'version': 'v.050',
        'size'   : (1000, 600)}                      # при необходимости добавим в другой переменной размеры диалоговых окон
 app   ['TV']    = app['title']+' '+app['version']   # название главного окна
 
+# цвета
+errColor = '#EF6C32'
+
 # файлы
 picsDir = 'libs/pics/'
 files   = {'lib'          :'справочник excelALC.xlsx',
-           'config'       : app['title']+'.config',
-           'log'          : app['title']+'.log',
-           'errors'       : app['title']+'.errors'}
+           'config'       : app['title']+       '.config',
+           'log'          : app['title']+  ' main.log',
+           'errors'       : app['title']+' errors.log'}
 pics    = {'filesUpdate'  : picsDir     +'filesUpdate.png', # нельзя здесь создавать PhotoImage, т. к. нужен master-объект
            'themeSelector':{'light': {'pic' :picsDir+'themeLight.png',
                                       'side':'left',

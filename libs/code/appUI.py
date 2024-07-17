@@ -173,8 +173,10 @@ class Window(TBS.Window):           # окно программы
             self.buildFrame('runSugg_entryButtons',frMain)  # кнопки ОК и Отмена
             self.setSuggState(False)
         elif type == 'runSugg_entryButtons':
-            frMain = TBS.Frame(parent)
-            frMain.pack     (fill='x',pady=3)
+            frMain =   TBS.Frame(parent)
+            frMain.pack(fill='x',pady=3)
+            self.lblInvalidUD = TBS.Label(frMain,foreground=G.errColor)
+            self.lblInvalidUD.pack(side='left')
             for key,cfg in S.layout['run']['suggUI']['buttons'].items():
                 self.suggWidgets[key] = TBS.Button(frMain,
                                                   text      = cfg['text'],
@@ -219,6 +221,8 @@ class Window(TBS.Window):           # окно программы
     def setSuggState(self,enabled:bool):
         if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
         for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
+    def setSuggErrorState(self,error:bool):
+        self.lblInvalidUD.configure(text = S.layout['run']['suggUI']['lblInvalid'] if error else '')
     def suggInvalidUD(self,errObj,suggList:list,errorsLeft:int):
         self.curError = errObj
         self.setSuggTitle(errorsLeft)
@@ -250,11 +254,13 @@ class Window(TBS.Window):           # окно программы
     def suggVarClicked(self,value):
         self.suggWidgets['entry'].delete(0,TBS.END)
         self.suggWidgets['entry'].insert(0,value)
+        self.setSuggErrorState(False)
     def suggFinalClicked(self,btn:str):       # btn = либо 'ok', либо 'cancel'
+        self.setSuggErrorState (False)
         if btn == 'ok':
             VAL =      self.app.validate_andCapitalize(self.curError.type,self.suggWidgets['entry'].get())
             if VAL['valid']: self.app.suggFinalClicked(True,VAL['value'])
-            else:            self  .suggInvalidEntered()
+            else:            self   .setSuggErrorState(True)
         else:                self.app.suggFinalClicked(False)
 class Errors(): # фрейм ошибок
     def __init__(self,parent:TBS.Labelframe):

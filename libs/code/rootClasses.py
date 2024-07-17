@@ -83,13 +83,16 @@ class Root():
         suggList = strF.getSuggList(errObj.type,errObj.initVal)
         return suggList
     def nextSugg(self):
-        queue = self.errors.suggQueue
-        if queue:
-            suggList = self.getSuggList(queue[0])
-            self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
+        queue    = self.errors.suggQueue
+        suggList = self.getSuggList(queue[0])
+        self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
     def suggFinalClicked(self,OKclicked:bool,newValue=''):
-        if self.errors.suggFinished(OKclicked,newValue): self.nextSugg()
-        else:                                self.UI.setSuggState(False)
+        if self.errors.suggClicked(OKclicked,newValue): self.nextSugg()
+        else:
+            self.UI.setSuggState(False)
+            self.finalizeErrors()
+    def finalizeErrors(self):
+        pass
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -151,10 +154,11 @@ class Log():        # журнал
             final = final      .replace('$$3',params['to'])
         elif type == 'errorsFound':
             final = S.log[type].replace('$$1',params['type']).replace('$$2',str(params['count']))
-        elif type == 'suggAccepted':
-            final = S.log[type].replace('$$1',params.type)  # здесь params = ErrorObj()
-            final = final      .replace('$$2',params.initVal)
-            final = final      .replace('$$3',params. newVal)
+        elif type == 'suggFinished':
+            # здесь params = ErrorObj()
+            final = tuple(S.log[type].values())[params.fixed].replace('$$1',params.type)
+            final =                                     final.replace('$$2',params.initVal)
+            if params.fixed: final =                    final.replace('$$3',params.newVal)
         return final
 class Errors():     # хранилище ошибок
     def __init__(self,UI,mainLog:Log):
@@ -167,17 +171,30 @@ class Errors():     # хранилище ошибок
         if type not in self.storage.keys(): self.storage[type] = {}
         self.storage[type] .update(errors)
         self.suggQueue = list(errors.values())  # очередь предложений для исправления; после проверки элемент удаляется
-        for low,err   in errors.items():
-            newEntry   = '['+type+'] ['+str(len(err.pos))+' шт.] ' + err.initVal
+        for low,errObj in     errors.items ():
+            newEntry = self.getLogEntry(errObj)
             write_toFile(newEntry,self.file,True)
             self.UI .add(type,low,newEntry)
         self.mainLog.add('errorsFound',{'type':type,'count':len(errors.keys())})
-    def suggFinished(self,OKclicked:bool,newValue:str):
+    def rmFixed(self,errObj):
+        # удаляем из фрейма в UI и из файла, оставляем в self.storage со статусом fixed
+        self.UI.rm(errObj)
+        self.updateFile ()
+
+    # вспомогательные
+    def suggClicked(self,OKclicked:bool,newValue:str):
         curError = self.suggQueue.pop(0)
         curError.suggFinished(OKclicked,newValue)
-        if OKclicked: self.mainLog.add('suggAccepted',curError)
-        self.UI.rm(curError)
+        self.mainLog.add('suggFinished',curError)
+        if OKclicked: self.rmFixed(curError)    # значит, исправление принято (оно валидно)
         return self.suggQueue
+    def updateFile(self):   # перезаписывает файл, проверяя весь self.storage
+        final = []
+        for errDict in self.storage.values():
+            for errObj in   errDict.values():
+                if not errObj.fixed: final.append(self.getLogEntry(errObj))
+        return final
+    def getLogEntry(self,errObj): return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
     def __init__(self,type:str,initValue:str,pos:dict): # pos={'r':row,'c':col}
         self.type    = type # тип ошибки, один из G.AStypes
