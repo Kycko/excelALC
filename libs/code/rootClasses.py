@@ -1,5 +1,5 @@
 from   sys import exit as SYSEXIT
-from   globalFuncs import write_toFile
+from   globalFuncs import curDateTime,write_toFile
 import globalVars      as G
 import appUI
 from   excelRW     import Excel
@@ -23,15 +23,19 @@ class Root():
         # запоминаем базовые переменные
         self.type       = type
         self.log        = Log(self.UI)
-        self.log.add('launch',type)
-        self.errors     = Errors(self.UI.errors,self.log)
         self.readRange  = params['readRange']
         self.toTD       = params['toTD'] # будем работать с TableDict (True) или же с CellTable (False)
         self.justVerify = params['justVerify']
         if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
 
+        self.initLE (book.name) # LE = log & errors
         self.getData(book)  # получаем данные
         if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data,params['AStype'])  # проверяем выделенный диапазон
+    def initLE(self,bookName:str):  # LE = log & errors
+        initStr = S.log['mainLaunch'].replace('$$1',curDateTime()).replace('$$2',bookName)
+        self.log.add   ('mainLaunch',initStr)
+        self.log.add   ('launchType',self.type)
+        self.errors = Errors(self.UI.errors,self.log,initStr)
 
     # основные алгоритмы проверки
     def rangeChecker(self,table:list,type:str):
@@ -139,8 +143,9 @@ class Log():        # журнал
         write_toFile(new,self.file,True)
         self.UI.log (new)
     def getType(self,type:str,params=None):
-        if   type == 'launch'   : final = '[core] ' + S.layout['actions'][params]['log']
-        elif type == 'readSheet': final = S.log[type].replace('$$1',params)
+        if   type == 'mainLaunch': final = params
+        elif type == 'launchType': final = '[core] ' + S.layout['actions'][params]['log']
+        elif type == 'readSheet' : final = S.log[type].replace('$$1',params)
         elif type == 'readFile':
             final =   S.log[type][params['range']]
             rows  =           len(params['tObj']['table'].data) - 1*(params['range'] == 'full') # считаем без заголовка
@@ -161,12 +166,13 @@ class Log():        # журнал
             if params.fixed: final =                    final.replace('$$3',params.newVal)
         return final
 class Errors():     # хранилище ошибок
-    def __init__(self,UI,mainLog:Log):
-        self.storage = {}       # {initLow:ErrorObj,...}
-        self.UI      = UI       # UI = класс appUI.Errors()
-        self.mainLog = mainLog  # основной журнал Root().log
-        self.file    = G.files['errors']
-        write_toFile([],self.file)
+    def __init__(self,UI,mainLog:Log,initLogStr:str):
+        self.storage    = {}       # {initLow:ErrorObj,...}
+        self.UI         = UI       # UI = класс appUI.Errors()
+        self.mainLog    = mainLog  # основной журнал Root().log
+        self.initLogStr = initLogStr    # время запуска и имя проверяемого файла, нужно для self.updateFile()
+        self.file       = G.files['errors']
+        self.updateFile()
     def add(self,errors:dict,type:str): # errors = {initLow:ErrorObj,...}
         self.storage  .update(errors)
         self.suggQueue = list(errors.values())  # очередь предложений для исправления; после проверки элемент удаляется
@@ -187,10 +193,10 @@ class Errors():     # хранилище ошибок
         if OKclicked: self.rmFixed(curError)    # значит, исправление принято (оно валидно)
         return self.suggQueue
     def updateFile(self):   # перезаписывает файл, проверяя весь self.storage
-        final = []
+        final = [self.initLogStr]
         for errObj in self.storage.values():
             if not errObj.fixed: final.append(self.getLogEntry(errObj))
-        return final
+        write_toFile(final,self.file)
     def getLogEntry(self,errObj): return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
     def __init__(self,type:str,initValue:str,pos:dict): # pos={'r':row,'c':col}

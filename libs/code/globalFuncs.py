@@ -1,4 +1,9 @@
-from sys import exit as SYSEXIT
+from sys      import exit as SYSEXIT
+from datetime import datetime
+
+# системные
+def sysExit(self=None): SYSEXIT()   # self для привязки к нажатию кнопок
+def curDateTime(): return datetime.now().strftime('%d.%m.%Y %H:%M:%S')
 
 # глобальные
 def readFile(file:str):
@@ -16,7 +21,6 @@ def get_initSettings(): return {'main':{'darkTheme':checkWinTheme()}}   # све
 def getIB(type:str,index:int):  # IB = index/boolean
     # служебная функция, которая возвращает либо сам index, либо true/false в зависимости от значения index
     return index if type == 'index' else index >= 0
-def sysExit(self=None): SYSEXIT()   # self для привязки к нажатию кнопок
 
 # GUI
 def checkWinTheme(): 
