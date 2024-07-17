@@ -1,6 +1,5 @@
 from   sys                  import exit as SYSEXIT
-from   tkinter                      import BooleanVar, Misc
-from typing import Literal
+from   tkinter                      import BooleanVar
 import ttkbootstrap                     as TBS
 from   ttkbootstrap.tooltip         import ToolTip
 from   ttkbootstrap.dialogs.dialogs import Messagebox
@@ -18,8 +17,17 @@ class Window(TBS.Window):           # окно программы
                          themename = G.app['themes'][G.config.get('main:darkTheme')],
                          size      = G.app['size'],
                          minsize   = G.app['size'])
+        self.bindSpace()
         self.place_window_center()  # расположить в центре экрана
         self.buildUI()
+    def bindSpace(self):
+        def callDefault(event):
+            try:
+                widget = self.nametowidget(event.widget)
+                widget.invoke()
+            except KeyError: self.tk.call(event.widget,'invoke')
+
+        self.bind_class('TButton','<Key-space>',callDefault,add='+')
     def buildUI(self,runUI=False):  # runUI = окно выбора (False) или окно выполнения (True)
         if hasattr(self,'frRoot'): self.frRoot.destroy()
         self.frRight = None # сначала это: он читается в self.loadExcelList()
