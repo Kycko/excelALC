@@ -9,10 +9,6 @@ app = {'version': 'v.050',
        'size'   : (1000, 600)}                      # при необходимости добавим в другой переменной размеры диалоговых окон
 app   ['TV']    = app['title']+' '+app['version']   # название главного окна
 
-# цвета
-colors = {'lightYellow':'#FED36B',
-          'lightRed'   :'#EF6C32'}
-
 # файлы
 picsDir = 'libs/pics/'
 files   = {'lib'          :'справочник excelALC.xlsx',
@@ -26,6 +22,22 @@ pics    = {'filesUpdate'  : picsDir     +'filesUpdate.png', # нельзя зд�
                             'dark' : {'pic' :picsDir+'themeDark.png',
                                       'side':'right',
                                       'padx':0}}}
+
+# настройки
+config = userCfg(files['config'])
+
+# цвета (разные для светлой[0] и тёмной[1] тем; colors перезаписывается при смене темы)
+themeColors = ( # ↓ светлая
+               {'magenta':'#C4ABE7',
+                'red'    :'#EF6C32',
+                'sand'   :'#FFE5A7',
+                'yellow' :'#FED36B'},
+                # ↓ тёмная
+               {'magenta':'#C4ABE7',
+                'red'    :'#EF6C32',
+                'sand'   :'#FFE5A7',    # аналог lightYellow
+                'yellow' :'#FED36B'})
+colors = themeColors[config.get('main:darkTheme')]
 
 # параметры по типам скриптов
 # getSuggParam = надо ли прочитать из userCfg настройку suggestErrors
@@ -44,8 +56,19 @@ launchTypes = {
 AStypes = {'title':{'readLib':True ,'checkList':True ,'acceptBlank':False},
            'mail' :{'readLib':False,'checkList':False,'acceptBlank':True }}
 
+log = {'units' :{'mainLaunch'  :'core',
+                 'launchType'  :'core', # отсутствует в S.log: читается из S.layout
+                 'readSheet'   :'core',
+                 'readFile'    :'core',
+                 'ACsuccess'   :'autocorr',
+                 'errorsFound' :'errors',
+                 'suggFinished':'sugg'},
+       'colors':{'core'        :None,
+                 'autocorr'    :colors['magenta'],
+                 'errors'      :colors['red'],
+                 'sugg'        :colors['sand']}}
+
 # прочее
-config  = userCfg(files['config'])
 exBooks = exBooks()
 
 # особые символы

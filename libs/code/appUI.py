@@ -150,10 +150,10 @@ class Window(TBS.Window):   # окно программы
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
             TBS.Label(frMain,
-                      foreground = G.colors['lightYellow'],
+                      foreground = G.colors['yellow'],
                       text       = S.layout['run']['suggUI']['errType']
                       ).pack(side='left')
-            self.lblSuggType = TBS.Label(frMain,foreground=G.colors['lightYellow'])
+            self.lblSuggType = TBS.Label(frMain,foreground=G.colors['yellow'])
             self.lblSuggType.pack (side='left')
         elif type == 'runSugg_curVal':
             frMain =   TBS.Frame(parent)
@@ -190,7 +190,7 @@ class Window(TBS.Window):   # окно программы
         elif type == 'runSugg_entryButtons':
             frMain =   TBS.Frame(parent)
             frMain.pack(fill='x',pady=3)
-            self.lblInvalidUD = TBS.Label(frMain,foreground=G.colors['lightRed'])
+            self.lblInvalidUD = TBS.Label(frMain,foreground=G.colors['red'])
             self.lblInvalidUD.pack(side='left')
             for key,cfg in S.layout['run']['suggUI']['buttons'].items():
                 self.suggWidgets[key] = TBS.Button(frMain,
@@ -215,7 +215,8 @@ class Window(TBS.Window):   # окно программы
     def buildSeparator(self,parent,padx=0,pady=3): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
 
     # вспомогательные
-    def log(self,string:str): TBS.Label(self.frLog,text=string).pack(fill='x')
+    def log(self,string:str,unit:str):
+        TBS.Label(self.frLog,text=string,foreground=G.log['colors'][unit]).pack(fill='x')
     def loadExcelList (self):
         G.exBooks.update()
         if G.exBooks.cur:   # Excel открыт, и не только стартовый экран
@@ -248,7 +249,9 @@ class Window(TBS.Window):   # окно программы
     def switchBoolSetting(self,param:str):
         newVal = not G.config.get(param)
         G.config.set(param,newVal)
-        if param == 'main:darkTheme': self.style.theme_use(G.app['themes'][newVal])
+        if param == 'main:darkTheme':
+            self.style.theme_use(G.app['themes'][newVal])
+            G.colors = G.themeColors[G.config.get(param)]
     def setLaunchBtnState(self):
         if G.exBooks.cur: self.launchBtn.configure(text=S.layout['main']['btn']['launch']['ready']    ,state='normal')
         else:             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['notChosen'],state='disabled')

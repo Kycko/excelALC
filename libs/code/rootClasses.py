@@ -139,12 +139,12 @@ class Log():        # журнал
         write_toFile([],self.file)
     def add(self,type:str,params=None):
         # в params можно передать любые объекты, необходимые для получения доп. данных
-        new  = self.getType(type,params)
-        write_toFile(new,self.file,True)
-        self.UI.log (new)
+        newStr,unit = self.getType(type,params)
+        write_toFile(newStr,self.file,True)
+        self.UI.log (newStr,unit)
     def getType(self,type:str,params=None):
         if   type == 'mainLaunch': final = params
-        elif type == 'launchType': final = '[core] ' + S.layout['actions'][params]['log']
+        elif type == 'launchType': final = S.layout['actions'][params]['log']
         elif type == 'readSheet' : final = S.log[type].replace('$$1',params)
         elif type == 'readFile':
             final =   S.log[type][params['range']]
@@ -164,7 +164,10 @@ class Log():        # журнал
             final = tuple(S.log[type].values())[params.fixed].replace('$$1',params.type)
             final =                                     final.replace('$$2',params.initVal)
             if params.fixed: final =                    final.replace('$$3',params.newVal)
-        return final
+
+        unit  = G.log['units'][type]
+        final =    '['+unit+'] '+final
+        return final,unit
 class Errors():     # хранилище ошибок
     def __init__(self,UI,mainLog:Log,initLogStr:str):
         self.storage    = {}       # {initLow:ErrorObj,...}
