@@ -162,22 +162,20 @@ class Log():        # журнал
         return final
 class Errors():     # хранилище ошибок
     def __init__(self,UI,mainLog:Log):
-        self.storage = {}       # {type:{initLow:ErrorObj,...},...}
+        self.storage = {}       # {initLow:ErrorObj,...}
         self.UI      = UI       # UI = класс appUI.Errors()
         self.mainLog = mainLog  # основной журнал Root().log
         self.file    = G.files['errors']
         write_toFile([],self.file)
     def add(self,errors:dict,type:str): # errors = {initLow:ErrorObj,...}
-        if type not in self.storage.keys(): self.storage[type] = {}
-        self.storage[type] .update(errors)
+        self.storage  .update(errors)
         self.suggQueue = list(errors.values())  # очередь предложений для исправления; после проверки элемент удаляется
         for low,errObj in     errors.items ():
             newEntry = self.getLogEntry(errObj)
             write_toFile(newEntry,self.file,True)
             self.UI .add(type,low,newEntry)
         self.mainLog.add('errorsFound',{'type':type,'count':len(errors.keys())})
-    def rmFixed(self,errObj):
-        # удаляем из фрейма в UI и из файла, оставляем в self.storage со статусом fixed
+    def rmFixed(self,errObj):   # удаляем из фрейма в UI и из файла, оставляем в self.storage со статусом fixed
         self.UI.rm(errObj)
         self.updateFile ()
 
@@ -190,9 +188,8 @@ class Errors():     # хранилище ошибок
         return self.suggQueue
     def updateFile(self):   # перезаписывает файл, проверяя весь self.storage
         final = []
-        for errDict in self.storage.values():
-            for errObj in   errDict.values():
-                if not errObj.fixed: final.append(self.getLogEntry(errObj))
+        for errObj in self.storage.values():
+            if not errObj.fixed: final.append(self.getLogEntry(errObj))
         return final
     def getLogEntry(self,errObj): return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
