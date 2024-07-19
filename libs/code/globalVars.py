@@ -28,15 +28,15 @@ config = userCfg(files['config'])
 
 # цвета (разные для светлой[0] и тёмной[1] тем; colors перезаписывается при смене темы)
 themeColors = ( # ↓ светлая
-               {'magenta':'#C4ABE7',
-                'red'    :'#EF6C32',
-                'sand'   :'#FFE5A7',
-                'yellow' :'#FED36B'},
+               {'magenta' :'#936BCC',
+                'red'     :'#DE3923',
+                'lightRed':'#E36B4F',
+                'sand'    :'#D1A63E'},
                 # ↓ тёмная
-               {'magenta':'#C4ABE7',
-                'red'    :'#EF6C32',
-                'sand'   :'#FFE5A7',    # аналог lightYellow
-                'yellow' :'#FED36B'})
+               {'magenta' :'#C4ABE7',
+                'red'     :'#EF6C32',
+                'lightRed':'#E36F47',
+                'sand'    :'#FFE5A7'})  # аналог lightYellow
 colors = themeColors[config.get('main:darkTheme')]
 
 # параметры по типам скриптов
@@ -64,9 +64,9 @@ log = {'units' :{'mainLaunch'  :'core',
                  'errorsFound' :'errors',
                  'suggFinished':'sugg'},
        'colors':{'core'        :None,
-                 'autocorr'    :colors['magenta'],
-                 'errors'      :colors['red'],
-                 'sugg'        :colors['sand']}}
+                 'autocorr'    :'magenta',
+                 'errors'      :'red',
+                 'sugg'        :'sand'}}
 
 # прочее
 exBooks = exBooks()

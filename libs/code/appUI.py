@@ -150,10 +150,10 @@ class Window(TBS.Window):   # окно программы
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
             TBS.Label(frMain,
-                      foreground = G.colors['yellow'],
+                      foreground = G.colors['lightRed'],
                       text       = S.layout['run']['suggUI']['errType']
                       ).pack(side='left')
-            self.lblSuggType = TBS.Label(frMain,foreground=G.colors['yellow'])
+            self.lblSuggType = TBS.Label(frMain,foreground=G.colors['lightRed'])
             self.lblSuggType.pack (side='left')
         elif type == 'runSugg_curVal':
             frMain =   TBS.Frame(parent)
@@ -216,7 +216,9 @@ class Window(TBS.Window):   # окно программы
 
     # вспомогательные
     def log(self,string:str,unit:str):
-        TBS.Label(self.frLog,text=string,foreground=G.log['colors'][unit]).pack(fill='x')
+        try   : color = G.colors[G.log['colors'][unit]]
+        except: color = None
+        TBS.Label(self.frLog,text=string,foreground=color).pack(fill='x')
     def loadExcelList (self):
         G.exBooks.update()
         if G.exBooks.cur:   # Excel открыт, и не только стартовый экран
@@ -251,7 +253,7 @@ class Window(TBS.Window):   # окно программы
         G.config.set(param,newVal)
         if param == 'main:darkTheme':
             self.style.theme_use(G.app['themes'][newVal])
-            G.colors = G.themeColors[G.config.get(param)]
+            G.colors           = G.themeColors  [newVal]
     def setLaunchBtnState(self):
         if G.exBooks.cur: self.launchBtn.configure(text=S.layout['main']['btn']['launch']['ready']    ,state='normal')
         else:             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['notChosen'],state='disabled')
