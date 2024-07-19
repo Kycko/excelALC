@@ -237,8 +237,8 @@ class Window(TBS.Window):   # окно программы
         if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
         for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
         if not enabled: self.lblSuggType.configure(text='')
-    def setSuggErrorState(self,error:bool):
-        self.lblInvalidUD.configure(text = S.layout['run']['suggUI']['lblInvalid'] if error else '')
+    def setSuggErrorState(self,error:bool,vObj=None):   # vObj={'type':,'value':,'valid':,'errKey':}
+        self.lblInvalidUD.configure(text = S.errInput[vObj['type']][vObj['errKey']] if error else '')
     def suggInvalidUD(self,errObj,suggList:list,errorsLeft:int):
         self.curError = errObj
         self.setSuggTitle(errorsLeft)
@@ -278,7 +278,7 @@ class Window(TBS.Window):   # окно программы
         if btn == 'ok':
             VAL =      self.app.validate_andCapitalize(self.curError.type,self.suggWidgets['entry'].get())
             if VAL['valid']: self.app.suggFinalClicked(True,VAL['value'])
-            else:            self   .setSuggErrorState(True)
+            else:            self   .setSuggErrorState(True,VAL)
         else:                self.app.suggFinalClicked(False)
 class Errors(): # фрейм ошибок
     def __init__(self,parent:TBS.Labelframe):

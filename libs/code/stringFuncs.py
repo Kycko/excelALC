@@ -31,41 +31,48 @@ def ACmail(value:str):
     return ','.join(listF.rmDoublesStr(list))
 def getSuggList(type:str,value:str):
     if type == 'mail':
-        new = value.replace(' ','')
-        if new != value and checkMail(new): return [new]
+        new  = value.replace(' ','').replace('|',',')
+        if new != value:
+            vObj = {'type':type,'value':new,'valid':None,'errKey':''}
+            validateCell(vObj)
+            if vObj['valid']: return [new]
     return []
-def validateCell(type:str,value:str):
-    if type in ('phone','mail','website'):
+def validateCell(vObj:dict):    # vObj={'type':,'value':,'valid':,'errKey':}
+    if vObj['type'] in ('phone','mail','website'):
         # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
-        for item in value.split(','):
-            if   type == 'phone'   and not checkPhone  (item): return False
-            elif type == 'mail'    and not checkMail   (item): return False
-            elif type == 'website' and not checkWebsite(item): return False
-    return True
-def checkPhone(phone:str):
-    if len(phone) != 11  : return False
-    if phone[0]   != '7' : return False
-    if phone[1]   in '67': return False # казахские номера
-    return True
-def checkMail(mail:str):
-    if mail             == ''       : return True
-    if mail .count('@') != 1        : return False
-    if findSubList(mail,G.ruSymbols): return False
+        # и ещё возвращать False, если номера дублируются
+        for item in vObj['value'].split(','):
+            vObj['valid'],vObj['errKey'] = checkPMW(vObj['type'],item)
+            if not        vObj['valid']: return
+    vObj['valid'] = True
+def checkPMW(type:str,value:str):
+    # PMW = phone, mail, website
+    # возвращаем valid:True/False и ключ для S.errInput[type]
+    if   type == 'phone':
+        if len(value) != 11  : return False,'length'
+        if value[0]   != '7' : return False,'firstSymb'
+        if value[1]   in '67': return False,'kazakh'
+    elif type == 'mail':
+        if value            == ''        : return True ,''
+        if value.count('@') != 1         : return False,'dogCount'
+        if findSubList(value,G.ruSymbols): return False,'ru'
 
-    name,domain = mail.split('@')
-    if not     '.' in       domain: return False
-    if        '..' in       domain: return False
-    if domain[-2:] in  ('.c','.r'): return False # аналог endswith()
-    if name        in G.allHyphens: return False
-    if findSubList(mail,(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),'bool',False,False,False): return False
-    return True
-def checkWebsite(site:str):
-    if site       ==   '': return True
-    if not    '.' in site: return False
-    if site.endswith('/'): return False
-    if findSubList(site,(' ','@','|'),     'bool',False,False)     : return False
-    if findSubList(site,('http://','https://','www.'),'index') == 0: return False
-    return True
+        name,domain = value.split('@')
+        if not     '.' in          domain: return False, 'dotDomain'
+        if        '..' in          domain: return False,'dotsDomain'
+        if domain[-2:] in     ('.c','.r'): return False, 'endDomain'    # аналог endswith()
+        if name        in    G.allHyphens: return False, 'hyphen'
+        if findSubList(value,G.badSymbols[type],'bool',False,False,False):
+            return False,'badSymbols'
+    elif type == 'website':
+        if value      ==    '': return True ,''
+        if not    '.' in value: return False,'dot'
+        if value.endswith('/'): return False,'endSlash'
+        if findSubList(value,G.badSymbols[type],'bool',False,False,False):
+            return False,'badSymbols'
+        if findSubList(value,('http://','https://','www.'),'index') == 0:
+            return False,'wwwHttp'
+    return True,''
 
 # поиск
 def findSubList(string:str,list:list,type='bool',fullText=False,lower=True,stripList=True):

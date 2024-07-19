@@ -75,13 +75,16 @@ class Root():
         params = G.AStypes[type]
         # ↓ передаём в extra suggList из appUI.suggInvalidUD()
         if extra is None and params['readLib']: extra = lib.getValidationList(type)
-        final  = {'valid':None, 'value':value}
+        final  = {'type'  :type,
+                  'value' :value,
+                  'valid' :None,
+                  'errKey':''}  # ключ сообщение для suggUI
 
         if params['checkList']:
             found          = listF.searchStr(extra,value,'item',True,not self.justVerify)
             final['valid'] = bool(len(found))
             if not self.justVerify and final['valid']: final['value'] = found[0]
-        else: final['valid'] = strF.validateCell(type, final['value'])
+        else:  strF.validateCell(final) # final обновляется внутри этой функции
         return final
     def getSuggList(self,errObj):
         suggList = strF.getSuggList(errObj.type,errObj.initVal)
