@@ -58,8 +58,9 @@ class Root():
                     if low in errors.keys (): errors[low]  .addPos                  ({'r':r,'c':c})
                     else:                     errors[low] = ErrorObj(type,cell.value,{'r':r,'c':c})
         if errors:
-            self.errors.add(errors,type)
+            self.errors.addCur    (errors,type)
             if self.suggErrors: self.nextSugg()
+            else:               self.finalizeErrors()
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -97,9 +98,10 @@ class Root():
         if self.errors.suggClicked(OKclicked,newValue): self.nextSugg()
         else:
             self.UI.setSuggState(False)
-            self.finalizeErrors()
+            self .finalizeErrors()
     def finalizeErrors(self):
-        pass
+        for low,errObj in self.errors.curData.items():
+            print(low+' '+str(errObj.fixed)+' '+str(errObj.newVal))
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -173,36 +175,55 @@ class Log():        # журнал
         return final,unit
 class Errors():     # хранилище ошибок
     def __init__(self,UI,mainLog:Log,initLogStr:str):
-        self.storage    = {}       # {initLow:ErrorObj,...}
-        self.UI         = UI       # UI = класс appUI.Errors()
-        self.mainLog    = mainLog  # основной журнал Root().log
-        self.initLogStr = initLogStr    # время запуска и имя проверяемого файла, нужно для self.updateFile()
+        # self.  mData{type:{initLow:ErrorObj,...},...} для всех ошибок (m = main)
+        # self.curData      {initLow:ErrorObj,...}      только для текущей проверки
+        # (разделяем для правильной работы комплексных проверок, например, launchAll)
+        self.mData      = {}
+        self.UI         = UI            # UI = класс appUI.Errors()
+        self.mainLog    = mainLog       # основной журнал Root().log
+        self.initLogStr = initLogStr    # время запуска и имя проверяемого файла, нужно для self.updFile()
         self.file       = G.files['errors']
-        self.updateFile()
-    def add(self,errors:dict,type:str): # errors = {initLow:ErrorObj,...}
-        self.storage  .update(errors)
-        self.suggQueue = list(errors.values())  # очередь предложений для исправления; после проверки элемент удаляется
-        for low,errObj in     errors.items ():
-            newEntry = self.getLogEntry(errObj)
-            write_toFile(newEntry,self.file,True)
-            self.UI .add(type,low,newEntry)
-        self.mainLog.add('errorsFound',{'type':type,'count':len(errors.keys())})
-    def rmFixed(self,errObj):   # удаляем из фрейма в UI и из файла, оставляем в self.storage со статусом fixed
+        self.updFile()
+    def addCur(self,errors:dict,type:str):  # errors = {initLow:ErrorObj,...}
+        self.add_mData(errors,type)
+        self.curData = errors
+        self.getSuggQueue()
+        self.log()
+    def rmFixed(self,errObj):   # удаляем из фрейма в UI и из файла, оставляем в self.curData со статусом fixed
         self.UI.rm(errObj)
-        self.updateFile ()
+        self.updFile()
 
     # вспомогательные
+    def add_mData(self,errors:dict,type:str):   # errors = {initLow:ErrorObj,...}
+        if type in self.mData.keys():
+            for low,errObj in errors.items():
+                if low in self.mData[type].keys(): errObj.updFrom_mData(self.mData[type][low])
+                else:                              self.mData[type][low] = errObj
+        else: self.mData[type] = errors
+    def getSuggQueue(self):
+        self.suggQueue = [] # очередь предложений для исправления; после проверки элемент удаляется
+        for errObj in self.curData.values():
+            if errObj.newVal is None: self.suggQueue.append(errObj)
     def suggClicked(self,OKclicked:bool,newValue:str):
         curError = self.suggQueue.pop(0)
         curError.suggFinished(OKclicked,newValue)
         self.mainLog.add('suggFinished',curError)
         if OKclicked: self.rmFixed(curError)    # значит, исправление принято (оно валидно)
         return self.suggQueue
-    def updateFile(self):   # перезаписывает файл, проверяя весь self.storage
+    def updFile(self):  # перезаписывает файл, проверяя весь self.mData
         final = [self.initLogStr]
-        for errObj in self.storage.values():
-            if not errObj.fixed: final.append(self.getLogEntry(errObj))
+        for typeErrors in self.mData.values():
+            for errObj in typeErrors.values():
+                if not errObj.fixed: final.append(self.getLogEntry(errObj))
         write_toFile(final,self.file)
+
+    # журналы
+    def log(self):
+        for errObj in self.suggQueue:
+            newEntry = self.getLogEntry(errObj)
+            write_toFile(newEntry,self.file,True)
+            self.UI .add(errObj.type,errObj.initVal.lower(),newEntry)
+        self.mainLog.add('errorsFound',{'type':errObj.type,'count':len(self.suggQueue)})
     def getLogEntry(self,errObj): return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
     def __init__(self,type:str,initValue:str,pos:dict): # pos={'r':row,'c':col}
@@ -215,6 +236,7 @@ class ErrorObj():   # объект одной ошибки, использует
     def suggFinished(self,fixed:bool,newVal:str):
         self.fixed  = fixed
         self.newVal = newVal
+    def updFrom_mData(self,errObj): self.suggFinished(errObj.fixed,errObj.newVal)
 
 # защита от запуска модуля
 if __name__ == '__main__':
