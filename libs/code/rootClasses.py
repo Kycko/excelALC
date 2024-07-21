@@ -24,7 +24,7 @@ class Root():
         self.type       = type
         self.log        = Log(self.UI)
         self.readRange  = params['readRange']
-        self.toTD       = params['toTD'] # будем работать с TableDict (True) или же с CellTable (False)
+        self.toTD       = params['toTD']    # будем работать с TableDict (True) или же с CellTable (False)
         self.justVerify = params['justVerify']
         if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
 
@@ -41,7 +41,8 @@ class Root():
     def rangeChecker(self,table:list,type:str):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell,...],...]
-        errors = {} # {initLow:ErrorObj,...}
+        self.rTable = table # range table, понадобится в self.finalizeErrors()
+        errors     = {}     # {initLow:ErrorObj,...}
         for r in range(len(table)):
             for c in range(len(table[r])):
                 cell    = table[r][c]
@@ -100,8 +101,15 @@ class Root():
             self.UI.setSuggState(False)
             self .finalizeErrors()
     def finalizeErrors(self):
-        for low,errObj in self.errors.curData.items():
-            print(low+' '+str(errObj.fixed)+' '+str(errObj.newVal))
+        for  errObj in self.errors.curData.values():
+            for pos in errObj.pos:
+                cell       = self.rTable[pos['r']][pos['c']] # self.rTable – это всегда [[Cell,...],...]
+                cell.error = not errObj.fixed
+                if errObj.fixed: cell.value = errObj.newVal
+        
+        if self.readRange == 'selection':
+            self.table.data = self.rTable
+            self.finalWrite()
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -109,6 +117,7 @@ class Root():
 
         # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
         for shName,tObj in self.file.data.items():
+            self.shName = shName
             tObj['table'].cutUp(self.searchTitleRow(tObj['table'].data))
             self.log .add('readSheet',shName)
             self.log .add('readFile' ,{'tObj' :tObj,
@@ -135,6 +144,14 @@ class Root():
         for item in keys: self.move_fromUnkTD_toCurTD(item[0],item[1])
     def move_fromUnkTD_toCurTD(self,unkKey:str,curKey:str):
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
+
+    # запись в файл
+    def finalWrite(self):
+        self.file.data[self.shName]['table'] = self.table.toTable()
+        newSheet  = G.config.get(self.type + ':newSheet')
+        saveAfter = G.config.get(self.type + ':saveAfter')
+        print('1')
+        self.file.write(self.shName,self.readRange,newSheet,saveAfter)
 
 # журнал и ошибки
 class Log():        # журнал

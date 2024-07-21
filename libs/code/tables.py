@@ -39,6 +39,12 @@ class CellTable(TableTemplate):
     # это таблица, в которой каждая ячейка – это объект Cell [[CellObj,...],...]
     def __init__(self,tObj:Table,errors=False): # errors – значение по умолчанию для всех ячеек
         self.data = [getCells_fromList(row,errors) for row in tObj.data]
+    def toTable(self):
+        final = []
+        for row in self.data:
+            final.append([])
+            for cell in row: final[-1].append(cell.value)
+        return Table(final,())
 class Cell():
     def __init__(self,value,error=False):
         self.value = value

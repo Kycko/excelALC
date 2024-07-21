@@ -38,9 +38,15 @@ class Excel():  # общий класс, можно копировать без 
     def readFullSheet(self,sheet:xw.Sheet,params:tuple): self.readRange(sheet.name,sheet.used_range,params)
     def readRange(self,sheetName:str,range:xw.Range,params:tuple):
         self.data[sheetName] = {
-            'addr' :range.address,
-            'table':Table(range.options(ndim=2,empty='',numbers=int).value,params)  # ndim=2 всегда даёт двумерный массив
-            }
+            'addr'    :range.address,
+            'rangeObj':range,
+            'table'   :Table(range.options(ndim=2,empty='',numbers=int).value,params)
+            }   # ndim=2 всегда даёт двумерный массив
+    def write(self,shName:str,type:str,newSheet=False,saveAfter=False):
+        # type может быть 'selection' или 'shActive'(fullRange)
+        if type == 'selection':
+            print('2')
+            self.data[shName]['rangeObj'].value = self.data[shName]['table'].data
 
 # защита от запуска модуля
 if __name__ == '__main__':
