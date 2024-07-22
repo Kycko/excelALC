@@ -273,6 +273,7 @@ class Window(TBS.Window):   # окно программы
         if param == 'main:darkTheme':
             self.style.theme_use(G.app['themes'][newVal])
             G.colors           = G.themeColors  [newVal]
+            G.colors     .update(G.exColors)
     def setLaunchBtnState(self):
         if G.exBooks.cur: self.launchBtn.configure(text=S.layout['main']['btn']['launch']['ready']    ,state='normal')
         else:             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['notChosen'],state='disabled')

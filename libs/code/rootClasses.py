@@ -114,7 +114,10 @@ class Root():
             self.finish()
     def finish(self):
         self.finalWrite()
-        self.UI .finish(self.errors.getTotalCount())
+        totalErrors = self.errors.getTotalCount()
+        if totalErrors < 100:  self.finalColors()
+        if G.config.get(self.type + ':saveAfter'): self.file.save()
+        self.UI.finish(totalErrors)
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -154,8 +157,12 @@ class Root():
     def finalWrite(self):
         self.file.data[self.shName]['table'] = self.table.toTable()
         newSheet  = G.config.get(self.type + ':newSheet')
-        saveAfter = G.config.get(self.type + ':saveAfter')
-        self.file.write(self.shName,self.readRange,newSheet,saveAfter)
+        self.file.write(self.shName,self.readRange,newSheet)
+    def finalColors(self):
+        for     r in range(len(self.table.data)):
+            for c in range(len(self.table.data[r])):
+                if  self.table.data[r][c].error:
+                    self.file.setCellColor(self.readRange,self.shName,r,c,G.colors['hlError'])
 
 # журнал и ошибки
 class Log():        # журнал

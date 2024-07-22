@@ -22,6 +22,7 @@ class exBooks():    # Excel books
         return None
 
 class Excel():  # общий класс, можно копировать без изменений в другие программы
+    # чтение
     def __init__(self,book:xw.Book,read='shActive',readParams=('toStrings','trimAll')):
         # read может быть 'selection', 'shActive'(fullRange) или 'shAll'(fullRange)
         # по необходимости можно добавить чтение диапазонов типа 'sheetName:range'
@@ -43,15 +44,36 @@ class Excel():  # общий класс, можно копировать без 
             'sheet':range.sheet,
             'table':Table(range.options(ndim=2,empty='',numbers=int).value,params)
             }   # ndim=2 всегда даёт двумерный массив
-    def write(self,shName:str,type:str,newSheet=False,saveAfter=False):
-        # type может быть 'selection' или 'shActive'(fullRange)
+
+    # запись; type может быть 'selection' или 'shActive'(fullRange)
+    def write(self,shName:str,type:str,newSheet=False):
         shObj = self.data[shName]
         if type == 'selection':
-            if newSheet: range = shObj['sheet'].copy().range(shObj['addr']) # sheet.copy() возвращает новый лист
-            else:        range = shObj['range']
-            range.value = shObj['table'].data
+            if newSheet:
+                shObj['range']   = shObj['sheet'].copy().range(shObj['addr']) # sheet.copy() возвращает новый лист
+                shObj['sheet']   = shObj['range'].sheet
+            shObj['range'].value = shObj['table'].data
+    def setCellColor(self,type:str,shName:str,row:int,col:int,color:str):
+        shObj   = self.data[shName]
+        if type == 'selection':
+            # f = first
+            fCol,fRow = self.cellNums_fromAddr(shObj['addr'].split(':')[0])
+            shObj['sheet'][fRow+row,fCol+col].color = color
+    def save(self): self.file.save()
 
-        if saveAfter: self.file.save()
+    # вспомогательные
+    def splitCellAddr(self,addr:str):
+        return (''.join(filter(str.isalpha,addr)) or None,
+                ''.join(filter(str.isdigit,addr)) or None)
+    def colLetters_toInt(self,letters:str):
+        # преобразует, например, 'AC' в 29
+        lib   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        final = 0
+        for symb in letters: final += lib.find(symb)
+        return final
+    def cellNums_fromAddr(self,cell:str):
+        col,row = self.splitCellAddr  (cell)
+        return   (self.colLetters_toInt(col), int(row)-1)
 
 # защита от запуска модуля
 if __name__ == '__main__':

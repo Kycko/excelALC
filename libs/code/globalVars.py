@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.037',
+app = {'version': 'v.038',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}                      # при необходимости добавим в другой переменной размеры диалоговых окон
@@ -37,7 +37,9 @@ themeColors = ( # ↓ светлая
                 'red'     :'#EF6C32',
                 'lightRed':'#E36F47',
                 'sand'    :'#FFE5A7'})  # аналог lightYellow
+exColors    =  {'hlError' :'#F69A98'}   # hl = highlight (cell)
 colors = themeColors[config.get('main:darkTheme')]
+colors.update(exColors)
 
 # параметры по типам скриптов
 # getSuggParam = надо ли прочитать из userCfg настройку suggestErrors
