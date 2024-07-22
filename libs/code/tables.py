@@ -24,6 +24,7 @@ class Table(TableTemplate): # общий класс, можно копирова
         self.data = values
         if 'toStrings' in initParams: self.stringAll()
         if 'trimAll'   in initParams: self.trimAll  ()
+    def getSize(self): return len(self.data),len(self.data[0])
     def stringAll(self):
         # конвертирует каждую ячейку таблицы в строку
         for r in range(len(self.data)):

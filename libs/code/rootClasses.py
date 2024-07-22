@@ -119,9 +119,9 @@ class Root():
         for shName,tObj in self.file.data.items():
             self.shName = shName
             tObj['table'].cutUp(self.searchTitleRow(tObj['table'].data))
-            self.log .add('readSheet',shName)
-            self.log .add('readFile' ,{'tObj' :tObj,
-                                       'range':('range','full')[self.readRange == 'shActive']})
+            self.log.add('readSheet',shName)
+            self.log.add('readFile',
+                         {'tObj' :tObj,'range':('range','full')[self.readRange == 'shActive']})
 
             if self.toTD:
                 self.unkTD = TableDict(tObj['table'])
@@ -150,7 +150,6 @@ class Root():
         self.file.data[self.shName]['table'] = self.table.toTable()
         newSheet  = G.config.get(self.type + ':newSheet')
         saveAfter = G.config.get(self.type + ':saveAfter')
-        print('1')
         self.file.write(self.shName,self.readRange,newSheet,saveAfter)
 
 # журнал и ошибки
