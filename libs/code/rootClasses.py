@@ -42,7 +42,7 @@ class Root():
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell,...],...]
         self.rTable = table # range table, понадобится в self.finalizeErrors()
-        errors     = {}     # {initLow:ErrorObj,...}
+        errors      = {}    # {initLow:ErrorObj,...}
         for r in range(len(table)):
             for c in range(len(table[r])):
                 cell    = table[r][c]
@@ -58,10 +58,9 @@ class Root():
                     low = cell.value.lower()
                     if low in errors.keys (): errors[low]  .addPos                  ({'r':r,'c':c})
                     else:                     errors[low] = ErrorObj(type,cell.value,{'r':r,'c':c})
-        if errors:
-            self.errors.addCur    (errors,type)
-            if self.suggErrors: self.nextSugg()
-            else:               self.finalizeErrors()
+
+        self.errors.addCur(errors,type)
+        self     .nextSugg()
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -92,14 +91,16 @@ class Root():
         suggList = strF.getSuggList(errObj.type,errObj.initVal)
         return suggList
     def nextSugg(self):
-        queue    = self.errors.suggQueue
-        suggList = self.getSuggList(queue[0])
-        self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
-    def suggFinalClicked(self,OKclicked:bool,newValue=''):
-        if self.errors.suggClicked(OKclicked,newValue): self.nextSugg()
+        queue = self.errors.suggQueue
+        if self.suggErrors and queue:
+            suggList = self.getSuggList(queue[0])
+            self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
         else:
             self.UI.setSuggState(False)
             self .finalizeErrors()
+    def suggFinalClicked(self,OKclicked:bool,newValue=''):
+        self.errors.suggClicked(OKclicked,newValue)
+        self.nextSugg()
     def finalizeErrors(self):
         for  errObj in self.errors.curData.values():
             for pos in errObj.pos:
@@ -201,10 +202,11 @@ class Errors():     # хранилище ошибок
         self.file       = G.files['errors']
         self.updFile()
     def addCur(self,errors:dict,type:str):  # errors = {initLow:ErrorObj,...}
-        self.add_mData(errors,type)
         self.curData = errors
         self.getSuggQueue()
-        self.log()
+        if errors:
+            self.add_mData(errors,type)
+            self.log()
     def rmFixed(self,errObj):   # удаляем из фрейма в UI и из файла, оставляем в self.curData со статусом fixed
         self.UI.rm(errObj)
         self.updFile()
@@ -225,7 +227,6 @@ class Errors():     # хранилище ошибок
         curError.suggFinished(OKclicked,newValue)
         self.mainLog.add('suggFinished',curError)
         if OKclicked: self.rmFixed(curError)    # значит, исправление принято (оно валидно)
-        return self.suggQueue
     def updFile(self):  # перезаписывает файл, проверяя весь self.mData
         final = [self.initLogStr]
         for typeErrors in self.mData.values():
