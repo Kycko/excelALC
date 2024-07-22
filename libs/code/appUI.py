@@ -134,18 +134,18 @@ class Window(TBS.Window):   # окно программы
         elif type == 'runSugg':
             self.suggLfl = TBS.Labelframe(parent,text=S.layout['run']['lfl']['sugg'])
             self.suggLfl.pack   (fill='x',pady=5)
-            frSugg      = TBS.Frame(self.suggLfl)
-            frSugg.pack (fill='x',padx=10,pady=2)
-            self.buildFrame('runSuggType',frSugg)
-            self.suggWidgets = {}                       # все виджеты, которые надо включать/отключать
-            self.buildFrame('runSugg_curVal',frSugg)    # фрейм вывода текущего значения
+            self.frSugg = TBS.Frame(self.suggLfl)
+            self.frSugg.pack (fill='x',padx=10,pady=2)
+            self.buildFrame('runSuggType'   ,self.frSugg)
+            self.suggWidgets = {}                           # все виджеты, которые надо включать/отключать
+            self.buildFrame('runSugg_curVal',self.frSugg)   # фрейм вывода текущего значения
 
-            self.frSuggMain = TBS.Frame(frSugg)  # чтобы фрейм предложений оставался при удалении данных
-            self.frSuggMain.pack     (fill='x')
+            self.frSuggMain = TBS.Frame(self.frSugg)    # чтобы фрейм предложений оставался при удалении данных
+            self.frSuggMain.pack(fill='x')
             # ↓ чтобы фрейм предложений сжимался после удаления всех предложений
             TBS.Frame(self.frSuggMain,height=1,width=1).pack(fill='x')
             self.buildFrame('runSuggVars' ,self.frSuggMain,[])  # фрейм для добавления кнопок выбора
-            self.buildFrame('runSuggEntry',frSugg)              # фрейм с полем ручного ввода текста
+            self.buildFrame('runSuggEntry',self.frSugg)         # фрейм с полем ручного ввода текста
         elif type == 'runSuggType':
             frMain = TBS.Frame(parent)
             frMain.pack     (fill='x')
@@ -198,6 +198,24 @@ class Window(TBS.Window):   # окно программы
                                                   command   = lambda key=key:self.suggFinalClicked(key),
                                                   bootstyle = cfg['style'])
                 self.suggWidgets[key].pack(side='right',padx=cfg['padx'])
+        elif type == 'finish':
+            self.frSugg .destroy  ()
+            strings = S.layout['run']
+            self.suggLfl.configure(text=strings['lfl']['finished'],bootstyle='success')
+            frMain     = TBS.Frame(self.suggLfl)
+            frMain.pack(padx=5,pady=2)
+            TBS.Label(frMain,text=strings['finished']['title']+str(params)).pack(anchor='w',padx=6)
+            self.buildFrame('finButtons',frMain)
+        elif type == 'finButtons':
+            frMain =   TBS.Frame(parent)
+            frMain.pack(fill='x',pady=7)
+            for btnType,cfg in S.layout['run']['finished']['buttons'].items():
+                TBS.Button(frMain,
+                           text      = cfg['text'],
+                           command   = self.buildUI if btnType == 'exit' else self.app.errors.showNotepad,
+                           bootstyle = cfg['style']
+                           ).pack(side=cfg['side'],padx=5)
+
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
@@ -246,6 +264,7 @@ class Window(TBS.Window):   # окно программы
         self.suggWidgets ['curVal'].configure(text=errObj.initVal,command=lambda s=errObj.initVal:self.suggVarClicked(s))
         self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
         self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
+    def finish(self,errorsCount:int): self.buildFrame('finish',self.suggLfl,errorsCount)
 
     # кнопки и переключатели
     def switchBoolSetting(self,param:str):

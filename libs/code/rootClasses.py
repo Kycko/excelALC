@@ -1,4 +1,5 @@
 from   sys import exit as SYSEXIT
+from   os          import startfile
 from   globalFuncs import curDateTime,write_toFile
 import globalVars      as G
 import appUI
@@ -110,7 +111,10 @@ class Root():
         
         if self.readRange == 'selection':
             self.table.data = self.rTable
-            self.finalWrite()
+            self.finish()
+    def finish(self):
+        self.finalWrite()
+        self.UI .finish(self.errors.getTotalCount())
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -215,8 +219,10 @@ class Errors():     # хранилище ошибок
     def add_mData(self,errors:dict,type:str):   # errors = {initLow:ErrorObj,...}
         if type in self.mData.keys():
             for low,errObj in errors.items():
-                if low in self.mData[type].keys(): errObj.updFrom_mData(self.mData[type][low])
-                else:                              self.mData[type][low] = errObj
+                if low in self.mData[type].keys():
+                    errObj.updFrom_mData(self.mData[type][low])
+                    self.mData[type][low].pos += errObj.pos
+                else: self.mData[type][low]    = errObj
         else: self.mData[type] = errors
     def getSuggQueue(self):
         self.suggQueue = [] # очередь предложений для исправления; после проверки элемент удаляется
@@ -233,6 +239,12 @@ class Errors():     # хранилище ошибок
             for errObj in typeErrors.values():
                 if not errObj.fixed: final.append(self.getLogEntry(errObj))
         write_toFile(final,self.file)
+    def getTotalCount(self):
+        final = 0
+        for typeErrors in self.mData.values():
+            for errObj in typeErrors.values():
+                if not errObj.fixed: final += len(errObj.pos)
+        return final
 
     # журналы
     def log(self):
@@ -242,6 +254,7 @@ class Errors():     # хранилище ошибок
             self.UI .add(errObj.type,errObj.initVal.lower(),newEntry)
         self.mainLog.add('errorsFound',{'type':errObj.type,'count':len(self.suggQueue)})
     def getLogEntry(self,errObj): return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
+    def showNotepad(self): startfile(self.file)
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
     def __init__(self,type:str,initValue:str,pos:dict): # pos={'r':row,'c':col}
         self.type    = type # тип ошибки, один из G.AStypes
