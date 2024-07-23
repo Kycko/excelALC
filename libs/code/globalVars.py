@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.038',
+app = {'version': 'v.039',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}                      # при необходимости добавим в другой переменной размеры диалоговых окон
@@ -45,18 +45,20 @@ colors.update(exColors)
 # getSuggParam = надо ли прочитать из userCfg настройку suggestErrors
 # AStype (нужен не везде) = тип проверки для autocorr & suggest
 launchTypes = {
-    'allChecks'  :{'readRange':'shActive', 'toTD':True ,'launch':'allChecks'   ,'justVerify':False,'getSuggParam':True},
-    'checkTitles':{'readRange':'shActive', 'toTD':True ,'launch':'checkTitles' ,'justVerify':False,'getSuggParam':True,'AStype':'title'},
-    'checkPhones':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'phone'},
-    'checkEmails':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'mail'}
+    'allChecks'    :{'readRange':'shActive', 'toTD':True ,'launch':'allChecks'   ,'justVerify':False,'getSuggParam':True},
+    'checkTitles'  :{'readRange':'shActive', 'toTD':True ,'launch':'checkTitles' ,'justVerify':False,'getSuggParam':True,'AStype':'title'},
+    'checkPhones'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'phone'},
+    'checkEmails'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'mail'},
+    'checkWebsites':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getSuggParam':True,'AStype':'website'}
     }
 
 # readLib    : прочитать подходящие варианты для валидации из библиотеки
 # checkList  : валидация путём проверки, есть ли value в списке допустимых (extra)
 # acceptBlank: для диалога с предложением исправить
 # ↓ !ВСЕ ЭТИ ТИПЫ ДОЛЖНЫ БЫТЬ В strings.suggMsg! ↓
-AStypes = {'title':{'readLib':True ,'checkList':True ,'acceptBlank':False},
-           'mail' :{'readLib':False,'checkList':False,'acceptBlank':True }}
+AStypes = {'title'  :{'readLib':True ,'checkList':True ,'acceptBlank':False},
+           'mail'   :{'readLib':False,'checkList':False,'acceptBlank':True },
+           'website':{'readLib':False,'checkList':False,'acceptBlank':True }}
 
 log = {'units' :{'mainLaunch'  :'core',
                  'launchType'  :'core', # отсутствует в S.log: читается из S.layout
@@ -75,11 +77,14 @@ exBooks = exBooks()
 
 # особые символы
 # ↓ неподходящие для почты и сайта
-badSymbols = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),
-              'website':(' ','@','|')}
-allHyphens = ('-','–','—')
-ruSymbols  = ('а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п',
-              'р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я')
+badSymbols   = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),
+                'website':(' ','@','|')}
+badWebStarts = ('http://'  ,'https://'  ,'www.')
+rmSites      = ('facebook.','instagram.','twitter.')
+
+allHyphens   = ('-','–','—')
+ruSymbols    = ('а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п',
+                'р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я')
 
 # защита от запуска модуля
 if __name__ == '__main__':

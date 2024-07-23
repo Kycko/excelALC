@@ -30,7 +30,7 @@ class Root():
         if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
 
         self.initLE (book.name) # LE = log & errors
-        self.getData(book)  # получаем данные
+        self.getData(book)      # получаем данные
         if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data,params['AStype'])  # проверяем выделенный диапазон
     def initLE(self,bookName:str):  # LE = log & errors
         initStr = S.log['mainLaunch'].replace('$$1',curDateTime()).replace('$$2',bookName)
@@ -50,7 +50,9 @@ class Root():
                 tempVal = cell.value
                 if not self.justVerify: tempVal = self.autocorr(type,tempVal)
 
+                print(tempVal)
                 VAL = self.validate_andCapitalize(type,tempVal)
+                print(VAL['valid'])
                 if VAL['valid']:
                     if not self.justVerify and tempVal != cell.value:
                         self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':tempVal})

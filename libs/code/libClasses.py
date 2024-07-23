@@ -25,10 +25,10 @@ class Columns():
         # vList = validation list, список допустимых значений
         self.data  = libR.parseDoubleDict(table.data)
         self.vList = [params['title'] for params in self.data.values()]
-    def getKey_byTitle(self,title:str,fullText=False,lower=False):
+    def getKey_byTitle(self,title:str,fullText=False,lower=False,stripTitle=False):
         # возвращает, например, ключ 'region' по заголовку 'Регион и город'
         for key,params in self.data.items():
-            if strF.findSub(params['title'],title,'bool',fullText,lower): return key
+            if strF.findSub(params['title'],title,'bool',fullText,lower,('','b')[stripTitle]): return key
 class Autocorr(AStemplate):
     def get(self,type:str,value:str):
         keys = super().get(type,value)

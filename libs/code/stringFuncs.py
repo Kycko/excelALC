@@ -12,25 +12,29 @@ def getEnding_forCount(words:dict,count:int):
     elif ten == 1:                                     return words['1']
     else:                                              return words['2-4']
 
-# проверка и исправление данных
+# проверка и исправление разных пользовательских данных
 def autocorrCell(type:str,value:str):
-    if type == 'mail': return ACmail(value)
-    else:              return        value
-def ACmail(value:str):
-    value = value.lower()
-    RPL   = {'from': ('​','–','—','|',';','; ',', ',',,'),  # RPL = replace
-             'to'  : ('','-','-',',',',',',' ,',' ,',' )}
+    if type in ('phone','mail','website'): return AC_PMW(type,value)
+    else:                                  return             value
+def AC_PMW(type:str,value:str): # AutoCorr Phone,Mail,Website
+    RPL = {'from': ('​','–','—','|',';',',,'),  # RPL = replace
+           'to'  : ('','-','-',',',',',',' )}
     for i in range(len(RPL['from'])): value = value.replace(RPL['from'][i],RPL['to'][i])
 
-    list = value.split(',')
+    list = value.lower().split(',')
     for i in range(len(list)):
-        parts = list[i].split('@')
-        if 'gmail' in parts[-1]: parts[-1] = 'gmail.com'
-        list[i] = '@'.join(parts)
+        list[i] = list[i].strip()   # обрезает пробелы и проч. по бокам
+        if   type == 'mail':
+            parts = list[i].split('@')
+            if 'gmail' in parts[-1]: parts[-1] = 'gmail.com'
+            list[i] = '@'.join(parts)
+        elif type == 'website':
+            list[i] = rmStartList(list[i],G.badWebStarts,0,False).rstrip('/')
+            if     checkStartList(list[i],G.rmSites,'bool',False):  list[i] = ''
 
-    return ','.join(listF.rmDoublesStr(list))
+    return ','.join(listF.rmDoublesStr(listF.rmBlankStr(list)))
 def getSuggList(type:str,value:str):
-    if type == 'mail':
+    if type in ('mail','website'):
         new  = value.replace(' ','').replace('|',',')
         if new != value:
             vObj = {'type':type,'value':new,'valid':None,'errKey':''}
@@ -41,7 +45,12 @@ def validateCell(vObj:dict):    # vObj={'type':,'value':,'valid':,'errKey':}
     if vObj['type'] in ('phone','mail','website'):
         # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
         # и ещё возвращать False, если номера дублируются
-        for item in vObj['value'].split(','):
+        list = vObj['value'].split(',')
+        if listF.inclDoublesStr(list,True):
+            vObj['valid']  = False
+            vObj['errKey'] = 'listDoubles'
+            return
+        for item in list:
             vObj['valid'],vObj['errKey'] = checkPMW(vObj['type'],item)
             if not        vObj['valid']: return
     vObj['valid'] = True
@@ -60,34 +69,35 @@ def checkPMW(type:str,value:str):
         name,domain = value.split('@')
         if not     '.' in          domain: return False, 'dotDomain'
         if        '..' in          domain: return False,'dotsDomain'
-        if domain[-2:] in     ('.c','.r'): return False, 'endDomain'    # аналог endswith()
+        if len(domain) > 1 and domain[-2:] in ('.c','.r'): return False,'endDomain'
         if name        in    G.allHyphens: return False, 'hyphen'
-        if findSubList(value,G.badSymbols[type],'bool',False,False,False):
+        if findSubList(value,G.badSymbols[type],'bool',False,False):
             return False,'badSymbols'
     elif type == 'website':
         if value      ==    '': return True ,''
         if not    '.' in value: return False,'dot'
         if value.endswith('/'): return False,'endSlash'
-        if findSubList(value,G.badSymbols[type],'bool',False,False,False):
+        if checkStartList(value,G.badWebStarts,'bool'): return False,'wwwHttp'
+        if checkStartList(value,G.rmSites     ,'bool'): return False,'rmSites'
+        if findSubList   (value,G.badSymbols[type],'bool',False,False):
             return False,'badSymbols'
-        if findSubList(value,('http://','https://','www.'),'index') == 0:
-            return False,'wwwHttp'
     return True,''
 
-# поиск
-def findSubList(string:str,list:list,type='bool',fullText=False,lower=True,stripList=True):
-    # ищет в строке каждый элемент списка; type может быть 'index', 'bool' и 'item'
+# поиск (общие)
+def findSubList(string:str,list:list,type='bool',fullText=False,lower=True,strip=''):
+    # ищет в строке каждый элемент списка list[]; type может быть 'index', 'bool' и 'item'
     # индекс – это позиция найденного в string, 'item' вернёт найденный элемент списка list
     for item in list:
-        result = findSub(string,item,'index',fullText,lower,stripList)
+        result = findSub(string,item,'index',fullText,lower,strip)
         if result >= 0: return item if type == 'item' else getIB(type,result)
     return None if type == 'item' else getIB(type,-1)
-def findSub(string:str,sub:str,type='index',fullText=False,lower=True,stripSub=True):
+def findSub(string:str,sub:str,type='index',fullText=False,lower=True,strip=''):
     # type может быть 'index' или 'bool'
     # если fullText=True, проверяется равенство строк (но после .trim() + можно задать lower=True)
     # если lower   =True, все строки будут сравниваться через .toLowerCase()
-    string           = string.strip()
-    if stripSub: sub = sub   .strip()
+    # strip может быть '', 'a' (для string), 'b' (для sub), 'ab'
+    if 'a' in strip: string = string.strip()
+    if 'b' in strip: sub    = sub   .strip()
 
     if fullText and len(string) != len(sub): return getIB(type,-1)
     if lower:
@@ -95,6 +105,22 @@ def findSub(string:str,sub:str,type='index',fullText=False,lower=True,stripSub=T
         sub    = sub   .lower()
 
     return getIB(type,string.find(sub))
+def checkStartList(string:str,list:list,type='item',lower=True,stripList=False):
+    # проверяет каждый элемент списка list[]: если он в начале строки, возвращает этот элемент или True/False
+    # type может быть 'item' или 'bool'
+    for item in list:
+        if findSub(string,item,'index',False,lower,('','b')[stripList]) == 0: return (True,item)[type == 'item']
+    return (False,None)[type == 'item']
+
+# изменение (общие)
+def rmStartList(string:str,list:list,count=0,lower=True,stripList=False):
+    # проверяет каждый элемент списка list[]: если он в начале строки, удаляет его из начала строки
+    # count = сколько раз удалять; если count=0, удаляем все, пока в начале не будет что-то другое
+    iter = 0    # итерация: увеличивается на 1, когда производим удаление
+    while checkStartList(string,list,'bool',lower,stripList) and (count == 0 or iter < count):
+        string = string.replace(checkStartList(string,list,'item',lower,stripList),'',1)
+        iter  += 1
+    return string
 
 # защита от запуска модуля
 if __name__ == '__main__':
