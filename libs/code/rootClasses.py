@@ -53,17 +53,21 @@ class Root():
                 VAL = self.validate_andCapitalize(type,tempVal)
                 if VAL['valid']:
                     if not self.justVerify and tempVal != cell.value:
-                        self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':tempVal})
+                        if not  self.addErrObj(errors,type,cell.value,{'r':r,'c':c},True,tempVal):
+                            self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':tempVal})
                         cell.value = VAL['value']
-                else:
-                    low = cell.value.lower()
-                    if low in errors.keys (): errors[low]  .addPos                  ({'r':r,'c':c})
-                    else:                     errors[low] = ErrorObj(type,cell.value,{'r':r,'c':c})
+                else: self.addErrObj(errors,type,cell.value,{'r':r,'c':c})
 
         self.errors.addCur(errors,type)
         self     .nextSugg()
 
     # работа с ошибками
+    def addErrObj(self,storage:dict,type:str,value:str,pos:dict,initFixed=False,newVal=None):
+        low    =          value.lower()
+        addPos = low in storage.keys ()
+        if addPos: storage[low]  .addPos             (pos)
+        else:      storage[low] = ErrorObj(type,value,pos,initFixed,newVal)
+        return addPos
     def autocorr(self,type:str,value:str):
         value    = strF.autocorrCell(type,value)    # выполнится не для всех type (кроме strip(), он же trim())
         if type == 'region':
@@ -113,11 +117,13 @@ class Root():
             self.table.data = self.rTable
             self.finish()
     def finish(self):
-        self.finalWrite()
-        totalErrors = self.errors.getTotalCount()
-        self.finalColors(totalErrors)
-        if G.config .get(self.type + ':saveAfter'): self.file.save()
-        self.UI  .finish(totalErrors)
+        count = self.errors.getCount()
+        self.finalWrite   (count['total'])
+        self.finalColors  (count['errors'])
+        if G.config   .get(self.type + ':saveAfter'):
+            self.file.save()
+            self.log .add ('fileSaved')
+        self.UI    .finish(count['errors'])
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -154,11 +160,12 @@ class Root():
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
     # запись в файл
-    def finalWrite(self):
-        self.file.data[self.shName]['table'] = self.table.toTable()
+    def finalWrite(self,totalErrors:int):
         newSheet  = G.config.get(self.type + ':newSheet')
-        self.file.write(self.shName,self.readRange,newSheet)
-        self.log.add('finalWrite',newSheet)
+        if totalErrors:
+            self.file.data[self.shName]['table'] = self.table.toTable()
+            self.file.write(self.shName,self.readRange,newSheet)
+        self.log.add('finalWrite',{'sheet':newSheet,'errors':totalErrors})
     def finalColors(self,totalErrors:int):
         self.file.resetSheetBgColors(self.shName)
         self.log .add ('colorErrors',totalErrors)
@@ -180,34 +187,37 @@ class Log():        # журнал
         write_toFile(newStr,self.file,True)
         self.UI.log (newStr,unit)
     def getType(self,type:str,params=None):
-        if   type == 'mainLaunch': final = params
-        elif type == 'launchType': final = S.layout['actions'][params]['log']
-        elif type == 'readSheet' : final = S.log[type].replace('$$1',params)
-        elif type == 'readFile':
+        if   type == 'mainLaunch'  : final = params
+        elif type == 'launchType'  : final = S.layout['actions'][params]['log']
+        elif type == 'readSheet'   : final = S.log[type].replace('$$1',params)
+        elif type == 'readFile'    :
             final =   S.log[type][params['range']]
             rows  =           len(params['tObj']['table'].data) - 1*(params['range'] == 'full') # считаем без заголовка
             cols  =           len(params['tObj']['table'].data[0])
             final = final.replace('$$1',params['tObj']['addr'])
             final = final.replace('$$2',str(cols)+' '+strF.getEnding_forCount(S.words_byCount['столбцы'],cols))
             final = final.replace('$$3',str(rows)+' '+strF.getEnding_forCount(S.words_byCount['строки' ],rows))
-        elif type == 'ACsuccess':
+        elif type == 'ACsuccess'   :
             final = S.log[type].replace('$$1',params['type'])
             final = final      .replace('$$2',params['from'])
             final = final      .replace('$$3',params['to'])
-        elif type == 'errorsFound':
+        elif type == 'errorsFound' :
             final = S.log[type].replace('$$1',params['type']).replace('$$2',str(params['count']))
         elif type == 'suggFinished':
             # здесь params = ErrorObj()
             final = tuple(S.log[type].values())[params.fixed].replace('$$1',params.type)
             final =                                     final.replace('$$2',params.initVal)
             if params.fixed: final =                    final.replace('$$3',params.newVal)
-        elif type == 'finalWrite':
-            final = S.log[type]['main'].replace('$$1',S.log[type]['sheet'][params])
-        elif type == 'colorErrors':
+        elif type == 'finalWrite'  :
+            key    = 'main' if params['errors'] else 'skip'
+            final  =      S.log[type][key]
+            if key == 'main': final = final.replace('$$1',S.log[type]['sheet'][params['sheet']])
+        elif type == 'colorErrors' :
             if    not params: key = '0'
             elif params > 99: key = 'skip'
             else            : key = 'done'
             final = S.log[type][key].replace('$$1',str(params))
+        elif type == 'fileSaved'   : final = S.log[type]
 
         unit  = G.log['units'][type]
         final =    '['+unit+'] '+final
@@ -257,11 +267,13 @@ class Errors():     # хранилище ошибок
             for errObj in typeErrors.values():
                 if not errObj.fixed: final.append(self.getLogEntry(errObj))
         write_toFile(final,self.file)
-    def getTotalCount(self):
-        final = 0
+    def getCount(self):
+        final = {'errors':0,'total':0}
         for typeErrors in self.mData.values():
             for errObj in typeErrors.values():
-                if not errObj.fixed: final += len(errObj.pos)
+                count = len(errObj.pos)
+                final['total']                       += count
+                if not errObj.fixed: final['errors'] += count
         return final
 
     # журналы
@@ -270,15 +282,16 @@ class Errors():     # хранилище ошибок
             newEntry = self.getLogEntry(errObj)
             write_toFile(newEntry,self.file,True)
             self.UI .add(errObj.type,errObj.initVal.lower(),newEntry)
-        self.mainLog.add('errorsFound',{'type':errObj.type,'count':len(self.suggQueue)})
+        if self.suggQueue:
+            self.mainLog.add('errorsFound',{'type':errObj.type,'count':len(self.suggQueue)})
     def getLogEntry(self,errObj): return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
     def showNotepad(self): startfile(self.file)
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
-    def __init__(self,type:str,initValue:str,pos:dict): # pos={'r':row,'c':col}
+    def __init__(self,type:str,initValue:str,pos:dict,initFixed=False,newVal=None): # pos={'r':row,'c':col}
         self.type    = type # тип ошибки, один из G.AStypes
         self.initVal = initValue
-        self. newVal = None
-        self.fixed   = False
+        self. newVal =  newVal
+        self.fixed   = initFixed
         self.pos     = [pos]    # список всех позиций этой ошибки в диапазоне проверки [{'r':row,'c':col},...]
     def addPos(self,pos:dict): self.pos.append(pos)
     def suggFinished(self,fixed:bool,newVal:str):
