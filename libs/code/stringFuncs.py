@@ -13,27 +13,35 @@ def getEnding_forCount(words:dict,count:int):
     else:                                              return words['2-4']
 
 # проверка и исправление разных пользовательских данных
-def autocorrCell(type:str,value:str):
+def autocorrCell(type:str,value:str,params=None):
     value = value.strip()
-    if type in ('phone','mail','website'): return AC_PMW(type,value)
+    if type in ('phone','mail','website'): return AC_PMW(type,value,params)
     else:                                  return             value
-def AC_PMW(type:str,value:str): # AutoCorr Phone,Mail,Website
+def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
     RPL = {'from': ('​','–','—','|',';',',,'),  # RPL = replace
            'to'  : ('','-','-',',',',',',' )}
     for i in range(len(RPL['from'])): value = value.replace(RPL['from'][i],RPL['to'][i])
 
     list = value.lower().split(',')
     for i in range(len(list)):
-        list[i] = list[i].strip()   # обрезает пробелы и проч. по бокам
-        if   type == 'mail':
-            parts = list[i].split('@')
+        item = list[i].strip()  # обрезает пробелы и проч. по бокам
+        if   type == 'phone':
+            item = ''.join(c for c in item if c.isdigit())                  # удаляем всё, кроме цифр
+            if   len(item) == 11                      : item = '7'+item[1:] # после этого проверить badPhone
+            elif len(item) == 10                      : item = '7'+item     # после этого проверить badPhone
+            if   len(item)  < 10 or item == G.badPhone: item = ''
+        elif type == 'mail':
+            parts = item.split('@')
             if 'gmail' in parts[-1]: parts[-1] = 'gmail.com'
-            list[i] = '@'.join(parts)
+            item = '@'.join(parts)
         elif type == 'website':
-            list[i] = rmStartList(list[i],G.badWebStarts,0,False).rstrip('/')
-            if     checkStartList(list[i],G.rmSites,'bool',False):  list[i] = ''
+            item = rmStartList(item,G.badWebStarts,0,False).rstrip('/')
+            if  checkStartList(item,G.rmSites,'bool',False): item = ''
+        list[i] = item  # для удобства именования внутри используем item
 
-    return ','.join(listF.rmDoublesStr(listF.rmBlankStr(list)))
+    list = listF.rmDoublesStr(listF.rmBlankStr(list))
+    if type == 'phone' and not list and params['noBlanks']: return G.badPhone
+    return ','.join(list)
 def getSuggList(type:str,value:str):
     if type in ('mail','website'):
         new  = value.replace(' ','').replace('|',',')
@@ -42,26 +50,31 @@ def getSuggList(type:str,value:str):
             validateCell(vObj)
             if vObj['valid']: return [new]
     return []
-def validateCell(vObj:dict):    # vObj={'type':,'value':,'valid':,'errKey':}
+def validateCell(vObj:dict,params=None):    # vObj={'type':,'value':,'valid':,'errKey':}
     if vObj['type'] in ('phone','mail','website'):
         # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
-        # и ещё возвращать False, если номера дублируются
         list = vObj['value'].split(',')
         if listF.inclDoublesStr(list,True):
             vObj['valid']  = False
             vObj['errKey'] = 'listDoubles'
             return
+        if vObj['type'] == 'phone' and len(list) > 1 and G.badPhone in list:
+            vObj['valid']  = False
+            vObj['errKey'] = 'nines_inMany'
+            return
         for item in list:
-            vObj['valid'],vObj['errKey'] = checkPMW(vObj['type'],item)
+            vObj['valid'],vObj['errKey'] = checkPMW(vObj['type'],item,params)
             if not        vObj['valid']: return
     vObj['valid'] = True
-def checkPMW(type:str,value:str):
+def checkPMW(type:str,value:str,params=None):
     # PMW = phone, mail, website
     # возвращаем valid:True/False и ключ для S.errInput[type]
     if   type == 'phone':
-        if len(value) != 11  : return False,'length'
-        if value[0]   != '7' : return False,'firstSymb'
-        if value[1]   in '67': return False,'kazakh'
+        if not params['noBlanks'] and value    == ''        : return True,''
+        if not params['noBlanks'] and value    == G.badPhone: return False,'secNines'
+        if                        len(value)   != 11        : return False,'length'
+        if                            value[0] != '7'       : return False,'firstSymb'
+        if                            value[1] in '67'      : return False,'kazakh'
     elif type == 'mail':
         if value            == ''        : return True ,''
         if value.count('@') != 1         : return False,'dogCount'

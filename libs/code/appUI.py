@@ -221,15 +221,17 @@ class Window(TBS.Window):   # окно программы
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
             for type in ('main','script'): self.buildFrame('MLtab',tabs,type)
     def buildActionsCfgGroup(self,parent:TBS.Frame,type:str,group:str):
+        SE = 'suggestErrors'
         for param,strings in S.layout['actionsCfg'][group].items():
-            sType = type+':'+param  # например, 'checkTitles:newSheet'
-            cb    = TBS.Checkbutton(parent,
-                                    text      = strings['lbl'],
-                                    variable  = BooleanVar    (value=G.config.get(sType)),
-                                    command   = lambda t=sType:self.switchBoolSetting(t),
-                                    bootstyle = 'round-toggle')
-            ToolTip(cb,text=strings['tt'])
-            cb.pack(padx=5,pady=5,expand=True,anchor='w')
+            if param != SE or SE in G.launchTypes[type]['getUserCfg']:
+                sType = type+':'+param  # например, 'checkTitles:newSheet'
+                cb    = TBS.Checkbutton(parent,
+                                        text      = strings['lbl'],
+                                        variable  = BooleanVar    (value=G.config.get(sType)),
+                                        command   = lambda t=sType:self.switchBoolSetting(t),
+                                        bootstyle = 'round-toggle')
+                ToolTip(cb,text=strings['tt'])
+                cb.pack(padx=5,pady=5,expand=True,anchor='w')
     def buildSeparator(self,parent,padx=0,pady=3): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
 
     # вспомогательные

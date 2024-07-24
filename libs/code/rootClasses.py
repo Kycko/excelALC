@@ -27,7 +27,10 @@ class Root():
         self.readRange  = params['readRange']
         self.toTD       = params['toTD']    # будем работать с TableDict (True) или же с CellTable (False)
         self.justVerify = params['justVerify']
-        if params['getSuggParam']: self.suggErrors = G.config.get(type + ':suggestErrors')
+
+        self.uCfg = {}
+        if 'getUserCfg' in params.keys():
+            for param in params['getUserCfg']: self.uCfg[param] = G.config.get(type+':'+param)
 
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные
@@ -69,7 +72,7 @@ class Root():
         else:      storage[low] = ErrorObj(type,value,pos,initFixed,newVal)
         return addPos
     def autocorr(self,type:str,value:str):
-        value    = strF.autocorrCell(type,value)    # выполнится не для всех type (кроме strip(), он же trim())
+        value    = strF.autocorrCell(type,value,self.uCfg)  # выполнится не для всех type (кроме strip(), он же trim())
         if type == 'region':
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
@@ -90,14 +93,14 @@ class Root():
             found          = listF.searchStr(extra,value,'item',True,not self.justVerify)
             final['valid'] = bool(len(found))
             if not self.justVerify and final['valid']: final['value'] = found[0]
-        else:  strF.validateCell(final) # final обновляется внутри этой функции
+        else:  strF.validateCell(final,self.uCfg)   # final обновляется внутри этой функции
         return final
     def getSuggList(self,errObj):
         suggList = strF.getSuggList(errObj.type,errObj.initVal)
         return suggList
     def nextSugg(self):
         queue = self.errors.suggQueue
-        if self.suggErrors and queue:
+        if queue and G.AStypes[queue[0].type]['showSugg'] and self.uCfg['suggestErrors']:
             suggList = self.getSuggList(queue[0])
             self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
         else:
