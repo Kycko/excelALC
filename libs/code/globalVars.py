@@ -28,12 +28,14 @@ config = userCfg(files['config'])
 
 # цвета (разные для светлой[0] и тёмной[1] тем; colors перезаписывается при смене темы)
 themeColors = ( # ↓ светлая
-               {'magenta' :'#936BCC',
+               {'green'   :'#4AAC7F',
+                'magenta' :'#936BCC',
                 'red'     :'#DE3923',
                 'lightRed':'#E36B4F',
                 'sand'    :'#D1A63E'},
                 # ↓ тёмная
-               {'magenta' :'#C4ABE7',
+               {'green'   :'#8EE4BD',
+                'magenta' :'#C4ABE7',
                 'red'     :'#EF6C32',
                 'lightRed':'#E36F47',
                 'sand'    :'#FFE5A7'})  # аналог lightYellow
@@ -68,12 +70,13 @@ log = {'units' :{'mainLaunch'  :'core',
                  'ACsuccess'   :'autocorr',
                  'errorsFound' :'errors',
                  'suggFinished':'sugg',
-                 'finalWrite'  :'core',
-                 'colorErrors' :'core'},
+                 'finalWrite'  :'finalWrite',
+                 'colorErrors' :'finalWrite'},
        'colors':{'core'        : None,
                  'autocorr'    :'sand',
                  'errors'      :'red',
-                 'sugg'        :'magenta'}}
+                 'sugg'        :'magenta',
+                 'finalWrite'  :'green'}}
 
 # прочее
 exBooks = exBooks()

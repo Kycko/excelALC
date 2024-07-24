@@ -37,8 +37,8 @@ class Excel():  # общий класс, можно копировать без 
             if   type == 'shActive' : self.readFullSheet(sheet,params)
             elif type == 'selection': self.readRange    (sheet.name,self.file.selection,params)
     def readFullSheet(self,sheet:xw.Sheet,params:tuple): self.readRange(sheet.name,sheet.used_range,params)
-    def readRange(self,sheetName:str,range:xw.Range,params:tuple):
-        self.data[sheetName] = {
+    def readRange(self,shName:str,range:xw.Range,params:tuple):
+        self.data[shName] = {
             'addr' :range.address,
             'range':range,
             'sheet':range.sheet,
@@ -53,6 +53,7 @@ class Excel():  # общий класс, можно копировать без 
                 shObj['range']   = shObj['sheet'].copy().range(shObj['addr']) # sheet.copy() возвращает новый лист
                 shObj['sheet']   = shObj['range'].sheet
             shObj['range'].value = shObj['table'].data
+    def resetSheetBgColors(self,shName:str): self.data[shName]['sheet'].used_range.color = None
     def setCellColor(self,type:str,shName:str,row:int,col:int,color:str):
         shObj   = self.data[shName]
         if type == 'selection':

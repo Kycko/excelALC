@@ -14,6 +14,7 @@ def getEnding_forCount(words:dict,count:int):
 
 # проверка и исправление разных пользовательских данных
 def autocorrCell(type:str,value:str):
+    value = value.strip()
     if type in ('phone','mail','website'): return AC_PMW(type,value)
     else:                                  return             value
 def AC_PMW(type:str,value:str): # AutoCorr Phone,Mail,Website

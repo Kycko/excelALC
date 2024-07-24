@@ -50,9 +50,7 @@ class Root():
                 tempVal = cell.value
                 if not self.justVerify: tempVal = self.autocorr(type,tempVal)
 
-                print(tempVal)
                 VAL = self.validate_andCapitalize(type,tempVal)
-                print(VAL['valid'])
                 if VAL['valid']:
                     if not self.justVerify and tempVal != cell.value:
                         self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':tempVal})
@@ -67,13 +65,13 @@ class Root():
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
-        value    = strF.autocorrCell(type,value)    # выполнится только для нужных type
+        value    = strF.autocorrCell(type,value)    # выполнится не для всех type (кроме strip(), он же trim())
         if type == 'region':
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
             if AC['fixed']: return AC['value']
             #else:           value = STR_autocorrCity(value)   ДОПИСАТЬ
-        return lib.autocorr.get(type,value)['value']    # выполнится только для нужных type
+        return lib.autocorr.get(type,value)['value']    # выполнится не для всех type
     def validate_andCapitalize(self,type:str,value:str,extra=None):
         # в extra можно передать любые необходимые доп. данные
         params = G.AStypes[type]
@@ -123,7 +121,7 @@ class Root():
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
-        self.file = Excel(book,self.readRange)
+        self.file = Excel(book,self.readRange,('toStrings'))
 
         # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
         for shName,tObj in self.file.data.items():
@@ -162,10 +160,11 @@ class Root():
         self.file.write(self.shName,self.readRange,newSheet)
         self.log.add('finalWrite',newSheet)
     def finalColors(self,totalErrors:int):
-        self.log.add('colorErrors',totalErrors)
-        if totalErrors  in range(1,100):
-            for       r in range(len(self.table.data)):
-                for   c in range(len(self.table.data[r])):
+        self.file.resetSheetBgColors(self.shName)
+        self.log .add ('colorErrors',totalErrors)
+        if totalErrors in range(1,100):
+            for      r in range(len(self.table.data)):
+                for  c in range(len(self.table.data[r])):
                     if  self.table.data[r][c].error:
                         self.file.setCellColor(self.readRange,self.shName,r,c,G.colors['hlError'])
 
