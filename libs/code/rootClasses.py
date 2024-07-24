@@ -117,9 +117,9 @@ class Root():
     def finish(self):
         self.finalWrite()
         totalErrors = self.errors.getTotalCount()
-        if totalErrors < 100:  self.finalColors()
-        if G.config.get(self.type + ':saveAfter'): self.file.save()
-        self.UI.finish(totalErrors)
+        self.finalColors(totalErrors)
+        if G.config .get(self.type + ':saveAfter'): self.file.save()
+        self.UI  .finish(totalErrors)
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -160,11 +160,14 @@ class Root():
         self.file.data[self.shName]['table'] = self.table.toTable()
         newSheet  = G.config.get(self.type + ':newSheet')
         self.file.write(self.shName,self.readRange,newSheet)
-    def finalColors(self):
-        for     r in range(len(self.table.data)):
-            for c in range(len(self.table.data[r])):
-                if  self.table.data[r][c].error:
-                    self.file.setCellColor(self.readRange,self.shName,r,c,G.colors['hlError'])
+        self.log.add('finalWrite',newSheet)
+    def finalColors(self,totalErrors:int):
+        self.log.add('colorErrors',totalErrors)
+        if totalErrors  in range(1,100):
+            for       r in range(len(self.table.data)):
+                for   c in range(len(self.table.data[r])):
+                    if  self.table.data[r][c].error:
+                        self.file.setCellColor(self.readRange,self.shName,r,c,G.colors['hlError'])
 
 # журнал и ошибки
 class Log():        # журнал
@@ -199,6 +202,13 @@ class Log():        # журнал
             final = tuple(S.log[type].values())[params.fixed].replace('$$1',params.type)
             final =                                     final.replace('$$2',params.initVal)
             if params.fixed: final =                    final.replace('$$3',params.newVal)
+        elif type == 'finalWrite':
+            final = S.log[type]['main'].replace('$$1',S.log[type]['sheet'][params])
+        elif type == 'colorErrors':
+            if    not params: key = '0'
+            elif params > 99: key = 'skip'
+            else            : key = 'done'
+            final = S.log[type][key].replace('$$1',str(params))
 
         unit  = G.log['units'][type]
         final =    '['+unit+'] '+final

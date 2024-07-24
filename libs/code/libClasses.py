@@ -16,7 +16,7 @@ class AStemplate(): # autocorr & sugg
         # vList: будет несколько 'to'[] (True для sugg) или только один (False для autocorr)
         self.data = libR.parseAS(table.data,vList)
     def get(self,type:str,value:str):
-        if type in self.data.keys(): return listF.searchStr(self.data[type].keys(),value)
+        if type in self.data.keys(): return listF.searchStr(tuple(self.data[type].keys()),value)
         else:                        return []
 
 # классы библиотек

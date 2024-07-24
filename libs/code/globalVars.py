@@ -54,9 +54,10 @@ launchTypes = {
 
 # readLib    : прочитать подходящие варианты для валидации из библиотеки
 # checkList  : валидация путём проверки, есть ли value в списке допустимых (extra)
-# acceptBlank: для диалога с предложением исправить
+# acceptBlank: для диалога с предложением исправить (None означает, что надо прочитать из настроек)
 # ↓ !ВСЕ ЭТИ ТИПЫ ДОЛЖНЫ БЫТЬ В strings.suggMsg! ↓
 AStypes = {'title'  :{'readLib':True ,'checkList':True ,'acceptBlank':False},
+           'phone'  :{'readLib':False,'checkList':False,'acceptBlank':None },
            'mail'   :{'readLib':False,'checkList':False,'acceptBlank':True },
            'website':{'readLib':False,'checkList':False,'acceptBlank':True }}
 
@@ -66,7 +67,9 @@ log = {'units' :{'mainLaunch'  :'core',
                  'readFile'    :'core',
                  'ACsuccess'   :'autocorr',
                  'errorsFound' :'errors',
-                 'suggFinished':'sugg'},
+                 'suggFinished':'sugg',
+                 'finalWrite'  :'core',
+                 'colorErrors' :'core'},
        'colors':{'core'        : None,
                  'autocorr'    :'sand',
                  'errors'      :'red',
