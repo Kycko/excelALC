@@ -31,6 +31,14 @@ def parseAS(table:list,vList=False):
         else: rTo = row[0]
         final[rType][rFrom] = rTo
     return final
+def parseRegions(table:list):   # table = таблица[[]]
+    final = {}
+    for row in table[1:]:
+        key = row[0].lower()
+        new = {'city':row[0],'region':row[1],'id':row[2]}
+        if key in final.keys(): final[key].append(new)
+        else:                   final[key]     = [new]
+    return final
 
 # защита от запуска модуля
 if __name__ == '__main__':
