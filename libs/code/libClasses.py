@@ -1,4 +1,5 @@
 from   sys import exit as SYSEXIT
+from   copy        import deepcopy
 import xlwings         as xw
 import globalVars      as G
 from   excelRW     import Excel
@@ -39,12 +40,14 @@ class Sugg(AStemplate):
 class Regions():
     def __init__(self,table):   # table = объект tables.Table()
         self.data = libR.parseRegions(table.data)
-        self.init_vList()
-    def init_vList(self):
-        # validation list, список допустимых значений
-        self.vList = []
+        self.initLists()
+    def initLists(self):
+        self.  vList = []                       # validation list, список допустимых значений
+        self.regList = deepcopy(G.initRegList)  # список всех регионов
         for list in self.data.values():
-            for  item in list: self.vList.append(item     ['id'])   # все ID, в т. ч. дублей по названию
+            for item in list:
+                self.vList.append(item['id'])   # все ID, в т. ч. дублей по названию
+                if not item['region'] in self.regList: self.regList.append(item['region'])
             if len(list) == 1: self.vList.append(list[0]['city'])   # только если  не дубли  по названию
 
 # создаём библиотеки, аналог глобальных переменных

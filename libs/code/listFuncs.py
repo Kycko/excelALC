@@ -22,6 +22,11 @@ def inclDoublesStr(oldList:list,lower=False):
         if inclStr(newList,item,True,lower): return True    # здесь оптимизация)
         else:                                newList.append(item)
     return False
+def indxAny_from_strList(root:list,vars:list,fullText=True,lower=True,strip=''):
+    # если в первом списке есть хотя бы один элемент второго списка, вернёт index из первого списка
+    for i in range(len(root)):
+        if inclStr(vars,root[i],fullText,lower,strip): return i
+    return -1
 
 # изменение
 def rmDoublesStr(oldList:list,lower=False):

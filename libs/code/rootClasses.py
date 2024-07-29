@@ -77,7 +77,7 @@ class Root():
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
             if AC['fixed']: return AC['value']
-            #else:           value = STR_autocorrCity(value)   ДОПИСАТЬ
+            else:  value = strF.ACcity(value)
         return lib.autocorr.get(type,value)['value']    # выполнится не для всех type
     def validate_andCapitalize(self,type:str,value:str,extra=None):
         # в extra можно передать любые необходимые доп. данные
@@ -135,10 +135,10 @@ class Root():
         # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
         for shName,tObj in self.file.data.items():
             self.shName = shName
-            tObj['table'].cutUp(self.searchTitleRow(tObj['table'].data))
+            if self.readRange == 'shActive': tObj['table'].cutUp(self.searchTitleRow(tObj['table'].data))
             self.log.add('readSheet',shName)
             self.log.add('readFile',
-                         {'tObj' :tObj,'range':('range','full')[self.readRange == 'shActive']})
+                         {'tObj':tObj,'range':('range','full')[self.readRange == 'shActive']})
 
             if self.toTD:
                 self.unkTD = TableDict(tObj['table'])

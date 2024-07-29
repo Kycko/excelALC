@@ -49,6 +49,7 @@ colors.update(exColors)
 launchTypes = {
     'allChecks'    :{'readRange':'shActive', 'toTD':True ,'launch':'allChecks'   ,'justVerify':False,'getUserCfg':['suggestErrors']},
     'checkTitles'  :{'readRange':'shActive', 'toTD':True ,'launch':'checkTitles' ,'justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'title'},
+    'checkCities'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'region'},
     'checkPhones'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['noBlanks']     ,'AStype':'phone'},
     'checkEmails'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'mail'},
     'checkWebsites':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'website'}
@@ -60,6 +61,7 @@ launchTypes = {
 # (не нужно?) acceptBlank: для диалога с предложением исправить (None означает, что надо прочитать из настроек)
 # ↓ !ВСЕ ЭТИ ТИПЫ ДОЛЖНЫ БЫТЬ В strings.suggMsg! ↓
 AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True},
+           'region' :{'readLib':True ,'checkList':True ,'showSugg':True},
            'phone'  :{'readLib':False,'checkList':False,'showSugg':False},
            'mail'   :{'readLib':False,'checkList':False,'showSugg':True},
            'website':{'readLib':False,'checkList':False,'showSugg':True}}
@@ -89,11 +91,27 @@ badSymbols   = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'
                 'website':(' ','@','|')}
 badWebStarts = ('http://'  ,'https://'  ,'www.')
 badPhone     = '79999999999'
-rmSites      = ('facebook.','instagram.','twitter.')
+rmSites      = ('facebook.','instagram.' ,'twitter.')
+initRegList  = ['Россия'   ,'все регионы','другие регионы','другой регион']
 
 allHyphens   = ('-','–','—')
 ruSymbols    = ('а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п',
                 'р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я')
+
+# cTrims = city trims; 'noSpace' нужен только здесь для расстановки всех вариантов
+cTrims  = {'noSpace':['г.','д.','с.','х.','рп.','дп.','ст.','пос.','пгт.','городской пос.'],
+           'spaced' :['г' ,'д' ,'с' ,'х' ,'рп' ,'дп' ,'ст' ,'посёлок','поселок','пос','пгт',
+                      'городской пос','город','станица','ст-ца','хутор', 'село','деревня']}
+cTrims    ['spaced'] = cTrims['noSpace'] + cTrims['spaced']
+cTrims    ['start']  = ['('+item+')' for item in cTrims['spaced']] + cTrims['noSpace']
+cTrims.pop('noSpace')
+
+# преобразование латиницы в кириллицу
+lat_toCyr = {'Ch':'Ч' ,"Kh'":'Хь','Kh’':'Хь','Kh':'Х' ,'Sh':'Ш' ,'Ts':'Ц' ,
+             'Ay':'Ай','Ey' :'Ей','Iy' :'Ий','Yy':'Ый','Ya':'Я' ,'Ye':'Е' ,'Yo':'Е','Yu':'Ю','Zh':'Ж',
+             "L'":'Ль','L’' :'Ль',"N'" :'Нь','N’':'Нь',"T'":'Ть','T’':'Ть',
+             'A' :'А' ,'B'  :'Б' ,'D'  :'Д' ,'E' :'Е' ,'F' :'Ф' ,'G' :'Г' ,'H' :'Х','I' :'И','K' :'К','L':'Л','M':'М',
+             'N' :'Н' ,'O'  :'О' ,'P'  :'П' ,'R' :'Р' ,'S' :'С' ,'T' :'Т' ,'U' :'У','V' :'В','W' :'В','Y':'Ы','Z':'З'}
 
 # защита от запуска модуля
 if __name__ == '__main__':

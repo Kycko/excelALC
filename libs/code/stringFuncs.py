@@ -1,6 +1,7 @@
 from   sys         import exit as SYSEXIT
 from   globalFuncs import getIB
 import globalVars  as G
+import libClasses  as lib
 import listFuncs   as listF
 
 # получение правильного окончания в зависимости от количества
@@ -12,7 +13,7 @@ def getEnding_forCount(words:dict,count:int):
     elif ten == 1:                                     return words['1']
     else:                                              return words['2-4']
 
-# проверка и исправление разных пользовательских данных
+# проверка и исправление разных пользовательских данных (общие)
 def autocorrCell(type:str,value:str,params=None):
     value = value.strip()
     if type in ('phone','mail','website'): return AC_PMW(type,value,params)
@@ -97,6 +98,48 @@ def checkPMW(type:str,value:str,params=None):
             return False,'badSymbols'
     return True,''
 
+# исправление регионов/городов; RC = region/city
+def ACcity(city:str):
+    city =  joinSpaces    (city)
+    city = RCfixOblast    (city)
+    city = RCrmOblast     (city)
+    city = RCtrimCity     (city)
+    city = lat_toCyr      (city)
+    city = trimOverHyphens(city)
+    city = try_cityHyphens_and_e(RVlibs, city)
+    return city
+def RCfixOblast(city:str):
+    list  = city .split()
+    index = listF.indxAny_from_strList(list,('обл.','обл'))
+    if index >= 0: list[index] = 'область'
+    return list.join(' ')
+def RCrmOblast (city:str):
+    initCity  = city
+    result    = findSubList(city,lib.regions.regList,'item')
+    if result is not None and len(result) != len(city):
+        city      = city.lower().replace(result.lower(),'')
+        rmSymbols = (' ',',','(',')')
+        city      = rmStartList(city,rmSymbols,0,False)
+        while city  and  city[-1] in rmSymbols: city = city[:-1]
+
+        if city: return city
+    return initCity
+def RCtrimCity (city:str):
+    # сначала те, что с пробелом
+    list = city.split()
+    for i in (0,-1):
+        list[i] = list[i].replace('(','').replace(')','')
+        if listF.inclStr(G.cTrims['spaced'],list[i]):
+            list.pop(i)
+            return ' '.join(list)
+
+    # потом           те, что могут быть в начале строки без пробела, но в скобках
+    # и сразу за ними те, что могут быть в начале строки без пробела и без скобок
+    temp     = rmStartList(city,G.cTrims['start'],1)
+    if temp != city: return temp
+
+    return city
+
 # поиск (общие)
 def findSubList(string:str,list:list,type='bool',fullText=False,lower=True,strip=''):
     # ищет в строке каждый элемент списка list[]; type может быть 'index', 'bool' и 'item'
@@ -127,14 +170,32 @@ def checkStartList(string:str,list:list,type='item',lower=True,stripList=False):
     return (False,None)[type == 'item']
 
 # изменение (общие)
-def rmStartList(string:str,list:list,count=0,lower=True,stripList=False):
+def rmStartList    (string:str,list:list,count=0,lower=True,stripList=False):
     # проверяет каждый элемент списка list[]: если он в начале строки, удаляет его из начала строки
     # count = сколько раз удалять; если count=0, удаляем все, пока в начале не будет что-то другое
     iter = 0    # итерация: увеличивается на 1, когда производим удаление
-    while checkStartList(string,list,'bool',lower,stripList) and (count == 0 or iter < count):
-        string = string.replace(checkStartList(string,list,'item',lower,stripList),'',1)
-        iter  += 1
+    while count == 0 or (count >= 0 and iter < count):
+        found = checkStartList(string,list,'item',lower,stripList)
+        if not found: return string
+        else:
+            string = string.replace(found,'',1)
+            iter  += 1
     return string
+def joinSpaces     (string:str): # объединяет все мультипробелы в одинарные
+    # while быстрее, чем regex и split+join
+    while '  ' in string: string = string.replace('  ',' ')
+    return string
+def lat_toCyr      (string:str):
+    for init,to in G.lat_toCyr.items():
+        string = string.replace(init        ,to)
+        string = string.replace(init.lower(),to.lower())
+    return string
+def trimOverHyphens(string:str):
+    # делит строку по дефисам, делает trim() каждой части и собирает строку обратно
+    list = fixHyphens(string).split('-')
+    for i in range(len(list)): list[i] = list[i].strip()
+    return    '-'.join(list)
+def      fixHyphens(string:str): return string.replace('—','-').replace('–','-')
 
 # защита от запуска модуля
 if __name__ == '__main__':
