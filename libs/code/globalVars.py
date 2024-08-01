@@ -55,16 +55,17 @@ launchTypes = {
     'checkWebsites':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'website'}
     }
 
-# readLib  : прочитать подходящие варианты для валидации из библиотеки
-# checkList: валидация путём проверки, есть ли value в списке допустимых (extra)
-# showSugg : предлагать ли исправить
+# readLib   : прочитать подходящие варианты для валидации из библиотеки
+# checkList : валидация путём проверки, есть ли value в списке допустимых (extra)
+# showSugg  : предлагать ли исправить
+# getLibSugg: варианты исправления надо прочитать из библиотеки; иначе берём из strF.getSuggList()
 # (не нужно?) acceptBlank: для диалога с предложением исправить (None означает, что надо прочитать из настроек)
 # ↓ !ВСЕ ЭТИ ТИПЫ ДОЛЖНЫ БЫТЬ В strings.suggMsg! ↓
-AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True},
-           'region' :{'readLib':True ,'checkList':True ,'showSugg':True},
-           'phone'  :{'readLib':False,'checkList':False,'showSugg':False},
-           'mail'   :{'readLib':False,'checkList':False,'showSugg':True},
-           'website':{'readLib':False,'checkList':False,'showSugg':True}}
+AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+           'region' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+           'phone'  :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
+           'mail'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
+           'website':{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}}
 
 log = {'units' :{'mainLaunch'  :'core',
                  'launchType'  :'core', # отсутствует в S.log: читается из S.layout

@@ -51,13 +51,16 @@ class Root():
             for c in range(len(table[r])):
                 cell    = table[r][c]
                 tempVal = cell.value
-                if not self.justVerify: tempVal = self.autocorr(type,tempVal)
+                VAL     = self.validate_andCapitalize(type,tempVal)
+                if not VAL['valid'] and not self.justVerify:
+                    tempVal = self.autocorr(type,tempVal)
+                    VAL     = self.validate_andCapitalize(type,tempVal)
 
-                VAL = self.validate_andCapitalize(type,tempVal)
                 if VAL['valid']:
-                    if not self.justVerify and tempVal != cell.value:
-                        if not  self.addErrObj(errors,type,cell.value,{'r':r,'c':c},True,tempVal):
-                            self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':tempVal})
+                    if not self.justVerify and VAL['value'] != cell.value:
+                        if not  self.addErrObj(errors,type,cell.value,{'r':r,'c':c},True,VAL['value']):
+                            # это условие только про autocorr?
+                            self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
                         cell.value = VAL['value']
                 else: self.addErrObj(errors,type,cell.value,{'r':r,'c':c})
 
@@ -77,13 +80,13 @@ class Root():
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
             if AC['fixed']: return AC['value']
-            else:  value = strF.ACcity(value)
+            else:  value = strF.ACcity(value,lib.regions.regList,lib.get_vList('ACregions'))
         return lib.autocorr.get(type,value)['value']    # выполнится не для всех type
     def validate_andCapitalize(self,type:str,value:str,extra=None):
         # в extra можно передать любые необходимые доп. данные
         params = G.AStypes[type]
         # ↓ передаём в extra suggList из appUI.suggInvalidUD()
-        if extra is None and params['readLib']: extra = lib.getValidationList(type)
+        if extra is None and params['readLib']: extra = lib.get_vList(type)
         final  = {'type'  :type,
                   'value' :value,
                   'valid' :None,
@@ -91,13 +94,14 @@ class Root():
 
         if params['checkList']:
             found          = listF.searchStr(extra,value,'item',True,not self.justVerify)
-            final['valid'] = bool(len(found))
+            final['valid'] = bool(found)
             if not self.justVerify and final['valid']: final['value'] = found[0]
         else:  strF.validateCell(final,self.uCfg)   # final обновляется внутри этой функции
         return final
     def getSuggList(self,errObj):
-        suggList = strF.getSuggList(errObj.type,errObj.initVal)
-        return suggList
+        type,value = errObj.type,errObj.initVal
+        if G.AStypes[type]['getLibSugg']: return lib .sugg   .get(type,value)
+        else:                             return strF.getSuggList(type,value)
     def nextSugg(self):
         queue = self.errors.suggQueue
         if queue and G.AStypes[queue[0].type]['showSugg'] and self.uCfg['suggestErrors']:

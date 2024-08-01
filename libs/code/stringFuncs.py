@@ -1,8 +1,7 @@
 from   sys         import exit as SYSEXIT
 from   globalFuncs import getIB
-import globalVars  as G
-import libClasses  as lib
-import listFuncs   as listF
+import globalVars      as G
+import listFuncs       as listF
 
 # получение правильного окончания в зависимости от количества
 def getEnding_forCount(words:dict,count:int):
@@ -99,30 +98,31 @@ def checkPMW(type:str,value:str,params=None):
     return True,''
 
 # исправление регионов/городов; RC = region/city
-def ACcity(city:str):
+def ACcity(city:str,regions:list,ACregions:list):
+    # ошибка при импорте lib сюда, поэтому передаём аргументами regions и ACregions
     city =  joinSpaces    (city)
     city = RCfixOblast    (city)
-    city = RCrmOblast     (city)
+    city = RCrmOblast     (city,regions,ACregions)
     city = RCtrimCity     (city)
     city = lat_toCyr      (city)
     city = trimOverHyphens(city)
-    city = try_cityHyphens_and_e(RVlibs, city)
+    city = RCtry          (city,ACregions)
     return city
 def RCfixOblast(city:str):
     list  = city .split()
     index = listF.indxAny_from_strList(list,('обл.','обл'))
-    if index >= 0: list[index] = 'область'
-    return list.join(' ')
-def RCrmOblast (city:str):
+    if index >= 0:  list[index] = 'область'
+    return ' '.join(list)
+def RCrmOblast (city:str,regList:list,ACregions:list):
     initCity  = city
-    result    = findSubList(city,lib.regions.regList,'item')
+    result    = findSubList(city,regList,'item')
     if result is not None and len(result) != len(city):
         city      = city.lower().replace(result.lower(),'')
         rmSymbols = (' ',',','(',')')
         city      = rmStartList(city,rmSymbols,0,False)
         while city  and  city[-1] in rmSymbols: city = city[:-1]
 
-        if city: return city
+        if city and listF.inclStr(ACregions,city): return city
     return initCity
 def RCtrimCity (city:str):
     # сначала те, что с пробелом
@@ -138,6 +138,21 @@ def RCtrimCity (city:str):
     temp     = rmStartList(city,G.cTrims['start'],1)
     if temp != city: return temp
 
+    return city
+def RCtry      (city:str,ACregions:list):
+    # пробует заменять 'е'<->'ё' (в обе стороны) и все пробелы на дефисы (напр., для 'Ростов на Дону')
+    # возвращает новый вариант, если получится правильный город либо подходящий под автозамену
+    vList    = ACregions
+    hyphened = city.replace  (' ','-')
+    if   listF.inclStr(vList,hyphened): return hyphened
+
+    RPL  = {'е':'ё','ё':'е'}    # RPL = replacement
+    vars = (city.lower(),hyphened.lower())
+    for   var in vars:
+        for i in range(len(var)):
+            if var[i] in RPL.keys():
+                new = replaceIndex(var,i,RPL[var[i]])
+                if   listF.inclStr(vList,new): return new
     return city
 
 # поиск (общие)
@@ -196,6 +211,8 @@ def trimOverHyphens(string:str):
     for i in range(len(list)): list[i] = list[i].strip()
     return    '-'.join(list)
 def      fixHyphens(string:str): return string.replace('—','-').replace('–','-')
+def  replaceIndex  (string:str,index:int,newChar:str):
+    return string[:index] + newChar + string[index+1:]
 
 # защита от запуска модуля
 if __name__ == '__main__':
