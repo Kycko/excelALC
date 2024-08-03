@@ -49,20 +49,26 @@ class Root():
         errors      = {}    # {initLow:ErrorObj,...}
         for r in range(len(table)):
             for c in range(len(table[r])):
-                cell    = table[r][c]
-                tempVal = cell.value
-                VAL     = self.validate_andCapitalize(type,tempVal)
-                if not VAL['valid'] and not self.justVerify:
-                    tempVal = self.autocorr(type,tempVal)
+                cell = table[r][c]
+ 
+                low  = cell.value.lower()
+                if low in errors.keys() and errors[low].fixed:
+                    cell.value = errors[low].newVal
+                    errors[low].addPos({'r':r,'c':c})
+                else:
+                    tempVal = cell.value
                     VAL     = self.validate_andCapitalize(type,tempVal)
+                    if not VAL['valid'] and not self.justVerify:
+                        tempVal = self.autocorr(type,tempVal)
+                        VAL     = self.validate_andCapitalize(type,tempVal)
 
-                if VAL['valid']:
-                    if not self.justVerify and VAL['value'] != cell.value:
-                        if not  self.addErrObj(errors,type,cell.value,{'r':r,'c':c},True,VAL['value']):
-                            # это условие только про autocorr?
-                            self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
-                        cell.value = VAL['value']
-                else: self.addErrObj(errors,type,cell.value,{'r':r,'c':c})
+                    if VAL['valid']:
+                        if not self.justVerify and VAL['value'] != cell.value:
+                            if not self.addErrObj(errors,type,cell.value,{'r':r,'c':c},True,VAL['value']):
+                                # это условие только про autocorr?
+                                self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
+                            cell.value = VAL['value']
+                    else: self.addErrObj(errors,type,cell.value,{'r':r,'c':c})
 
         self.errors.addCur(errors,type)
         self     .nextSugg()
