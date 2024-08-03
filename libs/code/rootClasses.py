@@ -75,13 +75,17 @@ class Root():
         else:      storage[low] = ErrorObj(type,value,pos,initFixed,newVal)
         return addPos
     def autocorr(self,type:str,value:str):
-        value    = strF.autocorrCell(type,value,self.uCfg)  # выполнится не для всех type (кроме strip(), он же trim())
+        initVal  = value
+        value    = strF.autocorrCell(type,value,self.uCfg)  # выполнится не для всех type (кроме strip())
         if type == 'region':
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
             if AC['fixed']: return AC['value']
             else:  value = strF.ACcity(value,lib.regions.regList,lib.get_vList('ACregions'))
-        return lib.autocorr.get(type,value)['value']    # выполнится не для всех type
+        AC = lib.autocorr.get(type,value)   # выполнится не для всех type
+        if type == 'region' and not listF.inclStr(lib.regions.vList,AC['value']):
+            return lib.regions.ACregionID(initVal)
+        else: return AC['value']
     def validate_andCapitalize(self,type:str,value:str,extra=None):
         # в extra можно передать любые необходимые доп. данные
         params = G.AStypes[type]

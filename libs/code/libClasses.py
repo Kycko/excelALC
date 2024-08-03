@@ -48,8 +48,8 @@ class Sugg(AStemplate):
         if res:
             for list in res: final += list
         if type == 'region' and len(value) > 2: # чтобы для 1-2 букв не выдавало огромный список
-            final += autocorr.getRegionSugg(value)
-        print(final)
+            final += regions .getDoubleSuggs(value)
+            final += autocorr.getRegionSugg (value)
         return self.rmDoubles(final)
     def rmDoubles(self,list:list):
         final       = []
@@ -68,12 +68,39 @@ class Regions():
     def initLists(self,ACvars:list):
         self.  vList = []                       # validation list, список допустимых значений
         self.regList = deepcopy(G.initRegList)  # список всех регионов
-        for list in self.data.values():
+        self.doubles = []                       # список городов (low) с дублирующимися названиями
+
+        for lowCity,list in self.data.items():
             for item in list:
                 self.vList.append(item['id'])   # все ID, в т. ч. дублей по названию
                 if not item['region'] in self.regList: self.regList.append(item['region'])
-            if len(list) == 1: self.vList.append(list[0]['city'])   # только если не дубли по названию
+            if len(list) == 1: self.vList  .append(list[0]['city']) # только если не дубли по названию
+            else:              self.doubles.append(lowCity)
+
+        self.regList.sort(key=len,reverse=True) # сортирует от длинных к коротким (важно для autocorr)
         self.vListAC = self.vList + ACvars
+
+    def getDoubleSuggs(self,value:str):
+        final = []
+        found = strF.findSubList(value.lower(),self.doubles,'item',True,False,False)
+        for low in found:
+            for u in self.data[low]:    # u = unique
+                final.append({'val':u['id'],
+                              'btn':u['id']+' ['+u['city']+', '+u['region']+']'})
+        return final
+    def getID_byRegion(self,city:str,region:str):
+        lowCity   = city  .lower()
+        lowRegion = region.lower()
+        if lowCity in self.data.keys():
+            for var in self.data[lowCity]:
+                if var['region'].lower() == lowRegion: return var['id']
+        return ''
+    def ACregionID(self,value:str):
+        # аналог autocorr'а (Autocorr().get()) для дублей по названиям
+        temp        = strF.RCfixOblast  (strF.joinSpaces(value))
+        city,region = strF.RCsplitRegion(temp,self.regList)
+        if region is not None: city = self.getID_byRegion(city,region)
+        return city if city else value
 
 # создаём библиотеки, аналог глобальных переменных
 try:

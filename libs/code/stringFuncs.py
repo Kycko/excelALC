@@ -114,16 +114,22 @@ def RCfixOblast(city:str):
     if index >= 0:  list[index] = 'область'
     return ' '.join(list)
 def RCrmOblast (city:str,regList:list,ACregions:list):
-    initCity  = city
-    result    = findSubList(city,regList)
-    if result is not None and len(result) != len(city):
-        city      = city.lower().replace(result.lower(),'')
-        rmSymbols = (' ',',','(',')')
-        city      = rmStartList(city,rmSymbols,0,False)
-        while city  and  city[-1] in rmSymbols: city = city[:-1]
-
-        if city and listF.inclStr(ACregions,city): return city
+    initCity = city
+    city     = RCsplitRegion(city,regList)[0]
+    if listF.inclStr(ACregions,city): return city
     return initCity
+def RCsplitRegion(string:str,regList:list):
+    # ищет в string каждый регион и, если найдёт его, возвращает отдельно город и регион
+    init   = string
+    region = findSubList(string,regList)
+    if region is not None and len(region) != len(string):
+        string    = string.lower().replace(region.lower(),'')
+        rmSymbols = (' ',',','(',')')
+        string    = rmStartList(string,rmSymbols,0,False)
+        while string and string[-1] in rmSymbols: string = string[:-1]
+
+        if not string: string = init
+    return string,region
 def RCtrimCity (city:str):
     # сначала те, что с пробелом
     list = city.split()
@@ -163,7 +169,7 @@ def inclSubList(string:str,list:list,fullText=False,lower=True,strip=''):
     return False
 def findSubList(string:str,list:list,type='item',multi=False,fullText=False,lower=True,strip=''):
     # ищет в строке каждый элемент списка list[] и возвращает их индекс(ы) или item('ы)
-    # type = 'index' (позиция найденного в string) или 'item' (вернёт найденный элемент списка list)
+    # type = 'index' (позиция найденного в string) или 'item' (вернёт найденные элементы списка list)
     # multi: вернуть все найденные или только первое найденное
     final = []
     for item in list:
