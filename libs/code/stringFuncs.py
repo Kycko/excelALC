@@ -48,7 +48,7 @@ def getSuggList(type:str,value:str):
         if new != value:
             vObj = {'type':type,'value':new,'valid':None,'errKey':''}
             validateCell(vObj)
-            if vObj['valid']: return [new]
+            if vObj['valid']: return [{'val':new,'btn':new}]
     return []
 def validateCell(vObj:dict,params=None):    # vObj={'type':,'value':,'valid':,'errKey':}
     if vObj['type'] in ('phone','mail','website'):
@@ -78,14 +78,14 @@ def checkPMW(type:str,value:str,params=None):
     elif type == 'mail':
         if value            == ''        : return True ,''
         if value.count('@') != 1         : return False,'dogCount'
-        if findSubList(value,G.ruSymbols): return False,'ru'
+        if inclSubList(value,G.ruSymbols): return False,'ru'
 
         name,domain = value.split('@')
         if not     '.' in          domain: return False, 'dotDomain'
         if        '..' in          domain: return False,'dotsDomain'
         if len(domain) > 1 and domain[-2:] in ('.c','.r'): return False,'endDomain'
         if name        in    G.allHyphens: return False, 'hyphen'
-        if findSubList(value,G.badSymbols[type],'bool',False,False):
+        if inclSubList(value,G.badSymbols[type],False,False):
             return False,'badSymbols'
     elif type == 'website':
         if value      ==    '': return True ,''
@@ -93,7 +93,7 @@ def checkPMW(type:str,value:str,params=None):
         if value.endswith('/'): return False,'endSlash'
         if checkStartList(value,G.badWebStarts,'bool'): return False,'wwwHttp'
         if checkStartList(value,G.rmSites     ,'bool'): return False,'rmSites'
-        if findSubList   (value,G.badSymbols[type],'bool',False,False):
+        if inclSubList   (value,G.badSymbols[type],False,False):
             return False,'badSymbols'
     return True,''
 
@@ -115,7 +115,7 @@ def RCfixOblast(city:str):
     return ' '.join(list)
 def RCrmOblast (city:str,regList:list,ACregions:list):
     initCity  = city
-    result    = findSubList(city,regList,'item')
+    result    = findSubList(city,regList)
     if result is not None and len(result) != len(city):
         city      = city.lower().replace(result.lower(),'')
         rmSymbols = (' ',',','(',')')
@@ -156,13 +156,23 @@ def RCtry      (city:str,ACregions:list):
     return city
 
 # поиск (общие)
-def findSubList(string:str,list:list,type='bool',fullText=False,lower=True,strip=''):
-    # ищет в строке каждый элемент списка list[]; type может быть 'index', 'bool' и 'item'
-    # индекс – это позиция найденного в string, 'item' вернёт найденный элемент списка list
+def inclSubList(string:str,list:list,fullText=False,lower=True,strip=''):
+    # возвращает True, если хотя бы один элемент list[] будет найден в string
+    for item in list:
+        if findSub(string,item,'bool',fullText,lower,strip): return True
+    return False
+def findSubList(string:str,list:list,type='item',multi=False,fullText=False,lower=True,strip=''):
+    # ищет в строке каждый элемент списка list[] и возвращает их индекс(ы) или item('ы)
+    # type = 'index' (позиция найденного в string) или 'item' (вернёт найденный элемент списка list)
+    # multi: вернуть все найденные или только первое найденное
+    final = []
     for item in list:
         result = findSub(string,item,'index',fullText,lower,strip)
-        if result >= 0: return item if type == 'item' else getIB(type,result)
-    return None if type == 'item' else getIB(type,-1)
+        if result >= 0:
+            new   = item if type == 'item' else result
+            if multi: final.append(new)
+            else    : return       new
+    return final if multi else (None,-1)[type == 'index']
 def findSub(string:str,sub:str,type='index',fullText=False,lower=True,strip=''):
     # type может быть 'index' или 'bool'
     # если fullText=True, проверяется равенство строк (но после .trim() + можно задать lower=True)

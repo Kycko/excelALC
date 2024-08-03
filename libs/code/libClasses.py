@@ -21,8 +21,8 @@ class AStemplate(): # autocorr & sugg
     def get(self,type:str,value:str,fullText:bool):
         # fullText = True для autocorr, False для sugg
         if  type in self.data.keys():
-            keys = listF.searchStr(tuple(self.data[type].keys()),value,'item',fullText)
-            return   [self.data[type][key] for key in keys]
+            keys = strF.findSubList(value,tuple(self.data[type].keys()),'item',True,fullText)
+            return [self.data[type][key] for key in keys]
         else: return []
 
 # классы библиотек
@@ -39,7 +39,7 @@ class Autocorr(AStemplate):
     def get(self,type:str,value:str):
         res   = super().get(type,value,True)
         return {'fixed': bool(res),
-                'value': res [0] if bool(res) else value}
+                'value': res [0]['val'] if bool(res) else value}
     def getRegionSugg(self,value:str): return super().get('region',value,False)
 class Sugg(AStemplate):
     def get(self,type:str,value:str):
@@ -47,7 +47,18 @@ class Sugg(AStemplate):
         res   = super().get(type,value,False)
         if res:
             for list in res: final += list
-        if type == 'region': final += autocorr.getRegionSugg(value)
+        if type == 'region' and len(value) > 2: # чтобы для 1-2 букв не выдавало огромный список
+            final += autocorr.getRegionSugg(value)
+        print(final)
+        return self.rmDoubles(final)
+    def rmDoubles(self,list:list):
+        final       = []
+        addedValues = []    # значения, которые мы добавили в final
+        for dict in list:
+            value = dict['val'].lower()
+            if value not in addedValues:
+                addedValues.append(value)
+                final      .append(dict)
         return final
 class Regions():
     def __init__(self,table,ACvars:list):

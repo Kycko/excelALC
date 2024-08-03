@@ -164,15 +164,15 @@ class Window(TBS.Window):   # окно программы
             self.suggWidgets['curVal'].pack(fill='x',side='right')
         elif type == 'runSuggVars':
             if hasattr(self,'frSuggVars'): self.frSuggVars.destroy()
-            if len(params): # здесь params = список[] предложений для исправления
+            if len(params): # здесь params = список[{'val':,'btn':},...] предложений для исправления
                 self.frSuggVars = TBS.Frame(parent)
                 self.frSuggVars.pack     (fill='x')
 
                 self.buildSeparator(self.frSuggVars)
                 TBS.Label(self.frSuggVars,text=S.layout['run']['suggUI']['vars']).pack(fill='x')
                 for item in params: TBS.Button(self.frSuggVars,
-                                              text    = item,
-                                              command = lambda s=item:self.suggVarClicked(s),
+                                              text    = item['btn'],
+                                              command = lambda s=item['val']:self.suggVarClicked(s),
                                               bootstyle='info-outline').pack(fill='x',pady=4)
         elif type == 'runSuggEntry':
             frMain = TBS.Frame (parent)

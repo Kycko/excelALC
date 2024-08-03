@@ -95,7 +95,9 @@ class Root():
         if params['checkList']:
             found          = listF.searchStr(extra,value,'item',True,not self.justVerify)
             final['valid'] = bool(found)
-            if not self.justVerify and final['valid']: final['value'] = found[0]
+            if final['valid']:
+                if not self.justVerify: final['value'] = found[0]
+            else: final['errKey'] = 'notInList'
         else:  strF.validateCell(final,self.uCfg)   # final обновляется внутри этой функции
         return final
     def getSuggList(self,errObj):

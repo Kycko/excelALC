@@ -21,15 +21,15 @@ def parseAS(table:list,vList=False):
     # vList: будет несколько 'to'[] (True для sugg) или только один (False для autocorr)
     final = {}
     for row in table[1:]:
-        rType   = row.pop(0)
-        rFrom   = row.pop(0).lower()    # в row остались только варианты 'to'
+        rType,rFrom = row[0],row[1].lower()
         if rType not in final.keys(): final[rType] = {}
+        tCur = final[rType]
 
+        new = {'val':row[2],'btn':row[3]}
         if vList:
-            rTo = listF.rmBlankStr(row)
-            if not len(rTo): rTo = ['']
-        else: rTo = row[0]
-        final[rType][rFrom] = rTo
+            if not rFrom in tCur.keys(): tCur[rFrom] = []
+            tCur  [rFrom].append(new)
+        else: tCur[rFrom] = new
     return final
 def parseRegions(table:list):   # table = таблица[[]]
     final = {}
