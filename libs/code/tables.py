@@ -51,7 +51,7 @@ class Cell():
         self.value = value
         self.error = error
 
-# это таблица, представленная в виде словаря {столбец: {title:CellObj, cells:[CellObj,...]},...}
+# это таблица, представленная в виде словаря {'столбец': TableColumn() obj,...}
 class TableDict():
     def __init__(self,tObj:Table=None,errors=False):
         # если tObj=None, создаём пустой объект без колонок; errors – значение по умолчанию для всех ячеек
@@ -61,10 +61,10 @@ class TableDict():
             tObj.rotate()
             for r in range(len(tObj.data)):
                 self.columns[str(r)] = TableColumn(tObj.data[r],errors,initPos=r)
-    def searchTitle(self,title:str,fullText=True,lower=True,stripTitle=False):
+    def searchTitle(self,title:str,fullText=True,lower=True,strip=''):
         for key,column in self.columns.items():
-            if strF.findSub(column.title.value,title,'bool',fullText,lower,('','b')[stripTitle]): return key
-class TableColumn():
+            if strF.findSub(column.title.value,title,'bool',fullText,lower,strip): return key
+class TableColumn():    # title=CellObj, cells=[CellObj,...]
     def __init__(self,values:list,errors=False,title=None,initPos:int=None):
         if title is None:         title = values.pop(0) # pop удаляет элемент 0 и возвращает его
         self.title   = Cell             (title, errors)

@@ -30,12 +30,10 @@ class Excel():  # общий класс, можно копировать без 
         self.mainRead(read,readParams)
     def mainRead(self,type:str,params=('toStrings','trimAll')):
         self.data = {}
-        if type == 'shAll':
+        if   type == 'shAll'    :
             for sheet in self.file.sheets: self.readFullSheet(sheet,params)
-        else:
-            sheet      = self.file.sheets.active
-            if   type == 'shActive' : self.readFullSheet(sheet,params)
-            elif type == 'selection': self.readRange    (self.file.selection,params)
+        elif type == 'shActive' : self.readFullSheet(self.file.sheets.active,params)
+        elif type == 'selection': self.readRange    (self.file.selection    ,params)
     def readFullSheet(self,sheet:xw.Sheet,params:tuple): self.readRange(sheet.used_range,params)
     def readRange(self,range:xw.Range,params:tuple):
         self.data[range.sheet.name] = {

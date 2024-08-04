@@ -34,7 +34,11 @@ class Root():
 
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные
-        if params['launch'] == 'rangeChecker': self.rangeChecker(self.table.data,params['AStype'])  # проверяем выделенный диапазон
+
+        if   params['launch'] == 'checkTitles' :
+            data = [[column.title for column in self.unkTD.columns.values()]]
+        elif params['launch'] == 'rangeChecker': data = self.table.data
+        self.rangeChecker(data,params['AStype'])
     def initLE(self,bookName:str):  # LE = log & errors
         initStr = S.log['mainLaunch'].replace('$$1',curDateTime()).replace('$$2',bookName)
         self.log.add   ('mainLaunch',initStr)
@@ -49,12 +53,11 @@ class Root():
         errors      = {}    # {initLow:ErrorObj,...}
         for r in range(len(table)):
             for c in range(len(table[r])):
-                cell = table[r][c]
+                cell   = table[r][c]
+                errPos = {'r':r,'c':c}
  
-                low  = cell.value.lower()
-                if low in errors.keys() and errors[low].fixed:
-                    cell.value = errors[low].newVal
-                    errors[low].addPos({'r':r,'c':c})
+                low = cell.value.lower()
+                if low in errors.keys(): errors[low].addPos(errPos)
                 else:
                     tempVal = cell.value
                     VAL     = self.validate_andCapitalize(type,tempVal)
@@ -63,23 +66,23 @@ class Root():
                         VAL     = self.validate_andCapitalize(type,tempVal)
 
                     if VAL['valid']:
-                        if not self.justVerify and VAL['value'] != cell.value:
-                            if not self.addErrObj(errors,type,cell.value,{'r':r,'c':c},True,VAL['value']):
-                                # это условие только про autocorr?
-                                self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
-                            cell.value = VAL['value']
-                    else: self.addErrObj(errors,type,cell.value,{'r':r,'c':c})
+                        if VAL['value'] != cell.value:
+                            # ↑ если они равны, ничего делать не надо (ошибки нет)
+                            errors[low] = ErrorObj(type,
+                                                cell.value,
+                                                errPos,
+                                                not self.justVerify,
+                                                (VAL['value'],None)[self.justVerify])
+                            if not self.justVerify: # это только про autocorr?
+                                self.log.add('ACsuccess',
+                                             {'type':type,'from':cell.value,'to':VAL['value']})
+                                cell.value = VAL['value']
+                    else: errors[low] = ErrorObj(type,cell.value,errPos)
 
         self.errors.addCur(errors,type)
         self     .nextSugg()
 
     # работа с ошибками
-    def addErrObj(self,storage:dict,type:str,value:str,pos:dict,initFixed=False,newVal=None):
-        low    =          value.lower()
-        addPos = low in storage.keys ()
-        if addPos: storage[low]  .addPos             (pos)
-        else:      storage[low] = ErrorObj(type,value,pos,initFixed,newVal)
-        return addPos
     def autocorr(self,type:str,value:str):
         initVal  = value
         value    = strF.autocorrCell(type,value,self.uCfg)  # выполнится не для всех type (кроме strip())
