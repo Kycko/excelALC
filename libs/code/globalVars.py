@@ -6,7 +6,7 @@ from userSettings import userCfg
 app = {'version': 'v.047',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
-       'size'   : (1000, 600)}                      # при необходимости добавим в другой переменной размеры диалоговых окон
+       'size'   : (1000, 600)}
 app   ['TV']    = app['title']+' '+app['version']   # название главного окна
 
 # файлы
@@ -15,13 +15,15 @@ files   = {'lib'          :'справочник excelALC.xlsx',
            'config'       : app['title']+       '.config',
            'log'          : app['title']+  ' main.log',
            'errors'       : app['title']+' errors.log'}
-pics    = {'filesUpdate'  : picsDir     +'filesUpdate.png', # нельзя здесь создавать PhotoImage, т. к. нужен master-объект
-           'themeSelector':{'light': {'pic' :picsDir+'themeLight.png',
-                                      'side':'left',
-                                      'padx':4},
-                            'dark' : {'pic' :picsDir+'themeDark.png',
-                                      'side':'right',
-                                      'padx':0}}}
+pics    = {# нельзя здесь создавать PhotoImage: нужен master-объект
+    'filesUpdate'  :  picsDir                 +'filesUpdate.png',
+    'themeSelector':{'light': {'pic' :picsDir + 'themeLight.png',
+                               'side':'left',
+                               'padx':4},
+                     'dark' : {'pic' :picsDir + 'themeDark.png',
+                               'side':'right',
+                               'padx':0}}
+    }
 
 # настройки
 config = userCfg(files['config'])
@@ -44,15 +46,44 @@ colors = themeColors[config.get('main:darkTheme')]
 colors.update(exColors)
 
 # параметры по типам скриптов
-# getUserCfg = какие настройки прочитать из userCfg; можно этот ключ не указывать (с tuple'ами почему-то не работает)
-# AStype (нужен не везде) = тип проверки для autocorr & suggest
 launchTypes = {
-    'allChecks'    :{'readRange':'shActive', 'toTD':True ,'launch':'allChecks'   ,'justVerify':False,'getUserCfg':['suggestErrors']},
-    'checkTitles'  :{'readRange':'shActive', 'toTD':True ,'launch':'checkTitles' ,'justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'title'},
-    'checkCities'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'region'},
-    'checkPhones'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['noBlanks']     ,'AStype':'phone'},
-    'checkEmails'  :{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'mail'},
-    'checkWebsites':{'readRange':'selection','toTD':False,'launch':'rangeChecker','justVerify':False,'getUserCfg':['suggestErrors'],'AStype':'website'}
+    'allChecks'    :{'readRange' :'shActive',
+                     'toTD'      : True,
+                     'launch'    :'allChecks',
+                     'justVerify': False,
+                     # ↓ какие настройки прочитать из userCfg; можно не указывать
+                     'getUserCfg':['suggestErrors']},    # с tuple'ами почему-то не работает
+    'checkTitles'  :{'readRange' :'shActive',
+                     'toTD'      : True,
+                     'launch'    :'checkTitles',
+                     'justVerify': False,
+                     'getUserCfg':['suggestErrors','reorder'],
+                     # ↓ тип проверки для autocorr & suggest (нужен не везде)
+                     'AStype'    :'title'},
+    'checkCities'  :{'readRange' :'selection',
+                     'toTD'      : False,
+                     'launch'    :'rangeChecker',
+                     'justVerify': False,
+                     'getUserCfg':['suggestErrors'],
+                     'AStype'    :'region'},
+    'checkPhones'  :{'readRange' :'selection',
+                     'toTD'      : False,
+                     'launch'    :'rangeChecker',
+                     'justVerify': False,
+                     'getUserCfg':['noBlanks'],
+                     'AStype'    :'phone'},
+    'checkEmails'  :{'readRange' :'selection',
+                     'toTD'      : False,
+                     'launch'    :'rangeChecker',
+                     'justVerify': False,
+                     'getUserCfg':['suggestErrors'],
+                     'AStype'    :'mail'},
+    'checkWebsites':{'readRange' :'selection',
+                     'toTD'      : False,
+                     'launch'    :'rangeChecker',
+                     'justVerify': False,
+                     'getUserCfg':['suggestErrors'],
+                     'AStype'    :'website'}
     }
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки
@@ -67,21 +98,23 @@ AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLib
            'mail'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
            'website':{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}}
 
-log = {'units' :{'mainLaunch'  :'core',
-                 'launchType'  :'core', # отсутствует в S.log: читается из S.layout
-                 'readSheet'   :'core',
-                 'readFile'    :'core',
-                 'ACsuccess'   :'autocorr',
-                 'errorsFound' :'errors',
-                 'suggFinished':'sugg',
-                 'finalWrite'  :'finalWrite',
-                 'colorErrors' :'finalWrite',
-                 'fileSaved'   :'finalWrite'},
-       'colors':{'core'        : None,
-                 'autocorr'    :'sand',
-                 'errors'      :'red',
-                 'sugg'        :'magenta',
-                 'finalWrite'  :'green'}}
+log = {
+    'units' :{'mainLaunch'  :'core',
+              'launchType'  :'core', # отсутствует в S.log: читается из S.layout
+              'readSheet'   :'core',
+              'readFile'    :'core',
+              'ACsuccess'   :'autocorr',
+              'errorsFound' :'errors',
+              'suggFinished':'sugg',
+              'finalWrite'  :'finalWrite',
+              'colorErrors' :'finalWrite',
+              'fileSaved'   :'finalWrite'},
+    'colors':{'core'        : None,
+              'autocorr'    :'sand',
+              'errors'      :'red',
+              'sugg'        :'magenta',
+              'finalWrite'  :'green'}
+    }
 
 # прочее
 exBooks = exBooks()
@@ -111,8 +144,9 @@ cTrims.pop('noSpace')
 lat_toCyr = {'Ch':'Ч' ,"Kh'":'Хь','Kh’':'Хь','Kh':'Х' ,'Sh':'Ш' ,'Ts':'Ц' ,
              'Ay':'Ай','Ey' :'Ей','Iy' :'Ий','Yy':'Ый','Ya':'Я' ,'Ye':'Е' ,'Yo':'Е','Yu':'Ю','Zh':'Ж',
              "L'":'Ль','L’' :'Ль',"N'" :'Нь','N’':'Нь',"T'":'Ть','T’':'Ть',
-             'A' :'А' ,'B'  :'Б' ,'D'  :'Д' ,'E' :'Е' ,'F' :'Ф' ,'G' :'Г' ,'H' :'Х','I' :'И','K' :'К','L':'Л','M':'М',
-             'N' :'Н' ,'O'  :'О' ,'P'  :'П' ,'R' :'Р' ,'S' :'С' ,'T' :'Т' ,'U' :'У','V' :'В','W' :'В','Y':'Ы','Z':'З'}
+             'A' :'А' ,'B'  :'Б' ,'D'  :'Д' ,'E' :'Е' ,'F' :'Ф' ,'G' :'Г' ,'H' :'Х','I' :'И',
+             'K' :'К' ,'L'  :'Л' ,'M'  :'М' ,'N' :'Н' ,'O' :'О' ,'P' :'П' ,'R' :'Р',
+             'S' :'С' ,'T'  :'Т' ,'U'  :'У' ,'V' :'В' ,'W' :'В' ,'Y' :'Ы' ,'Z' :'З'}
 
 # защита от запуска модуля
 if __name__ == '__main__':
