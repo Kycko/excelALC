@@ -35,10 +35,10 @@ class Excel():  # общий класс, можно копировать без 
         else:
             sheet      = self.file.sheets.active
             if   type == 'shActive' : self.readFullSheet(sheet,params)
-            elif type == 'selection': self.readRange    (sheet.name,self.file.selection,params)
-    def readFullSheet(self,sheet:xw.Sheet,params:tuple): self.readRange(sheet.name,sheet.used_range,params)
-    def readRange(self,shName:str,range:xw.Range,params:tuple):
-        self.data[shName] = {
+            elif type == 'selection': self.readRange    (self.file.selection,params)
+    def readFullSheet(self,sheet:xw.Sheet,params:tuple): self.readRange(sheet.used_range,params)
+    def readRange(self,range:xw.Range,params:tuple):
+        self.data[range.sheet.name] = {
             'addr' :range.address,
             'range':range,
             'sheet':range.sheet,
@@ -63,16 +63,16 @@ class Excel():  # общий класс, можно копировать без 
     def save(self): self.file.save()
 
     # вспомогательные
-    def splitCellAddr(self,addr:str):
+    def splitCellAddr    (self,addr   :str):
         return (''.join(filter(str.isalpha,addr)) or None,
                 ''.join(filter(str.isdigit,addr)) or None)
-    def colLetters_toInt(self,letters:str):
+    def colLetters_toInt (self,letters:str):
         # преобразует, например, 'AC' в 29
         lib   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         final = 0
         for symb in letters: final += lib.find(symb)
         return final
-    def cellNums_fromAddr(self,cell:str):
+    def cellNums_fromAddr(self,cell   :str):
         col,row = self.splitCellAddr  (cell)
         return   (self.colLetters_toInt(col), int(row)-1)
 
