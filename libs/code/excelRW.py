@@ -48,9 +48,12 @@ class Excel():  # общий класс, можно копировать без 
         shObj = self.data[shName]
         if type == 'selection':
             if newSheet:
-                shObj['range']   = shObj['sheet'].copy().range(shObj['addr']) # sheet.copy() возвращает новый лист
+                # sheet.copy() возвращает новый лист
+                shObj['range']   = shObj['sheet'].copy().range(shObj['addr'])
                 shObj['sheet']   = shObj['range'].sheet
             shObj['range'].value = shObj['table'].data
+        elif type == 'shActive':
+            if newSheet: 
     def resetSheetBgColors(self,shName:str): self.data[shName]['sheet'].used_range.color = None
     def setCellColor(self,type:str,shName:str,row:int,col:int,color:str):
         shObj   = self.data[shName]

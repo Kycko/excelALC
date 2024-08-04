@@ -13,8 +13,8 @@ class TableTemplate():
         self.data = self.data[row:]
     def rotate(self):
         rotated = [[] for cell in self.data[0]]
-        for r in range(len(self.data)):
-            for c in range(len(self.data[r])):
+        for      r  in  range(len(self.data)):
+            for  c  in  range(len(self.data[r])):
                 rotated[c].append(self.data[r][c])
         self.data = rotated
 
@@ -38,8 +38,12 @@ class Table(TableTemplate): # общий класс, можно копирова
 class CellTable(TableTemplate):
     # общий класс, ВОЗМОЖНО подойдёт для других программ
     # это таблица, в которой каждая ячейка – это объект Cell [[CellObj,...],...]
-    def __init__(self,tObj:Table,errors=False): # errors – значение по умолчанию для всех ячеек
-        self.data = [getCells_fromList(row,errors) for row in tObj.data]
+    def __init__(self,tObj,initCells=True,errors=False):
+        # если initCells=True,  в tObj получаем объект Table и создаём внутри объекты CellObj
+        # если initCells=False, в tObj получаем массив [[CellObj,...],...]
+        # errors – значение по умолчанию для всех ячеек
+        if initCells: self.data = [getCells_fromList(row,errors) for row in tObj.data]
+        else:         self.data =  tObj
     def toTable(self):
         final = []
         for row in self.data:
@@ -58,12 +62,25 @@ class TableDict():
         self.columns = {}   # основное хранилище столбцов (объектов TableColumn)
         if tObj is not None:
             tObj = deepcopy(tObj)
-            tObj.rotate()
+            tObj    .rotate()
             for r in range(len(tObj.data)):
                 self.columns[str(r)] = TableColumn(tObj.data[r],errors,initPos=r)
     def searchTitle(self,title:str,fullText=True,lower=True,strip=''):
         for key,column in self.columns.items():
             if strF.findSub(column.title.value,title,'bool',fullText,lower,strip): return key
+    def toCellTable(self):
+        # получаем "список" позиций и ключей столбцов
+        keys = {}
+        for key,column in self.columns.items(): keys[str(column.initPos)] = key
+
+        # создаём ротированную CellTable, затем переворачиваем её
+        table = []
+        for i in sorted([int(key) for key in keys.keys()]):
+            column = self.columns[keys[str(i)]]
+            table.append([column.title]+column.cells)
+        CT = CellTable(table,False)
+        CT.rotate()
+        return CT
 class TableColumn():    # title=CellObj, cells=[CellObj,...]
     def __init__(self,values:list,errors=False,title=None,initPos:int=None):
         if title is None:         title = values.pop(0) # pop удаляет элемент 0 и возвращает его

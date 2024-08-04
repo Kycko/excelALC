@@ -74,9 +74,9 @@ class Root():
                                                 not self.justVerify,
                                                 (VAL['value'],None)[self.justVerify])
                             if not self.justVerify: # это только про autocorr?
+                                cell.value = VAL['value']
                                 self.log.add('ACsuccess',
                                              {'type':type,'from':cell.value,'to':VAL['value']})
-                                cell.value = VAL['value']
                     else: errors[low] = ErrorObj(type,cell.value,errPos)
 
         self.errors.addCur(errors,type)
@@ -103,7 +103,7 @@ class Root():
         final  = {'type'  :type,
                   'value' :value,
                   'valid' :None,
-                  'errKey':''}  # ключ сообщение для suggUI
+                  'errKey':''}  # ключ сообщения для suggUI
 
         if params['checkList']:
             found          = listF.searchStr(extra,value,'item',True,not self.justVerify)
@@ -130,22 +130,23 @@ class Root():
         self.nextSugg()
     def finalizeErrors(self):
         for  errObj in self.errors.curData.values():
-            for pos in errObj.pos:
-                cell       = self.rTable[pos['r']][pos['c']] # self.rTable – это всегда [[Cell,...],...]
-                cell.error = not errObj.fixed
-                if errObj.fixed: cell.value = errObj.newVal
-        
-        if self.readRange == 'selection':
-            self.table.data = self.rTable
-            self.finish()
-    def finish(self):
-        count = self.errors.getCount()
-        self.finalWrite   (count['total'])
-        self.finalColors  (count['errors'])
-        if G.config   .get(self.type + ':saveAfter'):
-            self.file.save()
-            self.log .add ('fileSaved')
-        self.UI    .finish(count['errors'])
+            for i in range(len(errObj.pos)):
+                # self.rTable – это всегда [[Cell,...],...]
+                errPos = errObj .pos[i]
+                cell   = self.rTable[errPos['r']][errPos['c']]
+                if errObj.type == 'title' and i: cell.error = True
+                else:
+                    cell.error = not errObj.fixed
+                    if errObj.fixed: cell.value = errObj.newVal
+
+        if self.readRange == 'selection': self.table.data = self.rTable
+        self.finish()
+    def TDacceptFixedTitles(self):  # пока не используется, но понадобится для allChecks
+        keys = []   # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
+        for unkKey,column in self.unkTD.columns.items():
+            if not column.title.error:
+                keys.append((unkKey,lib.columns.getKey_byTitle(column.title.value)))
+        for item in keys: self.move_fromUnkTD_toCurTD(item[0],item[1])
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -169,23 +170,51 @@ class Root():
         return 0
     def init_curTD(self):
         self.curTD = TableDict()
-        keys       = [] # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
-
         for libKey,params in lib.columns.data.items():
             unkKey = self.unkTD.searchTitle(params['title'])
             if unkKey is not None:
-                self.unkTD.columns[unkKey].title.value = params['title']    # чтобы была правильная капитализация заголовка
-                keys.append((unkKey,libKey))
-
-        for item in keys: self.move_fromUnkTD_toCurTD(item[0],item[1])
+                self.unkTD.columns[unkKey].title.value = params['title']    # для правильной капитализации
+                self.move_fromUnkTD_toCurTD(unkKey,libKey)
     def move_fromUnkTD_toCurTD(self,unkKey:str,curKey:str):
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
-    # запись в файл
+    # финальные шаги (преобразование и запись)
+    def finish (self):
+        count = self.errors.getCount()
+        if self.toTD:
+            self.joinTDs()
+            self.curTD_toTable()
+        self.finalWrite   (count['total'])
+        self.finalColors  (count['errors'])
+        if G.config   .get(self.type + ':saveAfter'):
+            self.file.save()
+            self.log .add ('fileSaved')
+        self.UI    .finish(count['errors'])
+    def joinTDs(self):  # объединяем curTD и unkTD перед финальной записью
+        for key in self.unkTD.columns.keys(): self.move_fromUnkTD_toCurTD(key,key)
+    def curTD_toTable(self):
+        if 'reorder' in self.uCfg .keys() and self.uCfg['reorder']: self.finalTDreorder()
+        self.table    = self.curTD.toCellTable()
+    def finalTDreorder(self):
+        # изменяет в столбцах свойство initPos, по которому они будут расставлены при записи
+        keys    = list(self.curTD.columns.keys())
+        counter = 0
+
+        # сперва из библиотеки
+        for key in lib.columns.data.keys():
+            if key in keys:
+                keys.remove(key)
+                self.curTD.columns[key].initPos = counter
+                counter += 1
+
+        # затем с неправильными названиями
+        for i in sorted([int(key) for key in keys]):
+            self.curTD.columns[str(i)].initPos = counter
+            counter += 1
     def finalWrite(self,totalErrors:int):
         newSheet  = G.config.get(self.type + ':newSheet')
         if totalErrors:
-            self.file.data[self.shName]['table'] = self.table.toTable()
+            self.file.data [self.shName]['table'] = self.table.toTable()
             self.file.write(self.shName,self.readRange,newSheet)
         self.log.add('finalWrite',{'sheet':newSheet,'errors':totalErrors})
     def finalColors(self,totalErrors:int):
@@ -261,8 +290,9 @@ class Errors():     # хранилище ошибок
         if errors:
             self.add_mData(errors,type)
             self.log()
-    def rmFixed(self,errObj):   # удаляем из фрейма в UI и из файла, оставляем в self.curData со статусом fixed
-        self.UI.rm(errObj)
+    def rmFixed(self,errObj):
+        # удаляем из фрейма в UI и из файла, оставляем в self.curData со статусом fixed
+        self.UI  .rm(errObj)
         self.updFile()
 
     # вспомогательные
@@ -306,7 +336,8 @@ class Errors():     # хранилище ошибок
             self.UI .add(errObj.type,errObj.initVal.lower(),newEntry)
         if self.suggQueue:
             self.mainLog.add('errorsFound',{'type':errObj.type,'count':len(self.suggQueue)})
-    def getLogEntry(self,errObj): return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
+    def getLogEntry(self,errObj):
+        return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
     def showNotepad(self): startfile(self.file)
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
     def __init__(self,type:str,initValue:str,pos:dict,initFixed=False,newVal=None): # pos={'r':row,'c':col}
