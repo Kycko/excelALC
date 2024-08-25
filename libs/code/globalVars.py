@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.047',
+app = {'version': 'v.055',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -51,12 +51,14 @@ launchTypes = {
                      'toTD'      : True,
                      'launch'    :'allChecks',
                      'justVerify': False,
+                     'resetBg'   :'sheet',  # сбросить цвета ячеек на листе, в первой строке или в range
                      # ↓ какие настройки прочитать из userCfg; можно не указывать
-                     'getUserCfg':['suggestErrors']},    # с tuple'ами почему-то не работает
+                     'getUserCfg':['suggestErrors','reorder']}, # с tuple'ами почему-то не работает
     'checkTitles'  :{'readRange' :'shActive',
                      'toTD'      : True,
                      'launch'    :'checkTitles',
                      'justVerify': False,
+                     'resetBg'   :'sheet',
                      'getUserCfg':['suggestErrors','reorder'],
                      # ↓ тип проверки для autocorr & suggest (нужен не везде)
                      'AStype'    :'title'},
@@ -64,24 +66,28 @@ launchTypes = {
                      'toTD'      : False,
                      'launch'    :'rangeChecker',
                      'justVerify': False,
+                     'resetBg'   :'selection',
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'region'},
     'checkPhones'  :{'readRange' :'selection',
                      'toTD'      : False,
                      'launch'    :'rangeChecker',
                      'justVerify': False,
+                     'resetBg'   :'selection',
                      'getUserCfg':['noBlanks'],
                      'AStype'    :'phone'},
     'checkEmails'  :{'readRange' :'selection',
                      'toTD'      : False,
                      'launch'    :'rangeChecker',
                      'justVerify': False,
+                     'resetBg'   :'selection',
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'mail'},
     'checkWebsites':{'readRange' :'selection',
                      'toTD'      : False,
                      'launch'    :'rangeChecker',
                      'justVerify': False,
+                     'resetBg'   :'selection',
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'website'}
     }

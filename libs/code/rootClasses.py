@@ -27,6 +27,7 @@ class Root():
         self.readRange  = params['readRange']
         self.toTD       = params['toTD']    # будем работать с TableDict (True) или же с CellTable (False)
         self.justVerify = params['justVerify']
+        self.resetBg    = params['resetBg']
 
         self.uCfg = {}
         if 'getUserCfg' in params.keys():
@@ -139,9 +140,10 @@ class Root():
                     cell.error = not errObj.fixed
                     if errObj.fixed: cell.value = errObj.newVal
 
-        if self.readRange == 'selection': self.table.data = self.rTable
-        self.finish()
-    def TDacceptFixedTitles(self):  # пока не используется, но понадобится для allChecks
+        if   self.readRange ==  'selection': self.table.data = self.rTable
+        elif self.type      in ('allChecks','checkTitles'): self.TDacceptFixedTitles()
+        if   self.type      !=  'allChecks': self.finish()
+    def TDacceptFixedTitles(self):
         keys = []   # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
         for unkKey,column in self.unkTD.columns.items():
             if not column.title.error:
@@ -219,7 +221,7 @@ class Root():
         self.log.add('finalWrite',{'sheet':newSheet,'errors':totalErrors})
     def finalColors(self,totalErrors:int):
         if totalErrors:
-            self.file.resetBgColors(self.shName,self.readRange == 'selection')
+            self.file.resetBgColors(self.shName,self.resetBg)
             if totalErrors < 501:
                 for     r in range(len(self.table.data)):
                     for c in range(len(self.table.data[r])):
