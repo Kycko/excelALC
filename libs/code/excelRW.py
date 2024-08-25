@@ -46,21 +46,27 @@ class Excel():  # общий класс, можно копировать без 
     # запись; type может быть 'selection' или 'shActive'(fullRange)
     def write(self,shName:str,type:str,newSheet=False):
         shObj = self.data[shName]
-        if type == 'selection':
-            if newSheet:
-                # sheet.copy() возвращает новый лист
-                shObj['range']   = shObj['sheet'].copy().range(shObj['addr'])
-                shObj['sheet']   = shObj['range'].sheet
-            shObj['range'].value = shObj['table'].data
-        elif type == 'shActive':
-            if newSheet: 
-    def resetSheetBgColors(self,shName:str): self.data[shName]['sheet'].used_range.color = None
+        if newSheet:
+            shObj['sheet'] = shObj['sheet'].copy()  # возвращает новый лист
+            if   type == 'selection': shObj['range'] = shObj['sheet'].range(shObj['addr'])
+            elif type == 'shActive' :
+                rows  = len(shObj['table'].data)
+                cols  = len(shObj['table'].data[0])
+                shObj['range'] = shObj['sheet'].range((1,1),(rows,cols))
+                shObj['addr']  = shObj['range'].address
+        if type == 'shActive':   shObj['sheet'].clear_contents()
+        shObj['range'].value   = shObj['table'].data
+    def resetBgColors(self,shName:str,justRange=False):
+        if justRange: self.data[shName]['range'].color = None
+        else:         self.data[shName]['sheet'].clear_formats()
     def setCellColor(self,type:str,shName:str,row:int,col:int,color:str):
-        shObj   = self.data[shName]
-        if type == 'selection':
+        shObj      = self.data[shName]
+        if   type == 'selection':
             # f = first
             fCol,fRow = self.cellNums_fromAddr(shObj['addr'].split(':')[0])
-            shObj['sheet'][fRow+row,fCol+col].color = color
+            cell = shObj['sheet'][fRow+row,fCol+col]
+        elif type == 'shActive': cell = shObj['sheet'][row,col]
+        cell.color = color
     def save(self): self.file.save()
 
     # вспомогательные

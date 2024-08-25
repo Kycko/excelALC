@@ -74,9 +74,9 @@ class Root():
                                                 not self.justVerify,
                                                 (VAL['value'],None)[self.justVerify])
                             if not self.justVerify: # это только про autocorr?
-                                cell.value = VAL['value']
                                 self.log.add('ACsuccess',
                                              {'type':type,'from':cell.value,'to':VAL['value']})
+                                cell.value = VAL['value']
                     else: errors[low] = ErrorObj(type,cell.value,errPos)
 
         self.errors.addCur(errors,type)
@@ -191,7 +191,7 @@ class Root():
             self.log .add ('fileSaved')
         self.UI    .finish(count['errors'])
     def joinTDs(self):  # объединяем curTD и unkTD перед финальной записью
-        for key in self.unkTD.columns.keys(): self.move_fromUnkTD_toCurTD(key,key)
+        for key in tuple(self.unkTD.columns.keys()): self.move_fromUnkTD_toCurTD(key,key)
     def curTD_toTable(self):
         if 'reorder' in self.uCfg .keys() and self.uCfg['reorder']: self.finalTDreorder()
         self.table    = self.curTD.toCellTable()
@@ -218,13 +218,14 @@ class Root():
             self.file.write(self.shName,self.readRange,newSheet)
         self.log.add('finalWrite',{'sheet':newSheet,'errors':totalErrors})
     def finalColors(self,totalErrors:int):
-        self.file.resetSheetBgColors(self.shName)
-        self.log .add ('colorErrors',totalErrors)
-        if totalErrors in range(1,100):
-            for      r in range(len(self.table.data)):
-                for  c in range(len(self.table.data[r])):
-                    if  self.table.data[r][c].error:
-                        self.file.setCellColor(self.readRange,self.shName,r,c,G.colors['hlError'])
+        if totalErrors:
+            self.file.resetBgColors(self.shName,self.readRange == 'selection')
+            if totalErrors < 501:
+                for     r in range(len(self.table.data)):
+                    for c in range(len(self.table.data[r])):
+                        if self.table.data[r][c].error:
+                           self.file.setCellColor(self.readRange,self.shName,r,c,G.colors['hlError'])
+        self.log.add('colorErrors',totalErrors)
 
 # журнал и ошибки
 class Log():        # журнал
@@ -340,7 +341,8 @@ class Errors():     # хранилище ошибок
         return '['+errObj.type+'] ['+str(len(errObj.pos))+' шт.] ' + errObj.initVal
     def showNotepad(self): startfile(self.file)
 class ErrorObj():   # объект одной ошибки, используется в хранилище Errors()
-    def __init__(self,type:str,initValue:str,pos:dict,initFixed=False,newVal=None): # pos={'r':row,'c':col}
+    def __init__(self,type:str,initValue:str,pos:dict,initFixed=False,newVal=None):
+        # pos={'r':row,'c':col}
         self.type    = type # тип ошибки, один из G.AStypes
         self.initVal = initValue
         self. newVal =  newVal
