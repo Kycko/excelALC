@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.055',
+app = {'version': 'v.056',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -41,7 +41,8 @@ themeColors = ( # ↓ светлая
                 'red'     :'#EF6C32',
                 'lightRed':'#E36F47',
                 'sand'    :'#FFE5A7'})  # аналог lightYellow
-exColors    =  {'hlError' :'#F69A98'}   # hl = highlight (cell)
+exColors    =  {'goodTitle':'#56E0AB',
+                  'hlError':'#F69A98'}   # hl = highlight (cell)
 colors = themeColors[config.get('main:darkTheme')]
 colors.update(exColors)
 
@@ -52,7 +53,7 @@ launchTypes = {
                      'launch'    :'allChecks',
                      'justVerify': False,
                      'resetBg'   :'sheet',  # сбросить цвета ячеек на листе, в первой строке или в range
-                     # ↓ какие настройки прочитать из userCfg; можно не указывать
+                     # ↓ какие настройки прочитать из userCfg
                      'getUserCfg':['suggestErrors','reorder']}, # с tuple'ами почему-то не работает
     'checkTitles'  :{'readRange' :'shActive',
                      'toTD'      : True,
@@ -89,7 +90,14 @@ launchTypes = {
                      'justVerify': False,
                      'resetBg'   :'selection',
                      'getUserCfg':['suggestErrors'],
-                     'AStype'    :'website'}
+                     'AStype'    :'website'},
+    'checkDates'   :{'readRange' :'selection',
+                     'toTD'      : False,
+                     'launch'    :'rangeChecker',
+                     'justVerify': False,
+                     'resetBg'   :'selection',
+                     'getUserCfg':['suggestErrors'],
+                     'AStype'    :'date'}
     }
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки
@@ -97,12 +105,13 @@ launchTypes = {
 # showSugg  : предлагать ли исправить
 # getLibSugg: варианты исправления надо прочитать из библиотеки; иначе берём из strF.getSuggList()
 # (не нужно?) acceptBlank: для диалога с предложением исправить (None означает, что надо прочитать из настроек)
-# ↓ !ВСЕ ЭТИ ТИПЫ ДОЛЖНЫ БЫТЬ В strings.suggMsg! ↓
+# ↓ !БОЛЬШИНСТВО ЭТИХ ТИПОВ ДОЛЖНО БЫТЬ В strings.suggMsg! ↓
 AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
            'region' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
            'phone'  :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
            'mail'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
-           'website':{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}}
+           'website':{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
+           'date'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}}
 
 log = {
     'units' :{'mainLaunch'  :'core',
@@ -127,16 +136,19 @@ exBooks = exBooks()
 
 # особые символы
 # ↓ неподходящие для почты и сайта
-badSymbols   = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),
-                'website':(' ','@','|')}
-badWebStarts = ('http://'  ,'https://'  ,'www.')
-badPhone     = '79999999999'
-rmSites      = ('facebook.','instagram.' ,'twitter.')
-initRegList  = ['Россия'   ,'все регионы','другие регионы','другой регион']
+badSymbols    = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),
+                 'website':(' ','@','|')}
+badWebStarts  = ('http://'  ,'https://'  ,'www.')
+badPhone      = '79999999999'
+rmSites       = ('facebook.','instagram.' ,'twitter.')
+initRegList   = ['Россия'   ,'все регионы','другие регионы','другой регион']
 
-allHyphens   = ('-','–','—')
-ruSymbols    = ('а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п',
-                'р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я')
+allHyphens    = ['-','–','—']
+ruSymbols     = ('а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п',
+                 'р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я')
+
+dateSplitters = ['/'] + allHyphens
+monthDays     = {1:31,2:29,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}
 
 # cTrims = city trims; 'noSpace' нужен только здесь для расстановки всех вариантов
 cTrims  = {'noSpace':['г.','д.','с.','х.','рп.','дп.','ст.','пос.','пгт.','городской пос.'],

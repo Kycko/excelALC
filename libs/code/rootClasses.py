@@ -220,14 +220,16 @@ class Root():
             self.file.write(self.shName,self.readRange,newSheet)
         self.log.add('finalWrite',{'sheet':newSheet,'errors':totalErrors})
     def finalColors(self,totalErrors:int):
-        if totalErrors:
-            self.file.resetBgColors(self.shName,self.resetBg)
-            if totalErrors < 501:
-                for     r in range(len(self.table.data)):
-                    for c in range(len(self.table.data[r])):
-                        if self.table.data[r][c].error:
-                           self.file.setCellColor(self.readRange,self.shName,r,c,G.colors['hlError'])
-        self.log.add('colorErrors',totalErrors)
+        self.file.resetBgColors(self.shName,self.resetBg)
+        self.log .add        ('colorErrors',totalErrors)
+        if totalErrors in range(1,501):
+            for      r in range(len(self.table.data)):
+                for  c in range(len(self.table.data[r])):
+                    err     = self.table.data[r][c].error
+                    gTitle  = not r and self.type in ('allChecks','checkTitles')    # good title
+                    if err or gTitle:
+                        color = ('goodTitle','hlError')[err]
+                        self.file.setCellColor(self.readRange,self.shName,r,c,G.colors[color])
 
 # журнал и ошибки
 class Log():        # журнал

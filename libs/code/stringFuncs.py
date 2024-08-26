@@ -43,16 +43,24 @@ def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
     if type == 'phone' and not list and params['noBlanks']: return G.badPhone
     return ','.join(list)
 def getSuggList(type:str,value:str):
-    if type in ('mail','website'):
+    final = []
+    if   type in ('mail','website'):
         new  = value.replace(' ','').replace('|',',')
         if new != value:
             vObj = {'type':type,'value':new,'valid':None,'errKey':''}
             validateCell(vObj)
-            if vObj['valid']: return [{'val':new,'btn':new}]
-    return []
+            if vObj['valid']: final.append({'val':new,'btn':new})
+    elif type ==  'date':
+        parts = trySplitDate(value)
+        if parts:
+            for        i in range(3):
+                for    j in range(3):
+                    if i != j:
+                        new = parts[i]+'.'+parts[j]+'.'+parts[3-i-j]
+                        if validateDate(new): final.append({'val':new,'btn':new})
+    return final
 def validateCell(vObj:dict,params=None):    # vObj={'type':,'value':,'valid':,'errKey':}
-    if vObj['type'] in ('phone','mail','website'):
-        # ПО ТЕЛЕФОНАМ ПОТОМ ДОПИСАТЬ, ДОПОЛНИТЕЛЬНЫЕ МОГУТ БЫТЬ ПУСТЫМИ И НЕ МОГУТ БЫТЬ 79999999999
+    if   vObj['type'] in ('phone','mail','website'):
         list = vObj['value'].split(',')
         if listF.inclDoublesStr(list,True):
             vObj['valid']  = False
@@ -65,6 +73,11 @@ def validateCell(vObj:dict,params=None):    # vObj={'type':,'value':,'valid':,'e
         for item in list:
             vObj['valid'],vObj['errKey'] = checkPMW(vObj['type'],item,params)
             if not        vObj['valid']: return
+    elif vObj['type'] == 'date':
+        vObj['valid'] = validateDate(vObj['value'])
+        if not vObj['valid']:
+            vObj  ['errKey'] = 'format'
+            return
     vObj['valid'] = True
 def checkPMW(type:str,value:str,params=None):
     # PMW = phone, mail, website
@@ -96,6 +109,22 @@ def checkPMW(type:str,value:str,params=None):
         if inclSubList   (value,G.badSymbols[type],False,False):
             return False,'badSymbols'
     return True,''
+def trySplitDate(date:str):
+    for symb in G.dateSplitters:
+        parts = date.split(symb)
+        if len(parts) == 3: return parts
+def validateDate(date:str):
+    if not date: return True
+    else:
+        parts = date.split('.')
+        if len(parts) == 3:
+            try:
+                for i in range(len(parts)): parts[i] = int(parts[i])
+            except: return False
+
+            d,m,y = parts
+            if y in range(2000,2100) and m in range(1,13) and d in range(1,G.monthDays[m]): return True
+    return False
 
 # исправление регионов/городов; RC = region/city
 def ACcity(city:str,regions:list,ACregions:list):

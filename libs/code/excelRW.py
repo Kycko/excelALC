@@ -55,6 +55,7 @@ class Excel():  # общий класс, можно копировать без 
                 shObj['range'] = shObj['sheet'].range((1,1),(rows,cols))
                 shObj['addr']  = shObj['range'].address
         if type == 'shActive':   shObj['sheet'].clear_contents()
+        shObj['range'].number_format = '@'
         shObj['range'].value   = shObj['table'].data
     def resetBgColors(self,shName:str,type:str):
         if   type  == 'sheet'    : range = self.data[shName]['sheet'].used_range
