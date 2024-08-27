@@ -53,6 +53,7 @@ launchTypes = {
                      'launch'    :'allChecks',
                      'justVerify': False,
                      'resetBg'   :'sheet',  # сбросить цвета ячеек на листе, в первой строке или в range
+                     'hlTitles'  : True,    # менять ли подсветку заголовков столбцов
                      # ↓ какие настройки прочитать из userCfg
                      'getUserCfg':['suggestErrors','reorder']}, # с tuple'ами почему-то не работает
     'checkTitles'  :{'readRange' :'shActive',
@@ -60,6 +61,7 @@ launchTypes = {
                      'launch'    :'checkTitles',
                      'justVerify': False,
                      'resetBg'   :'sheet',
+                     'hlTitles'  : True,
                      'getUserCfg':['suggestErrors','reorder'],
                      # ↓ тип проверки для autocorr & suggest (нужен не везде)
                      'AStype'    :'title'},
@@ -68,6 +70,7 @@ launchTypes = {
                      'launch'    :'rangeChecker',
                      'justVerify': False,
                      'resetBg'   :'selection',
+                     'hlTitles'  : False,
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'region'},
     'checkPhones'  :{'readRange' :'selection',
@@ -75,6 +78,7 @@ launchTypes = {
                      'launch'    :'rangeChecker',
                      'justVerify': False,
                      'resetBg'   :'selection',
+                     'hlTitles'  : False,
                      'getUserCfg':['noBlanks'],
                      'AStype'    :'phone'},
     'checkEmails'  :{'readRange' :'selection',
@@ -82,6 +86,7 @@ launchTypes = {
                      'launch'    :'rangeChecker',
                      'justVerify': False,
                      'resetBg'   :'selection',
+                     'hlTitles'  : False,
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'mail'},
     'checkWebsites':{'readRange' :'selection',
@@ -89,6 +94,7 @@ launchTypes = {
                      'launch'    :'rangeChecker',
                      'justVerify': False,
                      'resetBg'   :'selection',
+                     'hlTitles'  : False,
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'website'},
     'checkDates'   :{'readRange' :'selection',
@@ -96,6 +102,7 @@ launchTypes = {
                      'launch'    :'rangeChecker',
                      'justVerify': False,
                      'resetBg'   :'selection',
+                     'hlTitles'  : False,
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'date'}
     }

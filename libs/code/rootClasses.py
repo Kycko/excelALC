@@ -28,6 +28,7 @@ class Root():
         self.toTD       = params['toTD']    # будем работать с TableDict (True) или же с CellTable (False)
         self.justVerify = params['justVerify']
         self.resetBg    = params['resetBg']
+        self.hlTitles   = params['hlTitles']
 
         self.uCfg = {}
         if 'getUserCfg' in params.keys():
@@ -223,13 +224,16 @@ class Root():
         self.file.resetBgColors(self.shName,self.resetBg)
         self.log .add        ('colorErrors',totalErrors)
         if totalErrors in range(1,501):
-            for      r in range(len(self.table.data)):
-                for  c in range(len(self.table.data[r])):
-                    err     = self.table.data[r][c].error
-                    gTitle  = not r and self.type in ('allChecks','checkTitles')    # good title
-                    if err or gTitle:
-                        color = ('goodTitle','hlError')[err]
-                        self.file.setCellColor(self.readRange,self.shName,r,c,G.colors[color])
+            for row in range(len(self.table.data)): self.hlRow(row,'errors')
+        if self.hlTitles: self.hlRow(0,'goodTitles')
+    def hlRow(self,r:int,type:str):
+        # r,c = row,column; type может быть 'errors' или 'goodTitles'
+        for c in range(len(self.table.data[r])):
+            err        =   self.table.data[r][c].error
+            if   type == 'errors'     and     err: self.setCellColor(r,c,'hlError')
+            elif type == 'goodTitles' and not err: self.setCellColor(r,c,'goodTitle')
+    def setCellColor(self,row:int,col:int,colorKey:str):
+        self.file.setCellColor(self.readRange,self.shName,row,col,G.colors[colorKey])
 
 # журнал и ошибки
 class Log():        # журнал
