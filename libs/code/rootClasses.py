@@ -142,14 +142,21 @@ class Root():
                     if errObj.fixed: cell.value = errObj.newVal
 
         if   self.readRange ==  'selection': self.table.data = self.rTable
-        elif self.type      in ('allChecks','checkTitles'): self.TDacceptFixedTitles()
+        elif self.type      in ('allChecks','checkTitles'): self.TDfinalizeTitles()
         if   self.type      !=  'allChecks': self.finish()
-    def TDacceptFixedTitles(self):
+    def TDfinalizeTitles(self):
+        # сперва переносим исправленные
         keys = []   # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
         for unkKey,column in self.unkTD.columns.items():
             if not column.title.error:
                 keys.append((unkKey,lib.columns.getKey_byTitle(column.title.value)))
         for item in keys: self.move_fromUnkTD_toCurTD(item[0],item[1])
+
+        # затем добавляем обязательные
+        rows = len(tuple(self.curTD.columns.values())[0].cells)
+        for key,params in lib.columns.data.items():
+            if params['mandatory'] and key not in self.curTD.columns.keys():
+                self.curTD.addEmptyColumn(key,params['title'],rows)
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -214,6 +221,8 @@ class Root():
         for i in sorted([int(key) for key in keys]):
             self.curTD.columns[str(i)].initPos = counter
             counter += 1
+
+        self.log.add('titlesReordered')
     def finalWrite(self,totalErrors:int):
         newSheet  = G.config.get(self.type + ':newSheet')
         if totalErrors:
@@ -247,37 +256,38 @@ class Log():        # журнал
         write_toFile(newStr,self.file,True)
         self.UI.log (newStr,unit)
     def getType(self,type:str,params=None):
-        if   type == 'mainLaunch'  : final = params
-        elif type == 'launchType'  : final = S.layout['actions'][params]['log']
-        elif type == 'readSheet'   : final = S.log[type].replace('$$1',params)
-        elif type == 'readFile'    :
-            final =   S.log[type][params['range']]
-            rows  =           len(params['tObj']['table'].data) - 1*(params['range'] == 'full') # считаем без заголовка
-            cols  =           len(params['tObj']['table'].data[0])
+        if   type == 'mainLaunch'     : final = params
+        elif type == 'launchType'     : final = S.layout['actions'][params]['log']
+        elif type == 'readSheet'      : final = S.log[type].replace('$$1',params)
+        elif type == 'readFile'       :
+            final = S.log[type][params['range']]
+            rows  = len(params['tObj']['table'].data) - 1*(params['range'] == 'full') # считаем без заголовка
+            cols  = len(params['tObj']['table'].data[0])
             final = final.replace('$$1',params['tObj']['addr'])
             final = final.replace('$$2',str(cols)+' '+strF.getEnding_forCount(S.words_byCount['столбцы'],cols))
             final = final.replace('$$3',str(rows)+' '+strF.getEnding_forCount(S.words_byCount['строки' ],rows))
-        elif type == 'ACsuccess'   :
+        elif type == 'ACsuccess'      :
             final = S.log[type].replace('$$1',params['type'])
             final = final      .replace('$$2',params['from'])
             final = final      .replace('$$3',params['to'])
-        elif type == 'errorsFound' :
+        elif type == 'errorsFound'    :
             final = S.log[type].replace('$$1',params['type']).replace('$$2',str(params['count']))
-        elif type == 'suggFinished':
+        elif type == 'suggFinished'   :
             # здесь params = ErrorObj()
             final = tuple(S.log[type].values())[params.fixed].replace('$$1',params.type)
             final =                                     final.replace('$$2',params.initVal)
             if params.fixed: final =                    final.replace('$$3',params.newVal)
-        elif type == 'finalWrite'  :
+        elif type == 'titlesReordered': final = S.log[type]
+        elif type == 'finalWrite'     :
             key    = 'main' if params['errors'] else 'skip'
             final  =      S.log[type][key]
             if key == 'main': final = final.replace('$$1',S.log[type]['sheet'][params['sheet']])
-        elif type == 'colorErrors' :
+        elif type == 'colorErrors'    :
             if    not params: key = '0'
             elif params > 99: key = 'skip'
             else            : key = 'done'
             final = S.log[type][key].replace('$$1',str(params))
-        elif type == 'fileSaved'   : final = S.log[type]
+        elif type == 'fileSaved'      : final = S.log[type]
 
         unit  = G.log['units'][type]
         final =    '['+unit+'] '+final

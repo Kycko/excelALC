@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.056',
+app = {'version': 'v.058',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -121,21 +121,22 @@ AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLib
            'date'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}}
 
 log = {
-    'units' :{'mainLaunch'  :'core',
-              'launchType'  :'core', # отсутствует в S.log: читается из S.layout
-              'readSheet'   :'core',
-              'readFile'    :'core',
-              'ACsuccess'   :'autocorr',
-              'errorsFound' :'errors',
-              'suggFinished':'sugg',
-              'finalWrite'  :'finalWrite',
-              'colorErrors' :'finalWrite',
-              'fileSaved'   :'finalWrite'},
-    'colors':{'core'        : None,
-              'autocorr'    :'sand',
-              'errors'      :'red',
-              'sugg'        :'magenta',
-              'finalWrite'  :'green'}
+    'units' :{'mainLaunch'     :'core',
+              'launchType'     :'core', # отсутствует в S.log: читается из S.layout
+              'readSheet'      :'core',
+              'readFile'       :'core',
+              'ACsuccess'      :'autocorr',
+              'errorsFound'    :'errors',
+              'suggFinished'   :'sugg',
+              'titlesReordered':'finalWrite',
+              'finalWrite'     :'finalWrite',
+              'colorErrors'    :'finalWrite',
+              'fileSaved'      :'finalWrite'},
+    'colors':{'core'           : None,
+              'autocorr'       :'sand',
+              'errors'         :'red',
+              'sugg'           :'magenta',
+              'finalWrite'     :'green'}
     }
 
 # прочее

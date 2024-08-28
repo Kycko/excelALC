@@ -73,6 +73,7 @@ def validateCell(vObj:dict,params=None):    # vObj={'type':,'value':,'valid':,'e
         for item in list:
             vObj['valid'],vObj['errKey'] = checkPMW(vObj['type'],item,params)
             if not        vObj['valid']: return
+        if vObj['type'] in ('mail','website'): vObj['value'] = vObj['value'].lower()
     elif vObj['type'] == 'date':
         vObj['valid'] = validateDate(vObj['value'])
         if not vObj['valid']:

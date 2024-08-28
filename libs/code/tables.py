@@ -65,6 +65,9 @@ class TableDict():
             tObj    .rotate()
             for r in range(len(tObj.data)):
                 self.columns[str(r)] = TableColumn(tObj.data[r],errors,initPos=r)
+    def addEmptyColumn(self,key:str,title:str,cellCount:int):
+        self.columns[key] = TableColumn(['' for i in range(cellCount)],title=title)
+
     def searchTitle(self,title:str,fullText=True,lower=True,strip=''):
         for key,column in self.columns.items():
             if strF.findSub(column.title.value,title,'bool',fullText,lower,strip): return key
