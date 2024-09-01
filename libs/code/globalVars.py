@@ -54,7 +54,7 @@ launchTypes = {
                      'toTD'      : True,
                      'launch'    :'allChecks',
                      'justVerify': False,
-                     'resetBg'   :'sheet',  # сбросить цвета ячеек на листе, в первой строке или в range
+                     'resetBg'   :'sheet',  # сбросить цвета ячеек на листе/в первой строке/в range/нигде
                      'hlTitles'  : True,    # менять ли подсветку заголовков столбцов
                      # ↓ какие настройки прочитать из userCfg
                      'getUserCfg':['suggestErrors','reorder']}, # с tuple'ами почему-то не работает
@@ -106,7 +106,14 @@ launchTypes = {
                      'resetBg'   :'selection',
                      'hlTitles'  : False,
                      'getUserCfg':['suggestErrors'],
-                     'AStype'    :'date'}
+                     'AStype'    :'date'},
+    'rmEmptyRC'    :{'readRange' :'shActive',
+                     'toTD'      : False,
+                     'launch'    :'rmEmptyRC',
+                     'justVerify': False,
+                     'resetBg'   :'sheet',
+                     'hlTitles'  : False,
+                     'getUserCfg':['rmTitled']}
     }
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки

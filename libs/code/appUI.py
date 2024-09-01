@@ -219,7 +219,7 @@ class Window(TBS.Window):   # окно программы
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
-            for type in ('main','script'): self.buildFrame('MLtab',tabs,type)
+            for type in ('main','extra','script'): self.buildFrame('MLtab',tabs,type)
     def buildActionsCfgGroup(self,parent:TBS.Frame,type:str,group:str):
         SE = 'suggestErrors'
         for param,strings in S.layout['actionsCfg'][group].items():

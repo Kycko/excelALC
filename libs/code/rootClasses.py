@@ -37,10 +37,14 @@ class Root():
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные
 
-        if   params['launch'] == 'checkTitles' :
-            data = [[column.title for column in self.unkTD.columns.values()]]
-        elif params['launch'] == 'rangeChecker': data = self.table.data
-        self.rangeChecker(data,params['AStype'])
+        if params['launch'] == 'rmEmptyRC':
+            changed = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
+            self.finish({'total':int(changed),'errors':0})
+        else:
+            if   params['launch'] == 'checkTitles' :
+                data = [[column.title for column in self.unkTD.columns.values()]]
+            elif params['launch'] == 'rangeChecker': data = self.table.data
+            self.rangeChecker(data,params['AStype'])
     def initLE(self,bookName:str):  # LE = log & errors
         initStr = S.log['mainLaunch'].replace('$$1',curDateTime()).replace('$$2',bookName)
         self.log.add   ('mainLaunch',initStr)
@@ -190,8 +194,8 @@ class Root():
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
     # финальные шаги (преобразование и запись)
-    def finish (self):
-        count = self.errors.getCount()
+    def finish (self,params=None):
+        count = self.errors.getCount() if params is None else params
         if self.toTD:
             self.joinTDs()
             self.curTD_toTable()

@@ -17,6 +17,19 @@ class TableTemplate():
             for  c  in  range(len(self.data[r])):
                 rotated[c].append(self.data[r][c])
         self.data = rotated
+    def rmEmptyRC(self,type='rc',ignoreTitles=True):
+        # type=r/c/rc; ignoreTitles работает только для столбцов
+        rows,cols = self.findEmptyRC(type,ignoreTitles)
+        self.rmRClist('r',rows)
+        self.rmRClist('c',cols)
+        return bool(rows or cols) # True, если удалялось хоть что-то
+    def rmRClist(self,type:str,list:list):          # type = 'r'/'c'
+        for i in sorted(list,reverse=True): self.rmRC(type,i)
+    def rmRC    (self,type:str,num:int,count=1):    # type = 'r'/'c'
+        for counter in range(count):
+            if type == 'r':     self.data.pop(num)
+            else:
+                for row in self.data: row.pop(num)
 
 # основные классы
 class Table(TableTemplate): # общий класс, можно копировать без изменений в другие программы
@@ -35,6 +48,26 @@ class Table(TableTemplate): # общий класс, можно копирова
         for r in range(len(self.data)):
             for c in range(len(self.data[r])):
                 self.data[r][c] = self.data[r][c].strip().replace('​','')
+    def findEmptyRC(self,type:str,ignoreTitles:bool):
+        # f = final
+        table = self.data
+        if len(table) > ignoreTitles:
+            fRows = []                                  # будем добавлять, если найдём пустую строку
+            fCols = [c for c in range(len(table[0]))]   # сначала в списке всё, потом будем удалять непустые
+
+            for r in range(ignoreTitles,len(table)):
+                emptyRow     = True
+                nonEmptyCols = []
+                for c in range(len(table[r])):
+                    if table[r][c]:
+                        emptyRow = False
+                        nonEmptyCols.append(c)
+
+                if emptyRow: fRows.append(r)
+                for col in nonEmptyCols:
+                    if col in fCols: fCols.remove(col)
+            return fRows,fCols
+        else: return [],[]
 class CellTable(TableTemplate):
     # общий класс, ВОЗМОЖНО подойдёт для других программ
     # это таблица, в которой каждая ячейка – это объект Cell [[CellObj,...],...]
@@ -50,6 +83,7 @@ class CellTable(TableTemplate):
             final.append([])
             for cell in row: final[-1].append(cell.value)
         return Table(final,())
+    def findEmptyRC(self,type:str,ignoreTitles:bool): return self.toTable().findEmptyRC(type,ignoreTitles)
 class Cell():
     def __init__(self,value,error=False):
         self.value = value

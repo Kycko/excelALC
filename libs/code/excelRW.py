@@ -74,6 +74,11 @@ class Excel():  # общий класс, можно копировать без 
         cell.color = color
     def save(self): self.file.save()
 
+    # преобразование
+    # def rmEmptyRC(self,shName :str,type='rc',ignoreTitles=True):
+    #     # type=r/c/rc; ignoreTitles работает только для столбцов
+    #     self.data[shName]['table'].rmEmptyRC(type,ignoreTitles)
+
     # вспомогательные
     def splitCellAddr    (self,addr   :str):
         return (''.join(filter(str.isalpha,addr)) or None,
