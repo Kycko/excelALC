@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.058',
+app = {'version': 'v.059',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -30,13 +30,15 @@ config = userCfg(files['config'])
 
 # цвета (разные для светлой[0] и тёмной[1] тем; colors перезаписывается при смене темы)
 themeColors = ( # ↓ светлая
-               {'green'   :'#4AAC7F',
+               {'blue'    :'#277CD4',
+                'green'   :'#4AAC7F',
                 'magenta' :'#936BCC',
                 'red'     :'#DE3923',
                 'lightRed':'#E36B4F',
                 'sand'    :'#D1A63E'},
                 # ↓ тёмная
-               {'green'   :'#8EE4BD',
+               {'blue'    :'#7BBCFF',
+                'green'   :'#8EE4BD',
                 'magenta' :'#C4ABE7',
                 'red'     :'#EF6C32',
                 'lightRed':'#E36F47',
@@ -128,7 +130,8 @@ log = {
               'ACsuccess'      :'autocorr',
               'errorsFound'    :'errors',
               'suggFinished'   :'sugg',
-              'titlesReordered':'finalWrite',
+              'columnAdded'    :'titles',
+              'titlesReordered':'titles',
               'finalWrite'     :'finalWrite',
               'colorErrors'    :'finalWrite',
               'fileSaved'      :'finalWrite'},
@@ -136,6 +139,7 @@ log = {
               'autocorr'       :'sand',
               'errors'         :'red',
               'sugg'           :'magenta',
+              'titles'         :'blue',
               'finalWrite'     :'green'}
     }
 

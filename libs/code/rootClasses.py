@@ -157,6 +157,7 @@ class Root():
         for key,params in lib.columns.data.items():
             if params['mandatory'] and key not in self.curTD.columns.keys():
                 self.curTD.addEmptyColumn(key,params['title'],rows)
+                self.log  .add ('columnAdded',params['title'])
 
     # чтение данных из таблицы
     def getData(self,book): # book – это сам объект книги из xlwings
@@ -278,6 +279,7 @@ class Log():        # журнал
             final =                                     final.replace('$$2',params.initVal)
             if params.fixed: final =                    final.replace('$$3',params.newVal)
         elif type == 'titlesReordered': final = S.log[type]
+        elif type == 'columnAdded'    : final = S.log[type].replace('$$1',params)
         elif type == 'finalWrite'     :
             key    = 'main' if params['errors'] else 'skip'
             final  =      S.log[type][key]
