@@ -22,7 +22,7 @@ class TableTemplate():
         rows,cols = self.findEmptyRC(type,ignoreTitles)
         self.rmRClist('r',rows)
         self.rmRClist('c',cols)
-        return bool(rows or cols) # True, если удалялось хоть что-то
+        return {'rows':rows, 'cols':cols}
     def rmRClist(self,type:str,list:list):          # type = 'r'/'c'
         for i in sorted(list,reverse=True): self.rmRC(type,i)
     def rmRC    (self,type:str,num:int,count=1):    # type = 'r'/'c'
@@ -68,6 +68,14 @@ class Table(TableTemplate): # общий класс, можно копирова
                     if col in fCols: fCols.remove(col)
             return fRows,fCols
         else: return [],[]
+    def equals     (self,tObj):
+        # сравнивает эту CellTable (self) с другой CellTable (tObj); вернёт True или False
+        this,sec = self.data,tObj.data  # эта и secondary таблицы
+        if len(this) != len(sec) or len(this[0]) != len(sec[0]): return False
+        for     r in range(len(this)):
+            for c in range(len(this[r])):
+                if this[r][c] != sec[r][c]: return False
+        return True
 class CellTable(TableTemplate):
     # общий класс, ВОЗМОЖНО подойдёт для других программ
     # это таблица, в которой каждая ячейка – это объект Cell [[CellObj,...],...]
@@ -75,9 +83,8 @@ class CellTable(TableTemplate):
         # если initCells=True,  в tObj получаем объект Table и создаём внутри объекты CellObj
         # если initCells=False, в tObj получаем массив [[CellObj,...],...]
         # errors – значение по умолчанию для всех ячеек
-        if initCells: self.data = [getCells_fromList(row,errors) for row in tObj.data]
-        else:         self.data =  tObj
-    def toTable(self):
+        self.data = [getCells_fromList(row,errors) for row in tObj.data] if initCells else tObj
+    def toTable    (self):
         final = []
         for row in self.data:
             final.append([])

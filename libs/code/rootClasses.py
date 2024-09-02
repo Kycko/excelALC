@@ -38,8 +38,8 @@ class Root():
         self.getData(book)      # получаем данные
 
         if params['launch'] == 'rmEmptyRC':
-            changed = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
-            self.finish({'total':int(changed),'errors':0})
+            self.rmEmptyRC()
+            self.finish   ()
         else:
             if   params['launch'] == 'checkTitles' :
                 data = [[column.title for column in self.unkTD.columns.values()]]
@@ -87,6 +87,10 @@ class Root():
 
         self.errors.addCur(errors,type)
         self     .nextSugg()
+    def rmEmptyRC   (self):
+        result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
+        # result = {'rows':int,'cols':int} (это кол-во удалённых)
+        self.log.add('RCremoved',result)
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -194,12 +198,12 @@ class Root():
         self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
 
     # финальные шаги (преобразование и запись)
-    def finish (self,params=None):
-        count = self.errors.getCount() if params is None else params
+    def finish (self):
+        count = self.errors.getCount()
         if self.toTD:
             self.joinTDs()
             self.curTD_toTable()
-        self.finalWrite   (count['total'])
+        self.finalWrite   ()
         self.finalColors  (count['errors'])
         if G.config   .get(self.type + ':saveAfter'):
             self.file.save()
@@ -228,12 +232,14 @@ class Root():
             counter += 1
 
         self.log.add('titlesReordered')
-    def finalWrite(self,totalErrors:int):
-        newSheet  = G.config.get(self.type + ':newSheet')
-        if totalErrors:
-            self.file.data [self.shName]['table'] = self.table.toTable()
+    def finalWrite(self):
+        newSheet = G  .config.get(self.type + ':newSheet')
+        tObj     = self.table.toTable()
+        equal    = tObj.equals(self.file.data[self.shName]['table'])
+        if not equal:
+            self.file.data [self.shName]['table'] = tObj
             self.file.write(self.shName,self.readRange,newSheet)
-        self.log.add('finalWrite',{'sheet':newSheet,'errors':totalErrors})
+        self.log.add('finalWrite',{'sheet':newSheet,'equal':equal})
     def finalColors(self,totalErrors:int):
         self.file.resetBgColors(self.shName,self.resetBg)
         self.log .add        ('colorErrors',totalErrors)
@@ -284,8 +290,11 @@ class Log():        # журнал
             if params.fixed: final =                    final.replace('$$3',params.newVal)
         elif type == 'titlesReordered': final = S.log[type]
         elif type == 'columnAdded'    : final = S.log[type].replace('$$1',params)
+        elif type == 'RCremoved'      :
+            r,c   = len(params['rows']),len(params['cols'])
+            final = S.log[type][('none','main')[bool(r or c)]].replace('$$1',str(r)).replace('$$2',str(c))
         elif type == 'finalWrite'     :
-            key    = 'main' if params['errors'] else 'skip'
+            key    = 'skip' if params['equal'] else 'main'
             final  =      S.log[type][key]
             if key == 'main': final = final.replace('$$1',S.log[type]['sheet'][params['sheet']])
         elif type == 'colorErrors'    :

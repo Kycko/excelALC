@@ -199,7 +199,7 @@ class Window(TBS.Window):   # окно программы
                                                   bootstyle = cfg['style'])
                 self.suggWidgets[key].pack(side='right',padx=cfg['padx'])
         elif type == 'finish':
-            self.frSugg .destroy  ()
+            self.frSugg .destroy   ()
             strings = S.layout['run']
             self.suggLfl.configure(text=strings['lfl']['finished'],bootstyle='success')
             frMain     = TBS.Frame(self.suggLfl)
