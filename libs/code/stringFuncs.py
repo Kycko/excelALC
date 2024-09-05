@@ -257,8 +257,17 @@ def trimOverHyphens(string:str):
     for i in range(len(list)): list[i] = list[i].strip()
     return    '-'.join(list)
 def      fixHyphens(string:str): return string.replace('—','-').replace('–','-')
-def  replaceIndex  (string:str,index:int,newChar:str):
+def replaceIndex   (string:str,index:int,newChar:str):
     return string[:index] + newChar + string[index+1:]
+def capitalize     (string:str,type :str):
+    if   type == 'Aa_Aa':
+        list = string.split()
+        for i  in range(len(list)): list[i] = list[i].capitalize()
+        return ' '.join(list)
+    elif type == 'Aa_aa': return string.capitalize()
+    elif type == 'Aa_aA': return string[0]  .upper() + string[1:]
+    elif type == 'AA_AA': return string     .upper()
+    elif type == 'aa_aa': return string     .lower()
 
 # защита от запуска модуля
 if __name__ == '__main__':

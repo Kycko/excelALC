@@ -115,7 +115,14 @@ launchTypes = {
                      'justVerify': False,
                      'resetBg'   :'sheet',
                      'hlTitles'  : False,
-                     'getUserCfg':['rmTitled']}
+                     'getUserCfg':['rmTitled']},
+    'capitalize'   :{'readRange' :'selection',
+                     'toTD'      : False,
+                     'launch'    :'capitalize',
+                     'justVerify': False,
+                     'resetBg'   :'selection',
+                     'hlTitles'  : False,
+                     'getUserCfg':['selected']}
     }
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки
@@ -133,10 +140,10 @@ AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLib
 
 log = {
     'units' :{'mainLaunch'     :'core',
-              'launchType'     :'core', # отсутствует в S.log: читается из S.layout
+              'launchType'     :'core',     # отсутствует в S.log: читается из S.layout
               'readSheet'      :'core',
               'readFile'       :'core',
-              'ACsuccess'      :'autocorr',
+              'ACsuccess'      :'autocorr', # используется и при запуске capitalize
               'errorsFound'    :'errors',
               'suggFinished'   :'sugg',
               'columnAdded'    :'titles',
@@ -147,6 +154,7 @@ log = {
               'fileSaved'      :'finalWrite'},
     'colors':{'core'           : None,
               'autocorr'       :'sand',
+              'capitalize'     :'sand',
               'errors'         :'red',
               'rmRC'           :'pink',
               'sugg'           :'magenta',

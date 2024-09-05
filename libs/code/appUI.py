@@ -1,5 +1,5 @@
 from   sys                  import exit as SYSEXIT
-from   tkinter                      import BooleanVar
+from   tkinter                      import BooleanVar,StringVar
 import ttkbootstrap                     as TBS
 from   ttkbootstrap.tooltip         import ToolTip
 from   ttkbootstrap.dialogs.dialogs import Messagebox
@@ -221,17 +221,26 @@ class Window(TBS.Window):   # окно программы
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
             for type in ('main','extra','script'): self.buildFrame('MLtab',tabs,type)
     def buildActionsCfgGroup(self,parent:TBS.Frame,type:str,group:str):
-        SE = 'suggestErrors'
+        SE   = 'suggestErrors'
+        stng = 'capitalize:selected'
+        cur  =  StringVar(value=G.config.get(stng))
         for param,strings in S.layout['actionsCfg'][group].items():
             if param != SE or SE in G.launchTypes[type]['getUserCfg']:
-                sType = type+':'+param  # например, 'checkTitles:newSheet'
-                cb    = TBS.Checkbutton(parent,
-                                        text      = strings['lbl'],
-                                        variable  = BooleanVar    (value=G.config.get(sType)),
-                                        command   = lambda t=sType:self.switchBoolSetting(t),
-                                        bootstyle = 'round-toggle')
-                ToolTip(cb,text=strings['tt'])
-                cb.pack(padx=5,pady=5,expand=True,anchor='w')
+                if  type  == 'capitalize' and group != 'forAll':
+                    widget = TBS.Radiobutton(parent,
+                                             text      = strings['lbl'],
+                                             value     = param,
+                                             variable  = cur,
+                                             command   = lambda p=param:G.config.set(stng,p))
+                else:
+                    sType  = type+':'+param # например, 'checkTitles:newSheet'
+                    widget = TBS.Checkbutton(parent,
+                                             text      = strings['lbl'],
+                                             variable  = BooleanVar    (value=G.config.get(sType)),
+                                             command   = lambda t=sType:self.switchBoolSetting(t),
+                                             bootstyle = 'round-toggle')
+                    ToolTip(widget,text=strings['tt'])
+                widget.pack(padx=5,pady=5,expand=True,anchor='w')
     def buildSeparator(self,parent,padx=0,pady=3): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
 
     # вспомогательные

@@ -31,13 +31,13 @@ class Root():
         self.hlTitles   = params['hlTitles']
 
         self.uCfg = {}
-        if 'getUserCfg' in params.keys():
-            for param in params['getUserCfg']: self.uCfg[param] = G.config.get(type+':'+param)
+        for param in params['getUserCfg']: self.uCfg[param] = G.config.get(type+':'+param)
 
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные
 
-        if params['launch'] == 'rmEmptyRC':
+        if   params['launch'] == 'capitalize': self.capitalizationLaunched()
+        elif params['launch'] == 'rmEmptyRC' :
             self.rmEmptyRC()
             self.finish   ()
         else:
@@ -91,6 +91,15 @@ class Root():
         result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
         # result = {'rows':int,'cols':int} (это кол-во удалённых)
         self.log.add('RCremoved',result)
+    def capitalizationLaunched(self):
+        type = self.uCfg['selected']
+        for     row  in self.table.data:
+            for cell in row:
+                new = strF.capitalize(cell.value,type)
+                if new != cell.value:
+                    self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':new})
+                cell.value = new
+        self.finish()
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
