@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.059',
+app = {'version': 'v.063',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -77,6 +77,14 @@ launchTypes = {
                      'hlTitles'  : False,
                      'getUserCfg':['suggestErrors'],
                      'AStype'    :'region'},
+    'checkSources' :{'readRange' :'selection',
+                     'toTD'      : False,
+                     'launch'    :'rangeChecker',
+                     'justVerify': False,
+                     'resetBg'   :'selection',
+                     'hlTitles'  : False,
+                     'getUserCfg':['suggestErrors'],
+                     'AStype'    :'source'},
     'checkPhones'  :{'readRange' :'selection',
                      'toTD'      : False,
                      'launch'    :'rangeChecker',
@@ -133,6 +141,7 @@ launchTypes = {
 # ↓ !БОЛЬШИНСТВО ЭТИХ ТИПОВ ДОЛЖНО БЫТЬ В strings.suggMsg! ↓
 AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
            'region' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+           'source' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
            'phone'  :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
            'mail'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
            'website':{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},

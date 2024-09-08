@@ -12,6 +12,7 @@ def get_vList(type:str):
     if   type == 'title'    : return columns.vList
     elif type == 'region'   : return regions.vList
     elif type == 'ACregions': return regions.vListAC
+    elif type == 'source'   : return sources.data
 
 # шаблоны классов
 class AStemplate(): # autocorr & sugg
@@ -101,6 +102,9 @@ class Regions():
         city,region = strF.RCsplitRegion(temp,self.regList)
         if region is not None: city = self.getID_byRegion(city,region)
         return city if city else value
+class oneCol_toList():  # один столбец записываем в список, можно использовать для разных библиотек
+    def __init__(self,table):   # table = объект tables.Table()
+        self.data = libR.oneCol_toList(table)
 
 # создаём библиотеки, аналог глобальных переменных
 try:
@@ -108,10 +112,11 @@ try:
             book = xw.Book(G.files['lib'])
             raw  = Excel(book,'shAll',('toStrings'))
             book.close()    # иначе, если других окон Excel не открыто, останется пустое окно
-        columns  = Columns (raw.data['columns'] ['table'])
-        autocorr = Autocorr(raw.data['autocorr']['table'],False)
-        sugg     = Sugg    (raw.data['sugg']    ['table'],True)
-        regions  = Regions (raw.data['regions'] ['table'],list(autocorr.data['region'].keys()))
+        columns  = Columns      (raw.data['columns'] ['table'])
+        autocorr = Autocorr     (raw.data['autocorr']['table'],False)
+        sugg     = Sugg         (raw.data['sugg']    ['table'],True)
+        regions  = Regions      (raw.data['regions'] ['table'],list(autocorr.data['region'].keys()))
+        sources  = oneCol_toList(raw.data['sources'] ['table'])
         del raw # удаляем из памяти
         ready    = True
 except: ready    = False
