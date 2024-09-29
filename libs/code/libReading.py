@@ -31,11 +31,14 @@ def parseAS        (table:list,vList=False):
             tCur  [rFrom].append(new)
         else: tCur[rFrom] = new
     return final
-def parseRegions   (table:list):    # table = таблица[[]]
-    final = {}
+def parseDict      (table:list,cols:list):
+    # например, для парсинга lib.regions и lib.cat
+    # table = таблица[[]]; cols=[0,1,2,...] – номера нужных столбцов
+    final  = {}
+    titles = table[0]
     for row in table[1:]:
         key = row[0].lower()
-        new = {'city':row[0],'region':row[1],'id':row[2]}
+        new = {titles[i]:row[i] for i in cols}
         if key in final.keys(): final[key].append(new)
         else:                   final[key]     = [new]
     return final

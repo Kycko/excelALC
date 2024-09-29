@@ -18,8 +18,8 @@ def autocorrCell(type:str,value:str,params=None):
     if type in ('phone','mail','website'): return AC_PMW(type,value,params)
     else:                                  return             value
 def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
-    RPL = {'from': ('​','–','—','|',';',',,'),  # RPL = replace
-           'to'  : ('','-','-',',',',',',' )}
+    RPL = {'from': ('​','﻿','–','—','|',';',',,'),  # RPL = replace
+           'to'  : ('',''  ,'-','-',',',',',',' )}
     for i in range(len(RPL['from'])): value = value.replace(RPL['from'][i],RPL['to'][i])
 
     list = value.lower().split(',')

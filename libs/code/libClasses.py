@@ -12,6 +12,8 @@ def get_vList(type:str):
     if   type == 'title'    : return columns.vList
     elif type == 'region'   : return regions.vList
     elif type == 'ACregions': return regions.vListAC
+    elif type == 'cat'      : return cat    .vList
+    elif type == 'vert'     : return cat    .parentList
     elif type == 'source'   : return sources.data
 
 # шаблоны классов
@@ -25,6 +27,36 @@ class AStemplate(): # autocorr & sugg
             keys = strF.findSubList(value,tuple(self.data[type].keys()),'item',True,fullText)
             return [self.data[type][key] for key in keys]
         else: return []
+class RegCatTemplate():
+    def initLists(self,core:str,parent:str):
+        self.vList   = []       # validation list, список допустимых значений
+        self.doubles = []       # список core (low) с дублирующимися названиями
+        self.core    = core     # core   = ключ основных элементов
+        self.parent  = parent   # parent = ключ родительских элементов
+
+        for low,list in self.data.items():
+            for item in list:
+                self.vList.append(item['id'])   # все ID, в т. ч. дублей по названию
+                if not item[parent] in self.parentList: self.parentList.append(item[parent])
+            if len(list) == 1: self.vList  .append(list[0][core])   # только если не дубли по названию
+            else:              self.doubles.append(low)
+
+        self.parentList.sort(key=len,reverse=True)  # сортирует от длинных к коротким (важно для autocorr регионов)
+    def getDoubleSuggs(self,value:str):
+        final = []
+        found = strF.findSubList(value.lower(),self.doubles,'item',True,False,False)
+        for low in found:
+            for u in self.data[low]:    # u = unique
+                final.append({'val':u['id'],
+                              'btn':u['id']+' ['+u[self.core]+', '+u[self.parent]+']'})
+        return final
+    def getID(self,core:str,parent:str):
+        lCore = core  .lower()
+        lPar  = parent.lower()
+        if    lCore in self.data.keys():
+            for var in self.data[lCore]:
+                if var[self.parent].lower() == lPar: return var['id']
+        return ''
 
 # классы библиотек
 class Columns():
@@ -41,16 +73,17 @@ class Autocorr(AStemplate):
         res   = super().get(type,value,True)
         return {'fixed': bool(res),
                 'value': res [0]['val'] if bool(res) else value}
-    def getRegionSugg(self,value:str): return super().get('region',value,False)
+    def getSugg(self,type:str,value:str): return super().get(type,value,False)
 class Sugg(AStemplate):
     def get(self,type:str,value:str):
         final = []
         res   = super().get(type,value,False)
         if res:
             for list in res: final += list
-        if type == 'region' and len(value) > 2: # чтобы для 1-2 букв не выдавало огромный список
-            final += regions .getDoubleSuggs(value)
-            final += autocorr.getRegionSugg (value)
+        if type in ('cat','region') and len(value) > 2: # чтобы для 1-2 букв не выдавало огромный список
+            lib    = cat if type == 'cat' else regions
+            final += lib.getDoubleSuggs(value)
+            final += autocorr  .getSugg(type,value)
         return self.rmDoubles(final)
     def rmDoubles(self,list:list):
         final       = []
@@ -61,46 +94,23 @@ class Sugg(AStemplate):
                 addedValues.append(value)
                 final      .append(dict)
         return final
-class Regions():
+class Cat(RegCatTemplate):
+    def __init__(self,table):   # table = объект tables.Table()
+        self.data       = libR.parseDict(table.data,(0,3,4))
+        self.parentList = []    # список всех вертикалей
+        self.initLists('cat','vert')
+class Regions(RegCatTemplate):
     def __init__(self,table,ACvars:list):
         # table = объект tables.Table(); ACvars = ключи из autocorr regions для функции strF.RCtry()
-        self.data = libR.parseRegions(table.data)
-        self.initLists(ACvars)
-    def initLists(self,ACvars:list):
-        self.  vList = []                       # validation list, список допустимых значений
-        self.regList = deepcopy(G.initRegList)  # список всех регионов
-        self.doubles = []                       # список городов (low) с дублирующимися названиями
-
-        for lowCity,list in self.data.items():
-            for item in list:
-                self.vList.append(item['id'])   # все ID, в т. ч. дублей по названию
-                if not item['region'] in self.regList: self.regList.append(item['region'])
-            if len(list) == 1: self.vList  .append(list[0]['city']) # только если не дубли по названию
-            else:              self.doubles.append(lowCity)
-
-        self.regList.sort(key=len,reverse=True) # сортирует от длинных к коротким (важно для autocorr)
+        self.data = libR.parseDict(table.data,(0,1,2))
+        self.parentList = deepcopy(G.initRegList)   # список всех регионов
+        self.initLists('city','region')
         self.vListAC = self.vList + ACvars
-
-    def getDoubleSuggs(self,value:str):
-        final = []
-        found = strF.findSubList(value.lower(),self.doubles,'item',True,False,False)
-        for low in found:
-            for u in self.data[low]:    # u = unique
-                final.append({'val':u['id'],
-                              'btn':u['id']+' ['+u['city']+', '+u['region']+']'})
-        return final
-    def getID_byRegion(self,city:str,region:str):
-        lowCity   = city  .lower()
-        lowRegion = region.lower()
-        if lowCity in self.data.keys():
-            for var in self.data[lowCity]:
-                if var['region'].lower() == lowRegion: return var['id']
-        return ''
     def ACregionID(self,value:str):
         # аналог autocorr'а (Autocorr().get()) для дублей по названиям
         temp        = strF.RCfixOblast  (strF.joinSpaces(value))
-        city,region = strF.RCsplitRegion(temp,self.regList)
-        if region is not None: city = self.getID_byRegion(city,region)
+        city,region = strF.RCsplitRegion(temp,self.parentList)
+        if region is not None: city = self.getID(city,region)
         return city if city else value
 class oneCol_toList():  # один столбец записываем в список, можно использовать для разных библиотек
     def __init__(self,table):   # table = объект tables.Table()
@@ -116,6 +126,7 @@ try:
         autocorr = Autocorr     (raw.data['autocorr']['table'],False)
         sugg     = Sugg         (raw.data['sugg']    ['table'],True)
         regions  = Regions      (raw.data['regions'] ['table'],list(autocorr.data['region'].keys()))
+        cat      = Cat          (raw.data['cat']     ['table'])
         sources  = oneCol_toList(raw.data['sources'] ['table'])
         del raw # удаляем из памяти
         ready    = True

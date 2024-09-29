@@ -109,7 +109,7 @@ class Root():
             # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
             AC = lib.autocorr.get(type,value)
             if AC['fixed']: return AC['value']
-            else:  value = strF.ACcity(value,lib.regions.regList,lib.get_vList('ACregions'))
+            else:  value = strF.ACcity(value,lib.regions.parentList,lib.get_vList('ACregions'))
         AC = lib.autocorr.get(type,value)   # выполнится не для всех type
         if type == 'region' and not listF.inclStr(lib.regions.vList,AC['value']):
             return lib.regions.ACregionID(initVal)
