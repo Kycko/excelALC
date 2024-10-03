@@ -93,6 +93,7 @@ def checkPMW(type:str,value:str,params=None):
         if value            == ''        : return True ,''
         if value.count('@') != 1         : return False,'dogCount'
         if inclSubList(value,G.ruSymbols): return False,'ru'
+        if '$'      in value             : return False,'$'
 
         name,domain = value.split('@')
         if not     '.' in          domain: return False, 'dotDomain'
