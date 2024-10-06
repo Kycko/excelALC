@@ -102,7 +102,7 @@ class Window(TBS.Window):   # окно программы
             strings = S.layout['actions'][params]
             frMain  = TBS.Labelframe(parent,text=strings['lfl'])
             frMain.pack (fill='both',expand=True,padx=6,pady=6,side='right')
-            TBS   .Label(frMain, text=strings['descr']).pack(fill='x',padx=8,pady=5)
+            TBS   .Label(frMain,text=strings['descr'],wraplength=650).pack(fill='x',padx=8,pady=5)
             self  .buildFrame('MRconfig',frMain,params)
             self  .launchBtn = TBS.Button(frMain,command=lambda t=params:self.launchClicked(t),bootstyle='success')
             self  .launchBtn.pack       (fill='x',padx=22,pady=12,side='bottom')
@@ -294,9 +294,15 @@ class Window(TBS.Window):   # окно программы
               self.frRight = None
         else: self.frRight = {'type':type, 'frame':self.buildFrame('mainRight',self.frRoot,type)}
     def launchClicked(self,type:str):   # это запуск проверок
-        book     = G.exBooks.getFile(self.fileList.get())
-        if book == None:
-            self.launchBtn.configure(text=S.layout['main']['btn']['launch']['cantLaunch'],state='disabled')
+        strings    = S.layout['main']['btn']['launch']
+        book       = G.exBooks.getFile(self.fileList.get())
+
+        msg        = ''
+        if   book == None:                                              msg = strings['fileNotFound']
+        elif type == 'checkVert' and book.selection.columns.count != 1: msg = strings['oneColumn']
+
+
+        if msg: self.launchBtn.configure(text=msg,state='disabled')
         else:
             self   .buildUI(True)
             self.app.launch(book,type)

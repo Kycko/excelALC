@@ -40,6 +40,7 @@ class Root():
         elif params['launch'] == 'rmEmptyRC' :
             self.rmEmptyRC()
             self.finish   ()
+        elif params['launch'] == 'checkVert' : self.vertChecker()
         else:
             if   params['launch'] == 'checkTitles' :
                 data = [[column.title for column in self.unkTD.columns.values()]]
@@ -87,6 +88,19 @@ class Root():
 
         self.errors.addCur(errors,type)
         self     .nextSugg()
+    def vertChecker(self):
+        # ПЕРЕНЕСТИ В self.readSelection_andExtraColumn()
+        shObj      = self.file.data[self.shName]
+        rawTable   = shObj   ['table'].data
+        titleRow   = rawTable[self.searchTitleRow(rawTable)]
+        titleIndex = listF.searchStr(titleRow,'Категория','index',True,False)
+        range      = shObj['range']
+
+        # vCats = categories for verts checker
+        self.   vCats  = self.file.getValues(range.offset(0,titleIndex+1-range.column))
+        self.readRange = 'selection'
+        self.  getData   (self.file.file,False)
+        self.rangeChecker(self.file.data[self.shName]['table'].data,'vert')
     def rmEmptyRC   (self):
         result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
         # result = {'rows':int,'cols':int} (это кол-во удалённых)
@@ -177,21 +191,27 @@ class Root():
                 self.log  .add ('columnAdded',params['title'])
 
     # чтение данных из таблицы
-    def getData(self,book): # book – это сам объект книги из xlwings
+    def getData(self,book,logging=True):    # book – это сам объект книги из xlwings
         self.file = Excel(book,self.readRange,('toStrings'))
 
         # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
         for shName,tObj in self.file.data.items():
             self.shName = shName
             if self.readRange == 'shActive': tObj['table'].cutUp(self.searchTitleRow(tObj['table'].data))
-            self.log.add('readSheet',shName)
-            self.log.add('readFile',
-                         {'tObj':tObj,'range':('range','full')[self.readRange == 'shActive']})
+            if logging:
+                self.log.add('readSheet',shName)
+                self.log.add('readFile',
+                            {'tObj':tObj,'range':('range','full')[self.readRange == 'shActive']})
 
             if self.toTD:
                 self.unkTD = TableDict(tObj['table'])
                 self.init_curTD()
             else: self.table = CellTable(tObj['table'])
+    def readSelection_andExtraColumn(self,title:str):
+        # возвращает Table selection'а + Table из тех же строк столбца с заголовком title
+        initData = self.file.data[self.shName]['table'].data
+        titleRow = initData[self.searchTitleRow(initData)]
+        self.file.file.selection
     def searchTitleRow(self,table:list):    # table = таблица[[]]
         for r in range(len(table)):
             if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r

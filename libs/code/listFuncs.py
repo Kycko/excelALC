@@ -4,6 +4,7 @@ import stringFuncs     as strF
 # поиск
 def searchStr(list:list,txt:str,type='item',fullText=True,lower=True,strip=''):
     # type может быть 'item' (вернёт подходящие элементы списка) или 'index' (вернёт индексы)
+    # strip может быть '', 'a' (для элементов list), 'b' (для txt), 'ab'
     final = []
     for i in range(len(list)):
         if strF.findSub(list[i],txt,'bool',fullText,lower,strip):
