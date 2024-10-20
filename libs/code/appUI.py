@@ -202,19 +202,23 @@ class Window(TBS.Window):   # окно программы
             self.frSugg .destroy   ()
             strings = S.layout['run']
             self.suggLfl.configure(text=strings['lfl']['finished'],bootstyle='success')
-            frMain     = TBS.Frame(self.suggLfl)
+            frMain      = TBS.Frame(self.suggLfl)
             frMain.pack(padx=5,pady=2)
-            TBS.Label(frMain,text=strings['finished']['title']+str(params)).pack(anchor='w',padx=6)
+            self.errLbl = TBS.Label(frMain,text=strings['finished']['title']+str(params))
+            self.errLbl.pack(anchor='w',padx=6)
             self.buildFrame('finButtons',frMain)
         elif type == 'finButtons':
             frMain =   TBS.Frame(parent)
             frMain.pack(fill='x',pady=7)
+            self.finBtns = {}
             for btnType,cfg in S.layout['run']['finished']['buttons'].items():
-                TBS.Button(frMain,
-                           text      = cfg['text'],
-                           command   = self.buildUI if btnType == 'exit' else self.app.errors.showNotepad,
-                           bootstyle = cfg['style']
-                           ).pack(side=cfg['side'],padx=5)
+                self.finBtns[btnType] = TBS.Button(
+                    frMain,
+                    text      = cfg['text'],
+                    command   = self.buildUI if btnType == 'exit' else self.app.errors.showNotepad,
+                    bootstyle = cfg['style']
+                    )
+                self.finBtns[btnType].pack(side=cfg['side'],padx=5)
 
     def buildTabs(self,parent:TBS.Frame):
             tabs  = TBS.Notebook(parent)
@@ -276,6 +280,13 @@ class Window(TBS.Window):   # окно программы
         self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
         self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
     def finish(self,errorsCount:int): self.buildFrame('finish',self.suggLfl,errorsCount)
+    def launchErr(self,type:str):
+        # если запущено с ошибкой, показывает её и завершает выполнение
+        strings = S.layout['run']
+        self.finish(1)
+        self.suggLfl        .configure(text=strings['lfl']  ['launchErr'],bootstyle='danger')
+        self.errLbl         .configure(text=strings['finished']['errors'][type])
+        self.finBtns['exit'].configure(bootstyle='danger')
 
     # кнопки и переключатели
     def switchBoolSetting(self,param:str):
@@ -294,15 +305,9 @@ class Window(TBS.Window):   # окно программы
               self.frRight = None
         else: self.frRight = {'type':type, 'frame':self.buildFrame('mainRight',self.frRoot,type)}
     def launchClicked(self,type:str):   # это запуск проверок
-        strings    = S.layout['main']['btn']['launch']
-        book       = G.exBooks.getFile(self.fileList.get())
-
-        msg        = ''
-        if   book == None:                                              msg = strings['fileNotFound']
-        elif type == 'checkVert' and book.selection.columns.count != 1: msg = strings['oneColumn']
-
-
-        if msg: self.launchBtn.configure(text=msg,state='disabled')
+        book     = G.exBooks.getFile(self.fileList.get())
+        if book == None:
+            self.launchBtn.configure(text=S.layout['main']['btn']['launch']['cantLaunch'],state='disabled')
         else:
             self   .buildUI(True)
             self.app.launch(book,type)

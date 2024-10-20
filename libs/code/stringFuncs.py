@@ -155,7 +155,7 @@ def RCsplitRegion(string:str,regList:list):
     region = findSubList(string,regList)
     if region is not None and len(region) != len(string):
         string    = string.lower().replace(region.lower(),'')
-        rmSymbols = (' ',',','(',')')
+        rmSymbols = (' ','.',',','(',')')
         string    = rmStartList(string,rmSymbols,0,False)
         while string and string[-1] in rmSymbols: string = string[:-1]
 

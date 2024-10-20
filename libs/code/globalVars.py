@@ -91,7 +91,7 @@ launchTypes = {
                      'justVerify': False,
                      'resetBg'   :'selection',
                      'hlTitles'  : False,
-                     'getUserCfg':['suggestErrors'],
+                     'getUserCfg':[],
                      'AStype'    :'vert'},
     'checkSources' :{'readRange' :'selection',
                      'toTD'      : False,
@@ -158,7 +158,7 @@ launchTypes = {
 AStypes = {'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
            'region' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
            'cat'    :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-           'vert'   :{'readLib':False,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+           'vert'   :{'readLib':False,'checkList':True ,'showSugg':False,'getLibSugg':True},
            'source' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
            'phone'  :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
            'mail'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
@@ -209,9 +209,9 @@ dateSplitters = ['/'] + allHyphens
 monthDays     = {1:31,2:29,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}
 
 # cTrims = city trims; 'noSpace' нужен только здесь для расстановки всех вариантов
-cTrims  = {'noSpace':['г.','д.','с.','х.','рп.','дп.','ст.','пос.','пгт.','городской пос.'],
+cTrims  = {'noSpace':['г.','д.','с.','х.','рп.','дп.','ст.','пос.','пгт.','гор.','городской пос.'],
            'spaced' :['г' ,'д' ,'с' ,'х' ,'рп' ,'дп' ,'ст' ,'посёлок','поселок','пос','пгт',
-                      'городской пос','город','станица','ст-ца','хутор', 'село','деревня']}
+                      'гор','городской пос','город','станица','ст-ца','хутор', 'село','деревня']}
 cTrims    ['spaced'] = cTrims['noSpace'] + cTrims['spaced']
 cTrims    ['start']  = ['('+item+')' for item in cTrims['spaced']] + cTrims['noSpace']
 cTrims.pop('noSpace')

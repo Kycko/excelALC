@@ -4,7 +4,7 @@ from   globalFuncs import curDateTime,write_toFile
 import globalVars      as G
 import appUI
 from   excelRW     import Excel
-from   tables      import CellTable,TableDict
+from   tables      import CellTable,Table,TableDict
 import strings         as S
 import stringFuncs     as strF
 import listFuncs       as listF
@@ -20,8 +20,6 @@ class Root():
     def launch(self,book,type:str):
         # book – это сам объект книги из xlwings; type = например, 'checkEmails'
         params = G.launchTypes[type]
-
-        # запоминаем базовые переменные
         self.type       = type
         self.log        = Log(self.UI)
         self.readRange  = params['readRange']
@@ -29,10 +27,7 @@ class Root():
         self.justVerify = params['justVerify']
         self.resetBg    = params['resetBg']
         self.hlTitles   = params['hlTitles']
-
-        self.uCfg = {}
-        for param in params['getUserCfg']: self.uCfg[param] = G.config.get(type+':'+param)
-
+        self.uCfg      = {param: G.config.get(type+':'+param) for param in params['getUserCfg']}
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные
 
@@ -40,7 +35,14 @@ class Root():
         elif params['launch'] == 'rmEmptyRC' :
             self.rmEmptyRC()
             self.finish   ()
-        elif params['launch'] == 'checkVert' : self.vertChecker()
+        elif params['launch'] == 'checkVert' :
+            if self.file.data[self.shName]['range'].columns.count != 1: self.UI.launchErr('oneColumn')
+            else:
+                cats = self.updData_forVertChecker()
+                if cats is None: self.UI.launchErr('noCatsColumn')
+                else:
+                    self.vertChecker(self.table.data,cats.data)
+                    self.finish()
         else:
             if   params['launch'] == 'checkTitles' :
                 data = [[column.title for column in self.unkTD.columns.values()]]
@@ -53,12 +55,12 @@ class Root():
         self.errors = Errors(self.UI.errors,self.log,initStr)
 
     # основные алгоритмы проверки
-    def rangeChecker(self,table:list,type:str):
+    def rangeChecker(self, table:list, type:str):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell,...],...]
         self.rTable = table # range table, понадобится в self.finalizeErrors()
         errors      = {}    # {initLow:ErrorObj,...}
-        for r in range(len(table)):
+        for     r in range(len(table)):
             for c in range(len(table[r])):
                 cell   = table[r][c]
                 errPos = {'r':r,'c':c}
@@ -76,31 +78,55 @@ class Root():
                         if VAL['value'] != cell.value:
                             # ↑ если они равны, ничего делать не надо (ошибки нет)
                             errors[low] = ErrorObj(type,
-                                                cell.value,
-                                                errPos,
-                                                not self.justVerify,
-                                                (VAL['value'],None)[self.justVerify])
+                                                   cell.value,
+                                                   errPos,
+                                                   not self.justVerify,
+                                                   (VAL['value'],None)[self.justVerify])
                             if not self.justVerify: # это только про autocorr?
                                 self.log.add('ACsuccess',
-                                             {'type':type,'from':cell.value,'to':VAL['value']})
+                                            {'type':type,'from':cell.value,'to':VAL['value']})
                                 cell.value = VAL['value']
                     else: errors[low] = ErrorObj(type,cell.value,errPos)
 
         self.errors.addCur(errors,type)
         self     .nextSugg()
-    def vertChecker(self):
-        # ПЕРЕНЕСТИ В self.readSelection_andExtraColumn()
-        shObj      = self.file.data[self.shName]
-        rawTable   = shObj   ['table'].data
-        titleRow   = rawTable[self.searchTitleRow(rawTable)]
-        titleIndex = listF.searchStr(titleRow,'Категория','index',True,False)
-        range      = shObj['range']
+    def  vertChecker(self,tVerts:list,tCats:list):
+        # в tVerts/tCats передаём либо CellTable().data, либо [cells[]] из TableColumn: это всегда [[Cell,...],...]
+        AClogger = []   # запоминаем autocorr'ы для журнала   (например, Services -> Услуги)
+        counter  = 0    # кол-во реальных изменений вертикали (например,   Товары -> Услуги)
 
-        # vCats = categories for verts checker
-        self.   vCats  = self.file.getValues(range.offset(0,titleIndex+1-range.column))
-        self.readRange = 'selection'
-        self.  getData   (self.file.file,False)
-        self.rangeChecker(self.file.data[self.shName]['table'].data,'vert')
+        for     r in range(len(tVerts)):
+            for c in range(len(tVerts[r])):
+                VC        = tVerts[r][c]                # это vert cell (CellObj)
+                lowCat    = tCats [r][c].value.lower()  # это string
+                CVlib     = lib.cat.catVertList         # cat & vert
+
+                # autocorr'ы выделять цветом не нужно (например, Services -> Услуги)
+                if not self.justVerify:
+                    ACval     = self.autocorr('vert',VC.value)
+                    if ACval != VC.value:
+                        self.logVert(AClogger,VC.value,ACval)
+                        VC.value = ACval
+
+                # а это надо выделять цветом
+                new = CVlib[lowCat] if lowCat in CVlib.keys() else ''
+                if self.justVerify:
+                    if new != VC.value:
+                        counter += 1
+                        VC.error = True
+                else:
+                    if new:
+                        if VC.value.lower() != new.lower():
+                            counter   += 1
+                            VC.changed = True
+                        elif VC.value != new: self.logVert(AClogger,VC.value,new)
+                    else:   VC.error   = True
+                    VC.value = new
+
+        if counter:
+            # такой errors нужен только для финального выделения цветом
+            errors = {'':ErrorObj('vert','',{'r':0,'c':0})}
+            for i in range(1,counter): errors[''].addPos({'r':i,'c':0})
     def rmEmptyRC   (self):
         result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
         # result = {'rows':int,'cols':int} (это кол-во удалённых)
@@ -189,6 +215,11 @@ class Root():
             if params['mandatory'] and key not in self.curTD.columns.keys():
                 self.curTD.addEmptyColumn(key,params['title'],rows)
                 self.log  .add ('columnAdded',params['title'])
+    def logVert(self,AClogger:list,prev:str,new:str):
+        if prev not in AClogger:
+            AClogger.append(prev)
+            self.log.add   ('ACsuccess',
+                            {'type':'vert','from':prev,'to':new})
 
     # чтение данных из таблицы
     def getData(self,book,logging=True):    # book – это сам объект книги из xlwings
@@ -207,15 +238,24 @@ class Root():
                 self.unkTD = TableDict(tObj['table'])
                 self.init_curTD()
             else: self.table = CellTable(tObj['table'])
-    def readSelection_andExtraColumn(self,title:str):
-        # возвращает Table selection'а + Table из тех же строк столбца с заголовком title
-        initData = self.file.data[self.shName]['table'].data
-        titleRow = initData[self.searchTitleRow(initData)]
-        self.file.file.selection
+    def updData_forVertChecker(self):
+        # возвращает Table из тех же строк столбца с заголовком 'Категория' + обновляет self.file по selection'у
+        catIndex           = self.searchTitleCol(lib.columns.data['cat']['title'])
+        if  len(catIndex) == 1:
+            range          = self.file.data[self.shName]['range']
+            cats           = self.file.getValues(range.offset(0,catIndex[0]+1-range.column))
+            self.readRange = 'selection'
+            self.getData(self.file.file,False)
+            return CellTable(Table(cats,('toStrings')))
     def searchTitleRow(self,table:list):    # table = таблица[[]]
         for r in range(len(table)):
             if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
         return 0
+    def searchTitleCol(self,title:str):
+        # возвращает индексЫ (список[]) столбцов с заголовком title, отсекая шапку (errors/unique)
+        rawTable = self.file.data[self.shName]['table'].data
+        titleRow = rawTable      [self.searchTitleRow(rawTable)]
+        return listF.searchStr(titleRow,title,'index',True,False)
     def init_curTD(self):
         self.curTD = TableDict()
         for libKey,params in lib.columns.data.items():

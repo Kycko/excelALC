@@ -98,7 +98,16 @@ class Cat(RegCatTemplate):
     def __init__(self,table):   # table = объект tables.Table()
         self.data       = libR.parseDict(table.data,(0,3,4))
         self.parentList = []    # список всех вертикалей
-        self.initLists('cat','vert')
+        self.initLists()
+    def initLists(self):
+        super().initLists('cat','vert')
+        self   .catVertList = {}
+        for list in self.data.values():
+            for  item in list: self.catVertList[item   ['id']]          = item   ['vert']
+            if len(list) == 1: self.catVertList[list[0]['cat'].lower()] = list[0]['vert']
+    # def getVerts(self,cat:str):
+    #     try   : return self.data[cat.lower()]
+    #     except: 
 class Regions(RegCatTemplate):
     def __init__(self,table,ACvars:list):
         # table = объект tables.Table(); ACvars = ключи из autocorr regions для функции strF.RCtry()

@@ -93,8 +93,9 @@ class CellTable(TableTemplate):
     def findEmptyRC(self,type:str,ignoreTitles:bool): return self.toTable().findEmptyRC(type,ignoreTitles)
 class Cell():
     def __init__(self,value,error=False):
-        self.value = value
-        self.error = error
+        self.value   = value
+        self.error   = error
+        self.changed = False    # изменялось ли значение ячейки; важно, например, для вертикалей
 
 # это таблица, представленная в виде словаря {'столбец': TableColumn() obj,...}
 class TableDict():
