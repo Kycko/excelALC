@@ -100,28 +100,37 @@ class Root():
             for c in range(len(tVerts[r])):
                 VC     = tVerts[r][c]               # это vert cell (CellObj)
                 lowCat = tCats [r][c].value.lower() # это string
+                CVstr  = tCats[r][c].value+' | '+VC.value   # 'cat | vert'
                 errPos = {'r':r,'c':c}
-                strPos = str(r) + str(c)
                 CVlib  = lib.cat.catVertList        # cat & vert
                 new    = CVlib[lowCat] if lowCat in CVlib.keys() else ''
 
-                if self.justVerify:
-                    if new != VC.value:
-                        errors[strPos] = ErrorObj('vert',VC.value,errPos)
-                        VC.error       = True
+                CVlow  = CVstr.lower()
+                if  CVlow in errors.keys():
+                    errors[CVlow].addPos(errPos)
+                    fRow       = errors[CVlow].pos[0]['r']
+                    fCol       = errors[CVlow].pos[0]['c']
+                    VC.value   = tVerts[fRow][fCol].value
+                    VC.error   = tVerts[fRow][fCol].error
+                    VC.changed = tVerts[fRow][fCol].changed
                 else:
-                    ACval = self.autocorr('vert',VC.value)
-                    if new:
-                        if ACval.lower() != new.lower():
-                            if VC.value:
-                                errors[strPos] = ErrorObj('vert',VC.value,errPos,True,new)
-                                VC.changed     = True
-                                vertsChanged   = True
-                        elif VC.value != new: self.logVert(AClogger,VC.value,new)
+                    if self.justVerify:
+                        if new != VC.value:
+                            errors[CVlow] = ErrorObj('vert',CVstr,errPos)
+                            VC.error      = True
                     else:
-                        errors[strPos] = ErrorObj('vert',VC.value,errPos)
-                        VC.error = True
-                    VC.value = new
+                        ACval = self.autocorr('vert',VC.value)
+                        if new:
+                            if VC   .value   != new: self.logVert(AClogger,CVstr,new)
+                            if ACval.lower() != new.lower():
+                                if VC.value:
+                                    errors[CVlow] = ErrorObj('vert',CVstr,errPos,True,new)
+                                    VC.changed    = True
+                                    vertsChanged  = True
+                        else:
+                            errors[CVlow] = ErrorObj('vert',CVstr,errPos)
+                            VC.error = True
+                        VC.value = new
 
         if vertsChanged: self.log.add('vertChanged')
         self.errors.addCur(errors,'vert')
