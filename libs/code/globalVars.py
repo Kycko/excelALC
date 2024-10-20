@@ -46,7 +46,8 @@ themeColors = ( # ↓ светлая
                 'lightRed':'#E36F47',
                 'sand'    :'#FFE5A7'})  # аналог lightYellow
 exColors    =  {'goodTitle':'#56E0AB',
-                  'hlError':'#F69A98'}   # hl = highlight (cell)
+                'hlChanged':'#E8E782',  # hl = highlight (cell)
+                'hlError'  :'#F69A98'}
 colors = themeColors[config.get('main:darkTheme')]
 colors.update(exColors)
 

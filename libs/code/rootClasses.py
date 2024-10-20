@@ -93,40 +93,35 @@ class Root():
     def  vertChecker(self,tVerts:list,tCats:list):
         # в tVerts/tCats передаём либо CellTable().data, либо [cells[]] из TableColumn: это всегда [[Cell,...],...]
         AClogger = []   # запоминаем autocorr'ы для журнала   (например, Services -> Услуги)
-        counter  = 0    # кол-во реальных изменений вертикали (например,   Товары -> Услуги)
+        errors   = {}   # {initLow:ErrorObj,...}
 
         for     r in range(len(tVerts)):
             for c in range(len(tVerts[r])):
-                VC        = tVerts[r][c]                # это vert cell (CellObj)
-                lowCat    = tCats [r][c].value.lower()  # это string
-                CVlib     = lib.cat.catVertList         # cat & vert
+                VC     = tVerts[r][c]               # это vert cell (CellObj)
+                lowCat = tCats [r][c].value.lower() # это string
+                errPos = {'r':r,'c':c}
+                strPos = str(r) + str(c)
+                CVlib  = lib.cat.catVertList        # cat & vert
+                new    = CVlib[lowCat] if lowCat in CVlib.keys() else ''
 
-                # autocorr'ы выделять цветом не нужно (например, Services -> Услуги)
-                if not self.justVerify:
-                    ACval     = self.autocorr('vert',VC.value)
-                    if ACval != VC.value:
-                        self.logVert(AClogger,VC.value,ACval)
-                        VC.value = ACval
-
-                # а это надо выделять цветом
-                new = CVlib[lowCat] if lowCat in CVlib.keys() else ''
                 if self.justVerify:
                     if new != VC.value:
-                        counter += 1
-                        VC.error = True
+                        errors[strPos] = ErrorObj('vert',VC.value,errPos)
+                        VC.error       = True
                 else:
+                    ACval = self.autocorr('vert',VC.value)
                     if new:
-                        if VC.value.lower() != new.lower():
-                            counter   += 1
-                            VC.changed = True
+                        if ACval.lower() != new.lower():
+                            if VC.value:
+                                errors[strPos] = ErrorObj('vert',VC.value,errPos,True,new)
+                                VC.changed     = True
                         elif VC.value != new: self.logVert(AClogger,VC.value,new)
-                    else:   VC.error   = True
+                    else:
+                        errors[strPos] = ErrorObj('vert',VC.value,errPos)
+                        VC.error = True
                     VC.value = new
 
-        if counter:
-            # такой errors нужен только для финального выделения цветом
-            errors = {'':ErrorObj('vert','',{'r':0,'c':0})}
-            for i in range(1,counter): errors[''].addPos({'r':i,'c':0})
+        self.errors.addCur(errors,'vert')
     def rmEmptyRC   (self):
         result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
         # result = {'rows':int,'cols':int} (это кол-во удалённых)
@@ -315,11 +310,15 @@ class Root():
         if totalErrors in range(1,501):
             for row in range(len(self.table.data)): self.hlRow(row,'errors')
         if self.hlTitles: self.hlRow(0,'goodTitles')
+        if self.type in ('launchAll','checkVert'):
+            for row in range(len(self.table.data)): self.hlRow(row,'chVerts')   # changed verticals
     def hlRow(self,r:int,type:str):
         # r,c = row,column; type может быть 'errors' или 'goodTitles'
         for c in range(len(self.table.data[r])):
             err        =   self.table.data[r][c].error
+            chg        =   self.table.data[r][c].changed
             if   type == 'errors'     and     err: self.setCellColor(r,c,'hlError')
+            elif type == 'chVerts'    and     chg: self.setCellColor(r,c,'hlChanged')
             elif type == 'goodTitles' and not err: self.setCellColor(r,c,'goodTitle')
     def setCellColor(self,row:int,col:int,colorKey:str):
         self.file.setCellColor(self.readRange,self.shName,row,col,G.colors[colorKey])
