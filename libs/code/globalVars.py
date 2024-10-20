@@ -177,6 +177,7 @@ log = {
               'columnAdded'    :'titles',
               'titlesReordered':'titles',
               'RCremoved'      :'rmRC',
+              'vertChanged'    :'warning',
               'finalWrite'     :'finalWrite',
               'colorErrors'    :'finalWrite',
               'fileSaved'      :'finalWrite'},
@@ -185,6 +186,7 @@ log = {
               'capitalize'     :'sand',
               'errors'         :'red',
               'rmRC'           :'pink',
+              'warning'        :'red',
               'sugg'           :'magenta',
               'titles'         :'blue',
               'finalWrite'     :'green'}

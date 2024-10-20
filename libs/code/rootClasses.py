@@ -92,8 +92,9 @@ class Root():
         self     .nextSugg()
     def  vertChecker(self,tVerts:list,tCats:list):
         # в tVerts/tCats передаём либо CellTable().data, либо [cells[]] из TableColumn: это всегда [[Cell,...],...]
-        AClogger = []   # запоминаем autocorr'ы для журнала   (например, Services -> Услуги)
-        errors   = {}   # {initLow:ErrorObj,...}
+        AClogger     = []       # запоминаем autocorr'ы для журнала   (например, Services -> Услуги)
+        errors       = {}       # {initLow:ErrorObj,...}
+        vertsChanged = False    # чтобы показать сообщение про changed только один раз
 
         for     r in range(len(tVerts)):
             for c in range(len(tVerts[r])):
@@ -115,12 +116,14 @@ class Root():
                             if VC.value:
                                 errors[strPos] = ErrorObj('vert',VC.value,errPos,True,new)
                                 VC.changed     = True
+                                vertsChanged   = True
                         elif VC.value != new: self.logVert(AClogger,VC.value,new)
                     else:
                         errors[strPos] = ErrorObj('vert',VC.value,errPos)
                         VC.error = True
                     VC.value = new
 
+        if vertsChanged: self.log.add('vertChanged')
         self.errors.addCur(errors,'vert')
     def rmEmptyRC   (self):
         result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
@@ -361,6 +364,7 @@ class Log():        # журнал
         elif type == 'RCremoved'      :
             r,c   = len(params['rows']),len(params['cols'])
             final = S.log[type][('none','main')[bool(r or c)]].replace('$$1',str(r)).replace('$$2',str(c))
+        elif type == 'vertChanged'    : final = S.log[type]
         elif type == 'finalWrite'     :
             key    = 'skip' if params['equal'] else 'main'
             final  =      S.log[type][key]
