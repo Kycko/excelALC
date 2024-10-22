@@ -271,6 +271,8 @@ errInput = {'title'  :{'notInList'   :'Отсутствует в списке д
                        'dot'         :'В сайте нет ни одной точки',
                        'endSlash'    :'Сайт заканчивается символом /',
                        'wwwHttp'     :'Сайт начинается на http(s)/www',
+                       'yaTrack'     :'В строке есть трекер "?ysclid"',
+                       'hhCity'      :'Ссылка на HH начинается не с hh.ru',
                        'rmSites'     :'Facebook/Instagram/Twitter',
                        'listDoubles' :'В строке есть дубли'},
             'date'   :{'format'      :'Формат даты: 27.03.2026'}}

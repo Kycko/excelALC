@@ -39,8 +39,8 @@ def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
             item = rmStartList(item,G.badWebStarts,0,False).rstrip('/')
             if  checkStartList(item,G.rmSites,'bool',False): item = ''
             else:
-                index    =  findSub(item,'?ysclid=','index',False,False)    # трекинг Яндекса
-                if index >= 0: item = item[:index]
+                item = cut_ifFound(item,'?ysclid=','end',False)             # трекинг Яндекса
+                item = cut_ifFound(item,'hh.ru/','start',False,'',True,13)  # напр., '[perm.]hh.ru/...
         list[i] = item  # для удобства именования внутри используем item
 
     list = listF.rmDoublesStr(listF.rmBlankStr(list))
@@ -114,6 +114,10 @@ def checkPMW(type:str,value:str,params=None):
         if checkStartList(value,G.rmSites     ,'bool'): return False,'rmSites'
         if inclSubList   (value,G.badSymbols[type],False,False):
             return False,'badSymbols'
+        if findSub       (value,'?ysclid='    ,'bool'): return False,'yaTrack'
+
+        index = findSub(value,'hh.ru/')
+        if index > 0: return False,'hhCity'
     return True,''
 def trySplitDate(date:str):
     for symb in G.dateSplitters:
@@ -236,6 +240,19 @@ def checkStartList(string:str,list:list,type='item',lower=True,stripList=False):
     return (False,None)[type == 'item']
 
 # изменение (общие)
+def cut_ifFound    (string:str,sub :str ,side='end',lower=True,strip='',inclSub=False,maxCut=0):
+    # ищет sub в string, обрезает начало (side='start') или конец (side='end')
+    # inclSub: оставить sub в возвращаемом результате (True) или нет (False)
+    # если обрежется больше, чем maxCut, то ничего не делает: вернёт изначальную string
+    # maxCut=0 отключает ограничение
+    index     = findSub(string,sub,'index',False,lower,strip)
+    if index >= 0:
+        new             = string[:index] if side == 'end' else string[len(sub)+index:]
+        if inclSub: new = new + sub      if side == 'end' else sub + new
+    else: return string
+
+    if not maxCut or len(string)-len(new) <= maxCut: return new
+    else:                                            return string
 def rmStartList    (string:str,list:list,count=0,lower=True,stripList=False):
     # проверяет каждый элемент списка list[]: если он в начале строки, удаляет его из начала строки
     # count = сколько раз удалять; если count=0, удаляем все, пока в начале не будет что-то другое
