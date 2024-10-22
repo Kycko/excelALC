@@ -38,6 +38,9 @@ def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
         elif type == 'website':
             item = rmStartList(item,G.badWebStarts,0,False).rstrip('/')
             if  checkStartList(item,G.rmSites,'bool',False): item = ''
+            else:
+                index    =  findSub(item,'?ysclid=','index',False,False)    # трекинг Яндекса
+                if index >= 0: item = item[:index]
         list[i] = item  # для удобства именования внутри используем item
 
     list = listF.rmDoublesStr(listF.rmBlankStr(list))
