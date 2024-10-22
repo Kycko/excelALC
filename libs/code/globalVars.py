@@ -92,7 +92,7 @@ launchTypes = {
                      'justVerify': False,
                      'resetBg'   :'selection',
                      'hlTitles'  : False,
-                     'getUserCfg':[],
+                     'getUserCfg':['autocorr','onlyBlanks'],
                      'AStype'    :'vert'},
     'checkSources' :{'readRange' :'selection',
                      'toTD'      : False,

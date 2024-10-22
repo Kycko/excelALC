@@ -15,8 +15,9 @@ def getEnding_forCount(words:dict,count:int):
 # проверка и исправление разных пользовательских данных (общие)
 def autocorrCell(type:str,value:str,params=None):
     value = value.strip()
-    if type in ('phone','mail','website'): return AC_PMW(type,value,params)
-    else:                                  return             value
+    if   type ==  'cat'                    : return             value.strip('.')
+    elif type in ('phone','mail','website'): return AC_PMW(type,value,params)
+    else:                                    return             value
 def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
     RPL = {'from': ('​','﻿','–','—','|',';',',,'),  # RPL = replace
            'to'  : ('',''  ,'-','-',',',',',',' )}
@@ -51,7 +52,7 @@ def getSuggList(type:str,value:str):
             validateCell(vObj)
             if vObj['valid']: final.append({'val':new,'btn':new})
     elif type ==  'date':
-        parts = trySplitDate(value)
+        parts = trySplitDate(value.strip('00:00:00').strip())
         if parts:
             for        i in range(3):
                 for    j in range(3):

@@ -114,7 +114,7 @@ class Root():
                     VC.error   = tVerts[fRow][fCol].error
                     VC.changed = tVerts[fRow][fCol].changed
                 else:
-                    if self.justVerify:
+                    if self.justVerify or not self.uCfg['autocorr']:
                         if new != VC.value:
                             errors[CVlow] = ErrorObj('vert',CVstr,errPos)
                             VC.error      = True
