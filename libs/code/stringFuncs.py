@@ -149,7 +149,7 @@ def ACcity(city:str,regions:list,ACregions:list):
     return city
 def RCfixOblast(city:str):
     list  = city .split()
-    index = listF.indxAny_from_strList(list,('обл.','обл'))
+    index = listF.searchAny_from_strList(list,('обл.','обл'),'index')
     if index >= 0:  list[index] = 'область'
     return ' '.join(list)
 def RCrmOblast (city:str,regList:list,ACregions:list):
@@ -185,14 +185,19 @@ def RCtrimCity (city:str):
 
     return city
 def RCtry      (city:str,ACregions:list):
-    # пробует заменять 'е'<->'ё' (в обе стороны) и все пробелы на дефисы (напр., для 'Ростов на Дону')
+    # пробует заменять 'е'<->'ё' (в обе стороны), все пробелы на дефисы (напр., для 'Ростов на Дону')
+    # и подчёркивания на пробелы/дефисы (напр., для 'Санкт_Петербург')
     # возвращает новый вариант, если получится правильный город либо подходящий под автозамену
-    vList    = ACregions
-    hyphened = city.replace  (' ','-')
-    if   listF.inclStr(vList,hyphened): return hyphened
+    RPL   = {'е':'ё','ё':'е'}   # RPL = replacement
+    vList =  ACregions
+    vars  = [city                 ,
+             city.replace(' ','-'),
+             city.replace('_','-'),
+             city.replace('_',' ')]
+    vars  = listF.rmDoublesStr                (vars)
+    found = listF.searchAny_from_strList(vList,vars)
+    if found is not None: return found
 
-    RPL  = {'е':'ё','ё':'е'}    # RPL = replacement
-    vars = (city.lower(),hyphened.lower())
     for   var in vars:
         for i in range(len(var)):
             if var[i] in RPL.keys():
