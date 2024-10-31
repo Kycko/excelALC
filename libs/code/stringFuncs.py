@@ -15,9 +15,9 @@ def getEnding_forCount(words:dict,count:int):
 # проверка и исправление разных пользовательских данных (общие)
 def autocorrCell(type:str,value:str,params=None):
     value = value.strip()
-    if   type ==  'cat'                    : return             value.strip('.')
-    elif type in ('phone','mail','website'): return AC_PMW(type,value,params)
-    else:                                    return             value
+    if   type ==  'cat'                    : return ' '.join(value.strip('.').split())
+    elif type in ('phone','mail','website'): return   AC_PMW(type,value,params)
+    else:                                    return               value
 def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
     RPL = {'from': ('​','﻿','–','—','|',';',',,'),  # RPL = replace
            'to'  : ('',''  ,'-','-',',',',',',' )}
@@ -155,6 +155,8 @@ def RCfixOblast(city:str):
 def RCrmOblast (city:str,regList:list,ACregions:list):
     initCity = city
     city     = RCsplitRegion(city,regList)[0]
+
+    city     = RCtrimCity(city) # только для проверки ACregions, приходится дублировать следующий шаг
     if listF.inclStr(ACregions,city): return city
     return initCity
 def RCsplitRegion(string:str,regList:list):
