@@ -153,19 +153,18 @@ def RCfixOblast(city:str):
     if index >= 0:  list[index] = 'область'
     return ' '.join(list)
 def RCrmOblast (city:str,regList:list,ACregions:list):
-    initCity = city
-    city     = RCsplitRegion(city,regList)[0]
-
-    city     = RCtrimCity(city) # только для проверки ACregions, приходится дублировать следующий шаг
-    if listF.inclStr(ACregions,city): return city
-    return initCity
+    initCity  = city
+    city      = RCsplitRegion(city,regList)[0]
+    city      = RCtrimCity   (city) # только для проверки ACregions, приходится дублировать следующий шаг
+    if city and listF.inclStr(ACregions,city): return city
+    else:                                      return initCity
 def RCsplitRegion(string:str,regList:list):
     # ищет в string каждый регион и, если найдёт его, возвращает отдельно город и регион
     init   = string
     region = findSubList(string,regList)
     if region is not None and len(region) != len(string):
         string    = string.lower().replace(region.lower(),'')
-        rmSymbols = (' ','.',',','(',')')
+        rmSymbols = (' ','.',',','(',')','/','|','\\')
         string    = rmStartList(string,rmSymbols,0,False)
         while string and string[-1] in rmSymbols: string = string[:-1]
 
