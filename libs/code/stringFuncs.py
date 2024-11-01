@@ -143,6 +143,7 @@ def ACcity(city:str,regions:list,ACregions:list):
     city = RCfixOblast    (city)
     city = RCrmOblast     (city,regions,ACregions)
     city = RCtrimCity     (city)
+    city = mRCtrims       (city)
     city = lat_toCyr      (city)
     city = trimOverHyphens(city)
     city = RCtry          (city,ACregions)
@@ -163,11 +164,7 @@ def RCsplitRegion(string:str,regList:list):
     init   = string
     region = findSubList(string,regList)
     if region is not None and len(region) != len(string):
-        string    = string.lower().replace(region.lower(),'')
-        rmSymbols = (' ','.',',','(',')','/','|','\\')
-        string    = rmStartList(string,rmSymbols,0,False)
-        while string and string[-1] in rmSymbols: string = string[:-1]
-
+        string = mRCtrims(string.lower().replace(region.lower(),''))
         if not string: string = init
     return string,region
 def RCtrimCity (city:str):
@@ -204,6 +201,10 @@ def RCtry      (city:str,ACregions:list):
             if var[i] in RPL.keys():
                 new = replaceIndex(var,i,RPL[var[i]])
                 if   listF.inclStr(vList,new): return new
+    return city
+def mRCtrims   (city:str):  # main region/city trims
+    city = rmStartList(city,G.mrcTrims,0,False)
+    while city and city[-1] in G.mrcTrims: city = city[:-1]
     return city
 
 # поиск (общие)
