@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.077',
+app = {'version': 'v.078',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -219,7 +219,7 @@ cTrims    ['spaced'] = cTrims['noSpace'] + cTrims['spaced']
 cTrims    ['start']  = ['('+item+')' for item in cTrims['spaced']] + cTrims['noSpace']
 cTrims.pop('noSpace')
 
-mrcTrims = (' ','.',',','(',')','/','|','\\')    # main region/city trims
+mrcTrims = (' ','.',',','(',')','/','|','\\','?','!')   # main region/city trims
 
 # преобразование латиницы в кириллицу
 lat_toCyr = {'Ch':'Ч' ,"Kh'":'Хь','Kh’':'Хь','Kh':'Х' ,'Sh':'Ш' ,'Ts':'Ц' ,

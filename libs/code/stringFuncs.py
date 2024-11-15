@@ -133,7 +133,7 @@ def validateDate(date:str):
             except: return False
 
             d,m,y = parts
-            if y in range(2000,2100) and m in range(1,13) and d in range(1,G.monthDays[m]): return True
+            if y in range(2000,2100) and m in range(1,13) and d in range(1,G.monthDays[m]+1): return True
     return False
 
 # исправление регионов/городов; RC = region/city
@@ -149,10 +149,12 @@ def ACcity(city:str,regions:list,ACregions:list):
     city = RCtry          (city,ACregions)
     return city
 def RCfixOblast(city:str):
-    list  = city .split()
-    index = listF.searchAny_from_strList(list,('обл.','обл'),'index')
-    if index >= 0:  list[index] = 'область'
-    return ' '.join(list)
+    list = city.split()
+    for  i in range(len(list)):
+        if mRCtrims(list[i]).lower() == 'обл':
+            list[i] = 'область'
+            return ' '.join(list)
+    return city
 def RCrmOblast (city:str,regList:list,ACregions:list):
     initCity  = city
     city      = RCsplitRegion(city,regList)[0]
