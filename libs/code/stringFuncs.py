@@ -151,7 +151,7 @@ def ACcity(city:str,regions:list,ACregions:list):
 def RCfixOblast(city:str):
     list = city.split()
     for  i in range(len(list)):
-        if mRCtrims(list[i]).lower() == 'обл':
+        if mRCtrims(list[i]).lower() in ('обл','оюл'):
             list[i] = 'область'
             return ' '.join(list)
     return city
