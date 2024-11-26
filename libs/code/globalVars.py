@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.081',
+app = {'version': 'v.082',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}

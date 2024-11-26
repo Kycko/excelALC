@@ -275,6 +275,7 @@ def rmStartList    (string:str,list:list,count=0,lower=True,stripList=False):
     return string
 def joinSpaces     (string:str): # объединяет все мультипробелы в одинарные
     # while быстрее, чем regex и split+join
+    string = string.replace(' ',' ')    # заменяем неразрывные пробелы
     while '  ' in string: string = string.replace('  ',' ')
     return string
 def lat_toCyr      (string:str):
