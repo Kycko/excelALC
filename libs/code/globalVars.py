@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.082',
+app = {'version': 'v.083',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -212,8 +212,8 @@ dateSplitters = ['/'] + allHyphens
 monthDays     = {1:31,2:29,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}
 
 # cTrims = city trims; 'noSpace' нужен только здесь для расстановки всех вариантов
-cTrims  = {'noSpace':['г.','д.','с.','х.','рп.','дп.','ст.','пос.','пгт.','гор.','городской пос.'],
-           'spaced' :['г' ,'д' ,'с' ,'х' ,'рп' ,'дп' ,'ст' ,'посёлок','поселок','пос','пгт',
+cTrims  = {'noSpace':['г.','д.','п.','с.','х.','рп.','дп.','ст.','пос.','пгт.','гор.','городской пос.'],
+           'spaced' :['г' ,'д' ,'п' ,'с' ,'х' ,'рп' ,'дп' ,'ст' ,'посёлок','поселок','пос','пгт',
                       'гор','городской пос','город','станица','ст-ца','хутор', 'село','деревня']}
 cTrims    ['spaced'] = cTrims['noSpace'] + cTrims['spaced']
 cTrims    ['start']  = ['('+item+')' for item in cTrims['spaced']] + cTrims['noSpace']

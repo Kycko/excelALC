@@ -15,7 +15,8 @@ def getEnding_forCount(words:dict,count:int):
 # проверка и исправление разных пользовательских данных (общие)
 def autocorrCell(type:str,value:str,params=None):
     value = value.strip()
-    if   type ==  'cat'                    : return ' '.join(value.strip('.').strip('|').split())
+    if   type ==  'cat'                    :
+        return ' '.join(value.strip('.').strip('-').strip('|').split())
     elif type in ('phone','mail','website'): return   AC_PMW(type,value,params)
     else:                                    return               value
 def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
@@ -139,14 +140,16 @@ def validateDate(date:str):
 # исправление регионов/городов; RC = region/city
 def ACcity(city:str,regions:list,ACregions:list):
     # ошибка при импорте lib сюда, поэтому передаём аргументами regions и ACregions
-    city =  joinSpaces    (city)
-    city = RCfixOblast    (city)
-    city = RCrmOblast     (city,regions,ACregions)
-    city = RCtrimCity     (city)
-    city = mRCtrims       (city)
-    city = lat_toCyr      (city)
-    city = trimOverHyphens(city)
-    city = RCtry          (city,ACregions)
+    city   =  joinSpaces      (city)
+    city   = RCfixOblast      (city)
+    city   = RCrmOblast       (city,regions,ACregions)
+    city   = RCtrimCity       (city)
+    city   = mRCtrims         (city)
+    if listF.inclStr(ACregions,city): return city
+
+    city   = lat_toCyr        (city)
+    city   = trimOverHyphens  (city)
+    city   = RCtry            (city,ACregions)
     return city
 def RCfixOblast(city:str):
     list = city.split()
