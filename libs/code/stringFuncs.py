@@ -20,8 +20,8 @@ def autocorrCell(type:str,value:str,params=None):
     elif type in ('phone','mail','website'): return   AC_PMW(type,value,params)
     else:                                    return               value
 def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
-    RPL = {'from': ('​','﻿','–','—','|',';',',,'),  # RPL = replace
-           'to'  : ('',''  ,'-','-',',',',',',' )}
+    RPL = {'from': ('​','\n','﻿','–','—','|',';',',,'),  # RPL = replace
+           'to'  : ('',',' ,''  ,'-','-',',',',',',' )}
     for i in range(len(RPL['from'])): value = value.replace(RPL['from'][i],RPL['to'][i])
 
     list = value.lower().split(',')
@@ -40,7 +40,13 @@ def AC_PMW(type:str,value:str,params=None): # AutoCorr Phone,Mail,Website
             item = rmStartList(item,G.badWebStarts,0,False).rstrip('/')
             if  checkStartList(item,G.rmSites,'bool',False): item = ''
             else:
-                item = cut_ifFound(item,'?ysclid=','end',False)             # трекинг Яндекса
+                item = cut_ifFound(item,'?ysclid='       ,'end',False)      # трекинг Яндекса
+                item = cut_ifFound(item,'?yclid='        ,'end',False)      # трекинг Яндекса
+                item = cut_ifFound(item,'?utm_campaign=' ,'end',False)
+                item = cut_ifFound(item,'?utm_medium=  ' ,'end',False)
+                item = cut_ifFound(item,'?utm_referrer=' ,'end',False)
+                item = cut_ifFound(item,'?utm_source='   ,'end',False)
+                item = cut_ifFound(item,'?roistat='      ,'end',False)
                 item = cut_ifFound(item,'hh.ru/','start',False,'',True,13)  # напр., '[perm.]hh.ru/...
         list[i] = item  # для удобства именования внутри используем item
 
