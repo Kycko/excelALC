@@ -3,7 +3,7 @@ from excelRW      import exBooks
 from userSettings import userCfg
 
 # базовые переменные приложения
-app = {'version': 'v.084',
+app = {'version': 'v.086',
        'title'  : 'excelALC',
        'themes' : ('flatly','superhero'),           # светлая и тёмная темы
        'size'   : (1000, 600)}
@@ -167,7 +167,7 @@ launchTypes = {
                      'resetBg'    :'none',
                      'hlTitles'   : False,
                      'getOnLaunch':['filler'],
-                     'getUserCfg' :['selected']}
+                     'getUserCfg' :['filler']}
     }
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки
@@ -198,6 +198,7 @@ log = {
               'titlesReordered':'titles',
               'RCremoved'      :'rmRC',
               'vertChanged'    :'warning',
+              'blanksFilled'   :'autocorr',
               'finalWrite'     :'finalWrite',
               'colorErrors'    :'finalWrite',
               'fileSaved'      :'finalWrite'},

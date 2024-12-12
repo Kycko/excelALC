@@ -254,9 +254,10 @@ class Window(TBS.Window):   # окно программы
         self.onLaunch = {}
         for param in inputs:
             frame = TBS.Frame(parent)
-            frame.pack(fill='x')
+            frame.pack(fill='x',pady=3)
             TBS.Label(frame,text =   S.layout['getOnLaunch'][type][param]).pack(side='left',padx=2)
             self.onLaunch[param] = TBS.Entry(frame)
+            self.onLaunch[param].insert(0,str(G.config.get(type+':'+param)))
             self.onLaunch[param].pack(fill='x',expand=True,side='right',padx=5)
     def buildSeparator(self,parent,padx=0,pady=3): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
 
@@ -322,6 +323,8 @@ class Window(TBS.Window):   # окно программы
         if book == None:
             self.launchBtn.configure(text=S.layout['main']['btn']['launch']['cantLaunch'],state='disabled')
         else:
+            for param in G.launchTypes[type]['getOnLaunch']:
+                G.config.set(type+':'+param,self.onLaunch[param].get())
             self   .buildUI(True)
             self.app.launch(book,type)
     def suggVarClicked(self,value):

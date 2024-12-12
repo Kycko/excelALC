@@ -28,7 +28,6 @@ class Root():
         self.resetBg    = params['resetBg']
         self.hlTitles   = params['hlTitles']
 
-        for param in params['getOnLaunch']: G.config.set(type+':'+param,self.UI.onLaunch[param].get())
         self.uCfg      = {param: G.config.get(type+':'+param) for param in params['getUserCfg']}
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные
@@ -45,6 +44,7 @@ class Root():
                 else:
                     self.vertChecker(self.table.data,cats.data)
                     self.finish()
+        elif params['launch'] == 'fillBlanks': self.fillBlanks()
         else:
             if   params['launch'] == 'checkTitles' :
                 data = [[column.title for column in self.unkTD.columns.values()]]
@@ -149,6 +149,17 @@ class Root():
                     self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':new})
                 cell.value = new
         self.finish()
+    def fillBlanks  (self):
+        filler = self.uCfg['filler']
+        count  = 0
+        for     row  in self.table.data:
+            for cell in row:
+                if not cell.value:
+                    cell.value = filler
+                    count     += 1
+
+        self.log.add('blanksFilled',count)
+        self. finish()
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -376,6 +387,7 @@ class Log():        # журнал
             r,c   = len(params['rows']),len(params['cols'])
             final = S.log[type][('none','main')[bool(r or c)]].replace('$$1',str(r)).replace('$$2',str(c))
         elif type == 'vertChanged'    : final = S.log[type]
+        elif type == 'blanksFilled'   : final = S.log[type].replace('$$1',str(params))
         elif type == 'finalWrite'     :
             key    = 'skip' if params['equal'] else 'main'
             final  =      S.log[type][key]

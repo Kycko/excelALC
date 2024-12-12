@@ -17,7 +17,8 @@ def write_toFile(list:list,file:str,justAdd=False):
         for line in list: f.write(f"{line}\n")
 def get_initSettings():
     return {'main'      :{'darkTheme': checkWinTheme()},
-            'capitalize':{'selected' :'Aa_aa'}}
+            'capitalize':{'selected' :'Aa_aa'},
+            'fillBlanks':{'filler'   :'Unknown'}}
 def getIB(type:str,index:int):  # IB = index/boolean
     # служебная функция, которая возвращает либо сам index, либо true/false в зависимости от значения index
     return index if type == 'index' else index >= 0
