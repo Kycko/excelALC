@@ -63,12 +63,13 @@ class Excel():  # общий класс, можно копировать без 
         shObj['range'].number_format = '@'
         shObj['range'].value   = shObj['table'].data
     def resetBgColors(self,shName:str,type:str):
-        if   type  == 'sheet'    : range = self.data[shName]['sheet'].used_range
-        elif type  == 'selection': range = self.data[shName]['range']
-        elif type  == 'firstRow' :
-            lastCol = self.data[shName]['range'].columns.count
-            range   = self.data[shName]['sheet'].range((1,1),(1,lastCol))
-        range.color = None
+        if type != 'none':
+            if   type  == 'sheet'    : range = self.data[shName]['sheet'].used_range
+            elif type  == 'selection': range = self.data[shName]['range']
+            elif type  == 'firstRow' :
+                lastCol = self.data[shName]['range'].columns.count
+                range   = self.data[shName]['sheet'].range((1,1),(1,lastCol))
+            range.color = None
     def setCellColor(self,type:str,shName:str,row:int,col:int,color:str):
         shObj      = self.data[shName]
         if   type == 'selection':

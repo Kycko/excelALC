@@ -27,6 +27,8 @@ class Root():
         self.justVerify = params['justVerify']
         self.resetBg    = params['resetBg']
         self.hlTitles   = params['hlTitles']
+
+        for param in params['getOnLaunch']: G.config.set(type+':'+param,self.UI.onLaunch[param].get())
         self.uCfg      = {param: G.config.get(type+':'+param) for param in params['getUserCfg']}
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные

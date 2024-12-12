@@ -116,6 +116,11 @@ class Window(TBS.Window):   # окно программы
                 if group in S.layout['actionsCfg'].keys():
                     self.buildSeparator      (frMain,padx=2,pady=6)
                     self.buildActionsCfgGroup(frMain,params,group)
+
+            GOL = G.launchTypes[params]['getOnLaunch']
+            if GOL:
+                self.buildSeparator     (frMain,padx=2,pady=6)
+                self.buildOnLaunchInputs(frMain,params,GOL)
         elif type == 'mainRun':
             frMain = TBS.Frame(parent)
             frMain.pack(fill='y',side='right',padx=5)
@@ -245,6 +250,14 @@ class Window(TBS.Window):   # окно программы
                                              bootstyle = 'round-toggle')
                     ToolTip(widget,text=strings['tt'])
                 widget.pack(padx=5,pady=5,expand=True,anchor='w')
+    def buildOnLaunchInputs (self,parent:TBS.Frame,type:str,inputs:list):
+        self.onLaunch = {}
+        for param in inputs:
+            frame = TBS.Frame(parent)
+            frame.pack(fill='x')
+            TBS.Label(frame,text =   S.layout['getOnLaunch'][type][param]).pack(side='left',padx=2)
+            self.onLaunch[param] = TBS.Entry(frame)
+            self.onLaunch[param].pack(fill='x',expand=True,side='right',padx=5)
     def buildSeparator(self,parent,padx=0,pady=3): TBS.Separator(parent).pack(fill='x',padx=padx,pady=pady)
 
     # вспомогательные
