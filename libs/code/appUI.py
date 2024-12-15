@@ -64,13 +64,12 @@ class Window(TBS.Window):   # окно программы
             frMain.pack       (fill='x')
             parent.add(frMain,text=S.layout['main']['tabs'][params],padding=7)
             for key,val in S.layout['actions'].items():
-                bootstyle = 'success' if key == 'allChecks' else 'primary'
                 if val['type'] == params:
                     TBS.Button(frMain,
                               text      = val['btn'],
                               width     = 45,
                               command   = lambda k=key:self.actionClicked(k),
-                              bootstyle = bootstyle
+                              bootstyle = val['style']
                               ).pack(pady=5)
         elif type == 'MLbottom':
             frMain = TBS.Frame(parent)
