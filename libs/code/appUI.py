@@ -101,7 +101,7 @@ class Window(TBS.Window):   # окно программы
             strings = S.layout['actions'][params]
             frMain  = TBS.Labelframe(parent,text=strings['lfl'])
             frMain.pack (fill='both',expand=True,padx=6,pady=6,side='right')
-            TBS   .Label(frMain,text=strings['descr'],wraplength=650).pack(fill='x',padx=8,pady=5)
+            TBS   .Label(frMain,text=strings['descr'],wraplength=620).pack(fill='x',padx=8,pady=5)
             self  .buildFrame('MRconfig',frMain,params)
             self  .launchBtn = TBS.Button(frMain,command=lambda t=params:self.launchClicked(t),bootstyle='success')
             self  .launchBtn.pack       (fill='x',padx=22,pady=12,side='bottom')
@@ -111,7 +111,7 @@ class Window(TBS.Window):   # окно программы
             # в params передан тип (напр., 'checkEmails')
             frMain = TBS.Frame(parent)
             frMain .pack (fill='x',padx=8)
-            for group in ('forAll',params):
+            for group in ('forAll',params) if G.launchTypes[params]['sharedCfg'] else (params):
                 if group in S.layout['actionsCfg'].keys():
                     self.buildSeparator      (frMain,padx=2,pady=6)
                     self.buildActionsCfgGroup(frMain,params,group)

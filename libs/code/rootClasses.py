@@ -45,6 +45,7 @@ class Root():
                     self.vertChecker(self.table.data,cats.data)
                     self.finish()
         elif params['launch'] == 'fillBlanks': self.fillBlanks()
+        elif params['launch'] == 'reCalc'    : self.  reCalc  ()
         else:
             if   params['launch'] == 'checkTitles' :
                 data = [[column.title for column in self.unkTD.columns.values()]]
@@ -160,6 +161,15 @@ class Root():
 
         self.log.add('blanksFilled',count)
         self. finish()
+    def   reCalc    (self,reValidate=True):
+        for col in self.curTD.columns.values():
+            if reValidate: self.rangeChecker([col.cells],col.type)
+
+            unique     = []
+            col.errors = 0
+            for cell in col.cells:
+                if cell.value not in unique: unique.append(cell.value)
+                if cell.error              : col.errors += 1
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -233,7 +243,7 @@ class Root():
         rows = len(tuple(self.curTD.columns.values())[0].cells)
         for key,params in lib.columns.data.items():
             if params['mandatory'] and key not in self.curTD.columns.keys():
-                self.curTD.addEmptyColumn(key,params['title'],rows)
+                self.curTD.addEmptyColumn(key,params['title'],rows,lib.columns.data[key]['type'])
                 self.log  .add ('columnAdded',params['title'])
     def logVert(self,AClogger:list,prev:str,new:str):
         if prev not in AClogger:
@@ -284,7 +294,8 @@ class Root():
                 self.unkTD.columns[unkKey].title.value = params['title']    # для правильной капитализации
                 self.move_fromUnkTD_toCurTD(unkKey,libKey)
     def move_fromUnkTD_toCurTD(self,unkKey:str,curKey:str):
-        self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
+        self.curTD.columns[curKey]      = self.unkTD.columns.pop(unkKey)
+        self.curTD.columns[curKey].type = lib .columns.data[curKey]['type']
 
     # финальные шаги (преобразование и запись)
     def finish (self):

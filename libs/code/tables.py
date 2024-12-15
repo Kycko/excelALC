@@ -107,8 +107,8 @@ class TableDict():
             tObj    .rotate()
             for r in range(len(tObj.data)):
                 self.columns[str(r)] = TableColumn(tObj.data[r],errors,initPos=r)
-    def addEmptyColumn(self,key:str,title:str,cellCount:int):
-        self.columns[key] = TableColumn(['' for i in range(cellCount)],title=title)
+    def addEmptyColumn(self,key:str,title:str,cellCount:int,type:str=None):
+        self.columns[key] = TableColumn(['' for i in range(cellCount)],title=title,type=type)
 
     def searchTitle(self,title:str,fullText=True,lower=True,strip=''):
         for key,column in self.columns.items():
@@ -127,13 +127,14 @@ class TableDict():
         CT.rotate()
         return CT
 class TableColumn():    # title=CellObj, cells=[CellObj,...]
-    def __init__(self,values:list,errors=False,title=None,initPos:int=None):
+    def __init__(self,values:list,errors=False,title=None,initPos:int=None,type:str=None):
         if title is None:         title = values.pop(0) # pop удаляет элемент 0 и возвращает его
         self.title   = Cell             (title, errors)
         self.cells   = getCells_fromList(values,errors)
-        self.initPos = initPos
+        self.type    = type     # тип данных в столбце
+        self.initPos = initPos  # номер по порядку в изначальной таблице
 
-        # для вывода в шапке таблицы
+        # для вывода в шапке таблицы (оба свойства – количество)
         self.unique  = None
         self.errors  = len(values) if errors else 0
 

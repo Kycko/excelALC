@@ -59,9 +59,19 @@ launchTypes = {
                      'justVerify' : False,
                      'resetBg'    :'sheet', # сбросить цвета ячеек на листе/в первой строке/в range/нигде
                      'hlTitles'   : True,   # менять ли подсветку заголовков столбцов
-                     'getOnLaunch':[],  # читаем при запуске
+                     'getOnLaunch':[],      # читаем при запуске
                      # ↓ какие настройки прочитать из userCfg
-                     'getUserCfg' :['suggestErrors','reorder']}, # с tuple'ами почему-то не работает
+                     'getUserCfg' :['suggestErrors','reorder'], # с tuple'ами почему-то не работает
+                     'sharedCfg'  : True},  # показывать ли настройки из группы 'forAll'
+    'reCalc'       :{'readRange'  :'shActive',
+                     'toTD'       : True,
+                     'launch'     :'reCalc',
+                     'justVerify' : True,
+                     'resetBg'    :'sheet',
+                     'hlTitles'   : True,
+                     'getOnLaunch':[],
+                     'getUserCfg' :[],
+                     'sharedCfg'  : False},
     'checkTitles'  :{'readRange'  :'shActive',
                      'toTD'       : True,
                      'launch'     :'checkTitles',
@@ -70,6 +80,7 @@ launchTypes = {
                      'hlTitles'   : True,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors','reorder'],
+                     'sharedCfg'  : True,
                      # ↓ тип проверки для autocorr & suggest (нужен не везде)
                      'AStype'     :'title'},
     'checkCities'  :{'readRange'  :'selection',
@@ -80,6 +91,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
+                     'sharedCfg'  : True,
                      'AStype'     :'region'},
     'checkCat'     :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -89,6 +101,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
+                     'sharedCfg'  : True,
                      'AStype'     :'cat'},
     'checkVert'    :{'readRange'  :'shSelection',
                      'toTD'       : False,
@@ -98,6 +111,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['autocorr','onlyBlanks'],
+                     'sharedCfg'  : True,
                      'AStype'     :'vert'},
     'checkSources' :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -107,6 +121,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
+                     'sharedCfg'  : True,
                      'AStype'     :'source'},
     'checkPhones'  :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -116,6 +131,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['noBlanks'],
+                     'sharedCfg'  : True,
                      'AStype'     :'phone'},
     'checkEmails'  :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -125,6 +141,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
+                     'sharedCfg'  : True,
                      'AStype'     :'mail'},
     'checkWebsites':{'readRange'  :'selection',
                      'toTD'       : False,
@@ -134,6 +151,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
+                     'sharedCfg'  : True,
                      'AStype'     :'website'},
     'checkDates'   :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -143,6 +161,7 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
+                     'sharedCfg'  : True,
                      'AStype'     :'date'},
     'rmEmptyRC'    :{'readRange'  :'shActive',
                      'toTD'       : False,
@@ -151,7 +170,8 @@ launchTypes = {
                      'resetBg'    :'sheet',
                      'hlTitles'   : False,
                      'getOnLaunch':[],
-                     'getUserCfg' :['rmTitled']},
+                     'getUserCfg' :['rmTitled'],
+                     'sharedCfg'  : True},
     'capitalize'   :{'readRange'  :'selection',
                      'toTD'       : False,
                      'launch'     :'capitalize',
@@ -159,7 +179,8 @@ launchTypes = {
                      'resetBg'    :'selection',
                      'hlTitles'   : False,
                      'getOnLaunch':[],
-                     'getUserCfg' :['selected']},
+                     'getUserCfg' :['selected'],
+                     'sharedCfg'  : True},
     'fillBlanks'   :{'readRange'  :'selection',
                      'toTD'       : False,
                      'launch'     :'fillBlanks',
@@ -167,7 +188,8 @@ launchTypes = {
                      'resetBg'    :'none',
                      'hlTitles'   : False,
                      'getOnLaunch':['filler'],
-                     'getUserCfg' :['filler']}
+                     'getUserCfg' :['filler'],
+                     'sharedCfg'  : True}
     }
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки
