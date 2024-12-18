@@ -231,6 +231,9 @@ layout = {
     }
 layout['actionsCfg']['allChecks'] = layout['actionsCfg']['checkTitles']
 
+# шапка с кол-вом ошибок и уникальных значений
+tblHeader = {'unique':'Уникальных:','errors':'Ошибок:'}
+
 # ↓ для диалогов с предложением исправить
 # !ВСЕ ЭТИ ТИПЫ ДОЛЖНЫ БЫТЬ В globalVars.AStypes!
 suggMsg = {'title'  :'название столбца',

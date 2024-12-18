@@ -55,32 +55,32 @@ colors.update(exColors)
 launchTypes = {
     'allChecks'    :{'readRange'  :'shActive',
                      'toTD'       : True,
+                     'addHeader'  : True,   # кол-во ошибок и уникальных; нужно только при toTD=True
                      'launch'     :'allChecks',
                      'justVerify' : False,
                      'resetBg'    :'sheet', # сбросить цвета ячеек на листе/в первой строке/в range/нигде
                      'hlTitles'   : True,   # менять ли подсветку заголовков столбцов
                      'getOnLaunch':[],      # читаем при запуске
                      # ↓ какие настройки прочитать из userCfg
-                     'getUserCfg' :['suggestErrors','reorder'], # с tuple'ами почему-то не работает
-                     'sharedCfg'  : True},  # показывать ли настройки из группы 'forAll'
+                     'getUserCfg' :['suggestErrors','reorder']},    # с tuple'ами почему-то не работает
     'reCalc'       :{'readRange'  :'shActive',
                      'toTD'       : True,
+                     'addHeader'  : True,
                      'launch'     :'reCalc',
                      'justVerify' : True,
                      'resetBg'    :'sheet',
                      'hlTitles'   : True,
                      'getOnLaunch':[],
-                     'getUserCfg' :[],
-                     'sharedCfg'  : False},
+                     'getUserCfg' :[]},
     'checkTitles'  :{'readRange'  :'shActive',
                      'toTD'       : True,
+                     'addHeader'  : False,
                      'launch'     :'checkTitles',
                      'justVerify' : False,
                      'resetBg'    :'sheet',
                      'hlTitles'   : True,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors','reorder'],
-                     'sharedCfg'  : True,
                      # ↓ тип проверки для autocorr & suggest (нужен не везде)
                      'AStype'     :'title'},
     'checkCities'  :{'readRange'  :'selection',
@@ -91,7 +91,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
-                     'sharedCfg'  : True,
                      'AStype'     :'region'},
     'checkCat'     :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -101,7 +100,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
-                     'sharedCfg'  : True,
                      'AStype'     :'cat'},
     'checkVert'    :{'readRange'  :'shSelection',
                      'toTD'       : False,
@@ -111,7 +109,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['autocorr','onlyBlanks'],
-                     'sharedCfg'  : True,
                      'AStype'     :'vert'},
     'checkSources' :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -121,7 +118,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
-                     'sharedCfg'  : True,
                      'AStype'     :'source'},
     'checkPhones'  :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -131,7 +127,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['noBlanks'],
-                     'sharedCfg'  : True,
                      'AStype'     :'phone'},
     'checkEmails'  :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -141,7 +136,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
-                     'sharedCfg'  : True,
                      'AStype'     :'mail'},
     'checkWebsites':{'readRange'  :'selection',
                      'toTD'       : False,
@@ -151,7 +145,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
-                     'sharedCfg'  : True,
                      'AStype'     :'website'},
     'checkDates'   :{'readRange'  :'selection',
                      'toTD'       : False,
@@ -161,7 +154,6 @@ launchTypes = {
                      'hlTitles'   : False,
                      'getOnLaunch':[],
                      'getUserCfg' :['suggestErrors'],
-                     'sharedCfg'  : True,
                      'AStype'     :'date'},
     'rmEmptyRC'    :{'readRange'  :'shActive',
                      'toTD'       : False,
@@ -170,8 +162,7 @@ launchTypes = {
                      'resetBg'    :'sheet',
                      'hlTitles'   : False,
                      'getOnLaunch':[],
-                     'getUserCfg' :['rmTitled'],
-                     'sharedCfg'  : True},
+                     'getUserCfg' :['rmTitled']},
     'capitalize'   :{'readRange'  :'selection',
                      'toTD'       : False,
                      'launch'     :'capitalize',
@@ -179,8 +170,7 @@ launchTypes = {
                      'resetBg'    :'selection',
                      'hlTitles'   : False,
                      'getOnLaunch':[],
-                     'getUserCfg' :['selected'],
-                     'sharedCfg'  : True},
+                     'getUserCfg' :['selected']},
     'fillBlanks'   :{'readRange'  :'selection',
                      'toTD'       : False,
                      'launch'     :'fillBlanks',
@@ -188,8 +178,7 @@ launchTypes = {
                      'resetBg'    :'none',
                      'hlTitles'   : False,
                      'getOnLaunch':['filler'],
-                     'getUserCfg' :['filler'],
-                     'sharedCfg'  : True}
+                     'getUserCfg' :['filler']}
     }
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки

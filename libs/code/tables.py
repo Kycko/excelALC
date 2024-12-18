@@ -113,8 +113,9 @@ class TableDict():
     def searchTitle(self,title:str,fullText=True,lower=True,strip=''):
         for key,column in self.columns.items():
             if strF.findSub(column.title.value,title,'bool',fullText,lower,strip): return key
-    def toCellTable(self):
+    def toCellTable(self,addHeader:bool,libColumns,strings:dict):
         # получаем "список" позиций и ключей столбцов
+        # header – кол-во ошибок и уникальных; libColumns и strings нельзя импортировать здесь
         keys = {}
         for key,column in self.columns.items(): keys[str(column.initPos)] = key
 
@@ -122,7 +123,14 @@ class TableDict():
         table = []
         for i in sorted([int(key) for key in keys.keys()]):
             column = self.columns[keys[str(i)]]
-            table.append([column.title]+column.cells)
+            header = []
+            if addHeader:
+                column.reCalc()
+                txtUnq = strings['unique']+' '+str(column.unique)
+                txtErr = strings['errors']+' '+str(column.errors)
+                header.append(Cell(txtUnq, column.unique > libColumns[keys[str(i)]]['maxUnique']))
+                header.append(Cell(txtErr, bool(column.errors)))
+            table.append(header + [column.title] + column.cells)
         CT = CellTable(table,False)
         CT.rotate()
         return CT
@@ -137,6 +145,13 @@ class TableColumn():    # title=CellObj, cells=[CellObj,...]
         # для вывода в шапке таблицы (оба свойства – количество)
         self.unique  = None
         self.errors  = len(values) if errors else 0
+    def reCalc(self):
+        unique      = []
+        self.errors = 0
+        for cell in self.cells:
+            if cell.value not in unique: unique.append(cell.value)
+            if cell.error              : self.errors += 1
+        self.unique = len(unique)
 
 # защита от запуска модуля
 if __name__ == '__main__':

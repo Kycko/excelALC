@@ -111,7 +111,7 @@ class Window(TBS.Window):   # окно программы
             # в params передан тип (напр., 'checkEmails')
             frMain = TBS.Frame(parent)
             frMain .pack (fill='x',padx=8)
-            for group in ('forAll',params) if G.launchTypes[params]['sharedCfg'] else (params):
+            for group in ('forAll',params):
                 if group in S.layout['actionsCfg'].keys():
                     self.buildSeparator      (frMain,padx=2,pady=6)
                     self.buildActionsCfgGroup(frMain,params,group)

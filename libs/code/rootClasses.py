@@ -24,6 +24,7 @@ class Root():
         self.log        = Log(self.UI)
         self.readRange  = params['readRange']
         self.toTD       = params['toTD']    # будем работать с TableDict (True) или же с CellTable (False)
+        if self.toTD: self.addHeader = params['addHeader']
         self.justVerify = params['justVerify']
         self.resetBg    = params['resetBg']
         self.hlTitles   = params['hlTitles']
@@ -45,7 +46,7 @@ class Root():
                     self.vertChecker(self.table.data,cats.data)
                     self.finish()
         elif params['launch'] == 'fillBlanks': self.fillBlanks()
-        elif params['launch'] == 'reCalc'    : self.  reCalc  ()
+        elif params['launch'] == 'reCalc'    : self.fullTDchecker()
         else:
             if   params['launch'] == 'checkTitles' :
                 data = [[column.title for column in self.unkTD.columns.values()]]
@@ -58,7 +59,9 @@ class Root():
         self.errors = Errors(self.UI.errors,self.log,initStr)
 
     # основные алгоритмы проверки
-    def rangeChecker(self, table:list, type:str):
+    def fullTDchecker(self):
+        for col in self.curTD.columns.values(): self.rangeChecker([col.cells],col.type)
+    def rangeChecker (self, table:list, type:str):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell,...],...]
         self.rTable = table # range table, понадобится в self.finalizeErrors()
@@ -93,7 +96,7 @@ class Root():
 
         self.errors.addCur(errors,type)
         self     .nextSugg()
-    def  vertChecker(self,tVerts:list,tCats:list):
+    def  vertChecker (self,tVerts:list,tCats:list):
         # в tVerts/tCats передаём либо CellTable().data, либо [cells[]] из TableColumn: это всегда [[Cell,...],...]
         AClogger     = []       # запоминаем autocorr'ы для журнала   (например, Services -> Услуги)
         errors       = {}       # {initLow:ErrorObj,...}
@@ -137,7 +140,7 @@ class Root():
 
         if vertsChanged: self.log.add('vertChanged')
         self.errors.addCur(errors,'vert')
-    def rmEmptyRC   (self):
+    def rmEmptyRC    (self):
         result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
         # result = {'rows':int,'cols':int} (это кол-во удалённых)
         self.log.add('RCremoved',result)
@@ -150,7 +153,7 @@ class Root():
                     self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':new})
                 cell.value = new
         self.finish()
-    def fillBlanks  (self):
+    def fillBlanks   (self):
         filler = self.uCfg['filler']
         count  = 0
         for     row  in self.table.data:
@@ -161,15 +164,6 @@ class Root():
 
         self.log.add('blanksFilled',count)
         self. finish()
-    def   reCalc    (self,reValidate=True):
-        for col in self.curTD.columns.values():
-            if reValidate: self.rangeChecker([col.cells],col.type)
-
-            unique     = []
-            col.errors = 0
-            for cell in col.cells:
-                if cell.value not in unique: unique.append(cell.value)
-                if cell.error              : col.errors += 1
 
     # работа с ошибками
     def autocorr(self,type:str,value:str):
@@ -313,7 +307,7 @@ class Root():
         for key in tuple(self.unkTD.columns.keys()): self.move_fromUnkTD_toCurTD(key,key)
     def curTD_toTable(self):
         if 'reorder' in self.uCfg .keys() and self.uCfg['reorder']: self.finalTDreorder()
-        self.table    = self.curTD.toCellTable()
+        self.table    = self.curTD.toCellTable(self.addHeader,lib.columns.data,S.tblHeader)
     def finalTDreorder(self):
         # изменяет в столбцах свойство initPos, по которому они будут расставлены при записи
         keys    = list(self.curTD.columns.keys())
