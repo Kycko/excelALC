@@ -60,7 +60,18 @@ class Root():
 
     # основные алгоритмы проверки
     def fullTDchecker(self):
-        for col in self.curTD.columns.values(): self.rangeChecker([col.cells],col.type)
+        columns = self.curTD.columns
+        for col in columns.values():
+            temp = col.type.split(':')
+            type = temp.pop(0)
+            if len(temp): self.subtype = temp[0]
+
+            if   type == 'vert':
+                if 'cat' in columns.keys(): self.vertChecker ([col.cells],[columns['cat'].cells])
+            elif type in  G.AStypes.keys(): self.rangeChecker([col.cells], type)
+
+            self.finalizeErrors()
+        self.finish()
     def rangeChecker (self, table:list, type:str):
         # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
         # т. е. table – это всегда [[Cell,...],...]
@@ -194,7 +205,9 @@ class Root():
             if final['valid']:
                 if not self.justVerify: final['value'] = found[0]
             else: final['errKey'] = 'notInList'
-        else:  strF.validateCell(final,self.uCfg)   # final обновляется внутри этой функции
+        else:
+            if type == 'phone' and self.type in ('allChecks','reCalc'): self.uCfg['noBlanks'] = False
+            strF.validateCell(final,self.uCfg)   # final обновляется внутри этой функции
         return final
     def getSuggList(self,errObj):
         type,value = errObj.type,errObj.initVal
@@ -202,12 +215,12 @@ class Root():
         else:                             return strF.getSuggList(type,value)
     def nextSugg(self):
         queue = self.errors.suggQueue
-        if queue and G.AStypes[queue[0].type]['showSugg'] and self.uCfg['suggestErrors']:
+        if queue and not self.justVerify and G.AStypes[queue[0].type]['showSugg'] and self.uCfg['suggestErrors']:
             suggList = self.getSuggList(queue[0])
             self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
         else:
-            self.UI.setSuggState(False)
-            self .finalizeErrors()
+            if not self.justVerify: self.UI.setSuggState(False)
+            if self.type not in ('allChecks','reCalc'): self.finalizeErrors()
     def suggFinalClicked(self,OKclicked:bool,newValue=''):
         self.errors.suggClicked(OKclicked,newValue)
         self.nextSugg()
@@ -222,9 +235,9 @@ class Root():
                     cell.error = not errObj.fixed
                     if errObj.fixed: cell.value = errObj.newVal
 
-        if   self.readRange ==  'selection': self.table.data = self.rTable
-        elif self.type      in ('allChecks','checkTitles'): self.TDfinalizeTitles()
-        if   self.type      !=  'allChecks': self.finish()
+        if   self.readRange == 'selection'  : self.table.data = self.rTable
+        elif self.type      == 'checkTitles': self.TDfinalizeTitles()
+        if   self.type  not in ('allChecks','reCalc'):  self.finish()
     def TDfinalizeTitles(self):
         # сперва переносим исправленные
         keys = []   # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
@@ -327,11 +340,11 @@ class Root():
 
         self.log.add('titlesReordered')
     def finalWrite(self):
-        newSheet = G  .config.get(self.type + ':newSheet')
-        tObj     = self.table.toTable()
-        equal    = tObj.equals(self.file.data[self.shName]['table'])
+        newSheet  = G  .config.get(self.type + ':newSheet')
+        self.tObj = self.table.toTable()
+        equal     = self.tObj.equals(self.file.data[self.shName]['table'])
         if not equal:
-            self.file.data [self.shName]['table'] = tObj
+            self.file.data [self.shName]['table'] = self.tObj
             self.file.write(self.shName,self.readRange,newSheet)
         self.log.add('finalWrite',{'sheet':newSheet,'equal':equal})
     def finalColors(self,totalErrors:int):
@@ -339,7 +352,7 @@ class Root():
         self.log .add        ('colorErrors',totalErrors)
         if totalErrors in range(1,501):
             for row in range(len(self.table.data)): self.hlRow(row,'errors')
-        if self.hlTitles: self.hlRow(0,'goodTitles')
+        if self.hlTitles: self.hlRow(self.searchTitleRow(self.tObj.data),'goodTitles')
         if self.type in ('launchAll','checkVert'):
             for row in range(len(self.table.data)): self.hlRow(row,'chVerts')   # changed verticals
     def hlRow(self,r:int,type:str):
