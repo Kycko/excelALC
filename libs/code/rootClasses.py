@@ -24,7 +24,7 @@ class Root():
         self.log        = Log(self.UI)
         self.readRange  = params['readRange']
         self.toTD       = params['toTD']    # будем работать с TableDict (True) или же с CellTable (False)
-        if self.toTD: self.addHeader = params['addHeader']
+        self.addHeader  = params['addHeader']
         self.justVerify = params['justVerify']
         self.resetBg    = params['resetBg']
         self.hlTitles   = params['hlTitles']
@@ -350,8 +350,11 @@ class Root():
     def finalColors(self,totalErrors:int):
         self.file.resetBgColors(self.shName,self.resetBg)
         self.log .add        ('colorErrors',totalErrors)
-        if totalErrors in range(1,501):
-            for row in range(len(self.table.data)): self.hlRow(row,'errors')
+
+        # шапку подсвечиваем в любом случае
+        last = len(self.table.data) if totalErrors in range(1,501) else (0,2)[self.addHeader]
+        for row in range(last): self.hlRow(row,'errors')
+
         if self.hlTitles: self.hlRow(self.searchTitleRow(self.tObj.data),'goodTitles')
         if self.type in ('launchAll','checkVert'):
             for row in range(len(self.table.data)): self.hlRow(row,'chVerts')   # changed verticals
