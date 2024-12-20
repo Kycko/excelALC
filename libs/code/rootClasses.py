@@ -301,8 +301,9 @@ class Root():
                 self.unkTD.columns[unkKey].title.value = params['title']    # для правильной капитализации
                 self.move_fromUnkTD_toCurTD(unkKey,libKey)
     def move_fromUnkTD_toCurTD(self,unkKey:str,curKey:str):
-        self.curTD.columns[curKey]      = self.unkTD.columns.pop(unkKey)
-        self.curTD.columns[curKey].type = lib .columns.data[curKey]['type']
+        self.curTD.columns[curKey] = self.unkTD.columns.pop(unkKey)
+        check = curKey in lib.columns.data.keys()
+        self.curTD.columns[curKey].type = lib.columns.data[curKey]['type'] if check else None
 
     # финальные шаги (преобразование и запись)
     def finish (self):
