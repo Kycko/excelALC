@@ -134,6 +134,29 @@ class TableDict():
         CT = CellTable(table,False)
         CT.rotate()
         return CT
+
+    def rmEmptyRC  (self,type='rc',ignoreTitles=True):
+        # type=r/c/rc; ignoreTitles работает только для столбцов
+        rows,cols = self.findEmptyRC(type,ignoreTitles)
+        for key in        cols              : self.rmRC('c',key)
+        for row in sorted(rows,reverse=True): self.rmRC('r',row)
+        return {'rows':rows, 'cols':cols}
+    def rmRC       (self,type: str,item):   # type = 'r'/'c'; item = column key / row index
+        if type == 'c': self.columns.pop(item)
+        else:
+            for col in self.columns.values(): col.cells.pop(item)
+    def findEmptyRC(self,type='rc',ignoreTitles=True):
+        try:
+            fRows,fCols = [],[] # f = final
+            count = len(self.columns[tuple(self.columns.keys())[0]].cells)  # кол-во ячеек в столбцах
+            if 'r' in type: fRows = [row for row     in range(count)         if self.checkEmptyRow  (row)]
+            if 'c' in type: fCols = [key for key,col in self.columns.items() if col.isEmpty(ignoreTitles)]
+            return  fRows,fCols
+        except: return [],[]
+    def checkEmptyRow(self,row:int):
+        for    col in self.columns.values():
+            if col.cells[row].value: return False
+        return True
 class TableColumn():    # title=CellObj, cells=[CellObj,...]
     def __init__(self,values:list,errors=False,title=None,initPos:int=None,type:str=None):
         if title is None:         title = values.pop(0) # pop удаляет элемент 0 и возвращает его
@@ -145,13 +168,17 @@ class TableColumn():    # title=CellObj, cells=[CellObj,...]
         # для вывода в шапке таблицы (оба свойства – количество)
         self.unique  = None
         self.errors  = len(values) if errors else 0
-    def reCalc(self):
+    def reCalc (self):
         unique      = []
         self.errors = 0
         for cell in self.cells:
             if cell.value not in unique: unique.append(cell.value)
             if cell.error              : self.errors += 1
         self.unique = len(unique)
+    def isEmpty(self,ignoreTitle=True):
+        for    cell in self.cells:
+            if cell.value: return False
+        return ignoreTitle or not bool(self.title.value)
 
 # защита от запуска модуля
 if __name__ == '__main__':

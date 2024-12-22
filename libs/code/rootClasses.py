@@ -35,11 +35,9 @@ class Root():
         self.uCfg  .update(params['forceUserCfg'])
 
         self.initLE (book.name) # LE = log & errors
-        self.getData(book)      # получаем данные
+        self.getData(book,TDrmRC=params['TDrmRC'])  # получаем данные
 
-        if   params['launch'] == 'allChecks' :
-            self.rmEmptyRC()
-            self.launchRangeChecker('title')
+        if   params['launch'] == 'allChecks' : self.launchRangeChecker('title')
         elif params['launch'] == 'reCalc'    : self.fullTDchecker()
         elif params['launch'] == 'capitalize': self.capitalizationLaunched()
         elif params['launch'] == 'rmEmptyRC' :
@@ -65,7 +63,6 @@ class Root():
 
         columns = self.curTD.columns
         if self.stages is None: self.stages = list(columns.keys())
-        print(self.stages)
         if self.stages:
             curCol = columns[self.stages.pop(0)]
             temp   = curCol.type.split(':')
