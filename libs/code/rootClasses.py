@@ -19,7 +19,9 @@ class Root():
         else: appUI.cantReadLib()
     def launch(self,book,type:str):
         # book – это сам объект книги из xlwings; type = например, 'checkEmails'
-        params = G.launchTypes[type]
+        self.stages     = None  # всегда сбрасываем для правильной работы allChecks
+
+        params          = G.launchTypes[type]
         self.type       = type
         self.log        = Log(self.UI)
         self.readRange  = params['readRange']
@@ -29,13 +31,19 @@ class Root():
         self.resetBg    = params['resetBg']
         self.hlTitles   = params['hlTitles']
 
-        self.uCfg      = {param: G.config.get(type+':'+param) for param in params['getUserCfg']}
+        self.uCfg       = {param: G.config.get(type+':'+param) for param in params['getUserCfg']}
+        self.uCfg  .update(params['forceUserCfg'])
+
         self.initLE (book.name) # LE = log & errors
         self.getData(book)      # получаем данные
 
-        if   params['launch'] == 'capitalize': self.capitalizationLaunched()
-        elif params['launch'] == 'rmEmptyRC' :
+        if   params['launch'] == 'allChecks' :
             self.rmEmptyRC()
+            self.launchRangeChecker('title')
+        elif params['launch'] == 'reCalc'    : self.fullTDchecker()
+        elif params['launch'] == 'capitalize': self.capitalizationLaunched()
+        elif params['launch'] == 'rmEmptyRC' :
+            self.rmEmptyRC(self.table)
             self.finish   ()
         elif params['launch'] == 'checkVert' :
             if self.file.data[self.shName]['range'].columns.count != 1: self.UI.launchErr('oneColumn')
@@ -46,12 +54,30 @@ class Root():
                     self.vertChecker(self.table.data,cats.data)
                     self.finish()
         elif params['launch'] == 'fillBlanks': self.fillBlanks()
-        elif params['launch'] == 'reCalc'    : self.fullTDchecker()
-        else:
-            if   params['launch'] == 'checkTitles' :
-                data = [[column.title for column in self.unkTD.columns.values()]]
-            elif params['launch'] == 'rangeChecker': data = self.table.data
-            self.rangeChecker(data,params['AStype'])
+        else                                 : self.launchRangeChecker(params['AStype'])
+    def launchRangeChecker(self,type:str):
+        if type == 'title': data = [[column.title for column in self.unkTD.columns.values()]]
+        else:               data =     self.table.data
+        self.rangeChecker(data,type)
+    def   nextStage       (self):
+        # запускает проверку следующего столбца для 'allChecks'
+        self.finalizeErrors()
+
+        columns = self.curTD.columns
+        if self.stages is None: self.stages = list(columns.keys())
+        print(self.stages)
+        if self.stages:
+            curCol = columns[self.stages.pop(0)]
+            temp   = curCol.type.split(':')
+            type   = temp.pop(0)
+            if len(temp): self.subtype = temp[0]
+
+            if     type  == 'vert':
+                if 'cat' in   columns.keys(): self. vertChecker([curCol.cells],[columns['cat'].cells])
+            elif   type  in G.AStypes.keys(): self.rangeChecker([curCol.cells], type)
+            else                            : self. nextStage  ( type)
+        else: self.finish()
+
     def initLE(self,bookName:str):  # LE = log & errors
         initStr = S.log['mainLaunch'].replace('$$1',curDateTime()).replace('$$2',bookName)
         self.log.add   ('mainLaunch',initStr)
@@ -151,10 +177,9 @@ class Root():
 
         if vertsChanged: self.log.add('vertChanged')
         self.errors.addCur(errors,'vert')
-    def rmEmptyRC    (self):
-        result = self.table.rmEmptyRC('rc',self.uCfg['rmTitled'])
-        # result = {'rows':int,'cols':int} (это кол-во удалённых)
-        self.log.add('RCremoved',result)
+    def rmEmptyRC    (self,tObj):
+        # tObj = CellTable либо TableDict
+        self.log.add('RCremoved',tObj.rmEmptyRC('rc',self.uCfg['rmTitled']))
     def capitalizationLaunched(self):
         type = self.uCfg['selected']
         for     row  in self.table.data:
@@ -219,12 +244,13 @@ class Root():
             suggList = self.getSuggList(queue[0])
             self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
         else:
-            if not self.justVerify: self.UI.setSuggState(False)
-            if self.type not in ('allChecks','reCalc'): self.finalizeErrors()
+            if not self.justVerify         : self.UI.setSuggState(False)
+            if     self.type == 'allChecks': self.nextStage      ()
+            elif   self.type != 'reCalc'   : self.finalizeErrors ()
     def suggFinalClicked(self,OKclicked:bool,newValue=''):
         self.errors.suggClicked(OKclicked,newValue)
         self.nextSugg()
-    def finalizeErrors(self):
+    def finalizeErrors(self,forceTitles=False):
         for  errObj in self.errors.curData.values():
             for i in range(len(errObj.pos)):
                 # self.rTable – это всегда [[Cell,...],...]
@@ -235,9 +261,9 @@ class Root():
                     cell.error = not errObj.fixed
                     if errObj.fixed: cell.value = errObj.newVal
 
-        if   self.readRange == 'selection'  : self.table.data = self.rTable
-        elif self.type      == 'checkTitles': self.TDfinalizeTitles()
-        if   self.type  not in ('allChecks','reCalc'):  self.finish()
+        if             self.readRange ==   'selection': self.table.data = self.rTable
+        elif forceTitles or self.type == 'checkTitles': self.TDfinalizeTitles()
+        if   self.type   not in ('allChecks','reCalc'): self.finish()
     def TDfinalizeTitles(self):
         # сперва переносим исправленные
         keys = []   # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
@@ -259,7 +285,8 @@ class Root():
                             {'type':'vert','from':prev,'to':new})
 
     # чтение данных из таблицы
-    def getData(self,book,logging=True):    # book – это сам объект книги из xlwings
+    def getData(self,book,logging=True,TDrmRC=False):
+        # book – это сам объект книги из xlwings; TDrmRC – сразу удаляем пустые столбцы/строки
         self.file = Excel(book,self.readRange,('toStrings'))
 
         # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
@@ -273,6 +300,7 @@ class Root():
 
             if self.toTD:
                 self.unkTD = TableDict(tObj['table'])
+                if TDrmRC: self.rmEmptyRC(self.unkTD)
                 self.init_curTD()
             else: self.table = CellTable(tObj['table'])
     def updData_forVertChecker(self):
