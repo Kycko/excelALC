@@ -114,13 +114,10 @@ class TableDict():
         for key,column in self.columns.items():
             if strF.findSub(column.title.value,title,'bool',fullText,lower,strip): return key
     def toCellTable(self,addHeader:bool,libColumns,strings:dict):
-        # получаем "список" позиций и ключей столбцов
         # header – кол-во ошибок и уникальных; libColumns и strings нельзя импортировать здесь
-        keys = {}
-        for key,column in self.columns.items(): keys[str(column.initPos)] = key
-
-        # создаём ротированную CellTable, затем переворачиваем её
-        table = []
+        # ↓ получаем "список" позиций и ключей столбцов
+        keys  = {str(column.initPos):key for key,column in self.columns.items()}
+        table = []  # создаём ротированную CellTable, затем переворачиваем её
         for i in sorted([int(key) for key in keys.keys()]):
             column = self.columns[keys[str(i)]]
             header = []
@@ -128,7 +125,10 @@ class TableDict():
                 column.reCalc()
                 txtUnq = strings['unique']+' '+str(column.unique)
                 txtErr = strings['errors']+' '+str(column.errors)
-                header.append(Cell(txtUnq, column.unique > libColumns[keys[str(i)]]['maxUnique']))
+
+                try   : colorize = column.unique > libColumns[keys[str(i)]]['maxUnique']
+                except: colorize = False
+                header.append(Cell(txtUnq, colorize))
                 header.append(Cell(txtErr, bool(column.errors)))
             table.append(header + [column.title] + column.cells)
         CT = CellTable(table,False)

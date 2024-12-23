@@ -59,8 +59,6 @@ class Root():
         self.rangeChecker(data,type)
     def   nextStage       (self):
         # запускает проверку следующего столбца для 'allChecks'
-        self.finalizeErrors()
-
         columns = self.curTD.columns
         if self.stages is None: self.stages = list(columns.keys())
         if self.stages:
@@ -72,7 +70,7 @@ class Root():
             if     type  == 'vert':
                 if 'cat' in   columns.keys(): self. vertChecker([curCol.cells],[columns['cat'].cells])
             elif   type  in G.AStypes.keys(): self.rangeChecker([curCol.cells], type)
-            else                            : self. nextStage  ( type)
+            else                            : self. nextStage  ()
         else: self.finish()
 
     def initLE(self,bookName:str):  # LE = log & errors
@@ -174,6 +172,7 @@ class Root():
 
         if vertsChanged: self.log.add('vertChanged')
         self.errors.addCur(errors,'vert')
+        if self.type == 'allChecks': self.nextStage()
     def rmEmptyRC    (self,tObj):
         # tObj = CellTable либо TableDict
         self.log.add('RCremoved',tObj.rmEmptyRC('rc',self.uCfg['rmTitled']))
@@ -241,9 +240,8 @@ class Root():
             suggList = self.getSuggList(queue[0])
             self.UI      .suggInvalidUD(queue[0],suggList,len(queue))
         else:
-            if not self.justVerify         : self.UI.setSuggState(False)
-            if     self.type == 'allChecks': self.nextStage      ()
-            elif   self.type != 'reCalc'   : self.finalizeErrors ()
+            if not self.justVerify      : self.UI.setSuggState(False)
+            if     self.type != 'reCalc': self.finalizeErrors (self.type == 'allChecks')
     def suggFinalClicked(self,OKclicked:bool,newValue=''):
         self.errors.suggClicked(OKclicked,newValue)
         self.nextSugg()
@@ -260,7 +258,8 @@ class Root():
 
         if             self.readRange ==   'selection': self.table.data = self.rTable
         elif forceTitles or self.type == 'checkTitles': self.TDfinalizeTitles()
-        if   self.type   not in ('allChecks','reCalc'): self.finish()
+        if                  self.type ==   'allChecks': self.nextStage()
+        elif                self.type !=    'reCalc'  : self.finish()
     def TDfinalizeTitles(self):
         # сперва переносим исправленные
         keys = []   # ключи[(unkKey,curKey),...], которые потом надо будет переместить из unkTD в curTD
