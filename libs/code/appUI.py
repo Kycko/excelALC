@@ -229,26 +229,28 @@ class Window(TBS.Window):   # окно программы
             tabs.pack(fill='both',expand=True,padx=7,pady=5)
             for type in ('main','extra','script'): self.buildFrame('MLtab',tabs,type)
     def buildActionsCfgGroup(self,parent:TBS.Frame,type:str,group:str):
-        SE   = 'suggestErrors'
-        stng = 'capitalize:selected'
-        cur  =  StringVar(value=G.config.get(stng))
-        for param,strings in S.layout['actionsCfg'][group].items():
+        SE = 'suggestErrors'
+        strVars = {}
+        for param,cfg in S.layout['actionsCfg'][group].items():
             if param != SE or SE in G.launchTypes[type]['getUserCfg']:
-                if  type  == 'capitalize' and group != 'forAll':
-                    widget = TBS.Radiobutton(parent,
-                                             text      = strings['lbl'],
-                                             value     = param,
-                                             variable  = cur,
-                                             command   = lambda p=param:G.config.set(stng,p))
-                else:
-                    sType  = type+':'+param # например, 'checkTitles:newSheet'
+                sType = type+':'+param  # например, 'checkTitles:newSheet'
+                if   cfg['type'] == 'check':
                     widget = TBS.Checkbutton(parent,
-                                             text      = strings['lbl'],
+                                             text      = cfg['lbl'],
                                              variable  = BooleanVar    (value=G.config.get(sType)),
                                              command   = lambda t=sType:self.switchBoolSetting(t),
                                              bootstyle = 'round-toggle')
-                    ToolTip(widget,text=strings['tt'])
-                widget.pack(padx=5,pady=5,expand=True,anchor='w')
+                    ToolTip    (widget,text=cfg['tt'])
+                    widget.pack(padx=5,pady=5,expand=True,anchor='w')
+                elif cfg['type'] == 'radio':
+                    strVars[param] = StringVar(value=G.config.get(sType))
+                    for key,txt in cfg['vars'].items():
+                        TBS.Radiobutton(parent,
+                                        text     = txt,
+                                        value    = key,
+                                        variable = strVars[param],
+                                        command  = lambda p=key:G.config.set(sType,p)
+                                        ).pack(padx=5,pady=5,expand=True,anchor='w')
     def buildOnLaunchInputs (self,parent:TBS.Frame,type:str,inputs:list):
         self.onLaunch = {}
         for param in inputs:

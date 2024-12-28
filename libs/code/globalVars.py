@@ -218,6 +218,17 @@ launchTypes = {
                      'hlTitles'    : False,
                      'getOnLaunch' :['filler'],
                      'getUserCfg'  :['filler'],
+                     'forceUserCfg':{}},
+    'formatSheet'  :{'readRange'   :'userSelect',
+                     'toTD'        : None,
+                     'addHeader'   : False,
+                     'TDrmRC'      : False,
+                     'launch'      :'formatSheet',
+                     'justVerify'  : False,
+                     'resetBg'     :'none',
+                     'hlTitles'    : False,
+                     'getOnLaunch' :[],
+                     'getUserCfg'  :['justRange','font'],
                      'forceUserCfg':{}}
     }
 
