@@ -287,9 +287,10 @@ def joinSpaces     (string:str): # объединяет все мультипр�
     string = string.replace(' ',' ')    # заменяем неразрывные пробелы
     while '  ' in string: string = string.replace('  ',' ')
     return string
-def lat_toCyr      (string:str):
+def lat_toCyr      (string:str,allowLower=True):
+    if allowLower: string = string.lower()
     for init,to in G.lat_toCyr.items():
-        string = string.replace(init        ,to)
+        if not allowLower: string = string.replace(init,to)
         string = string.replace(init.lower(),to.lower())
     return string
 def trimOverHyphens(string:str):
