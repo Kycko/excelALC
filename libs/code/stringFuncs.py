@@ -251,10 +251,11 @@ def findSub(string:str,sub:str,type='index',fullText=False,lower=True,strip=''):
 
     return getIB(type,string.find(sub))
 def checkStartList(string:str,list:list,type='item',lower=True,stripList=False):
-    # проверяет каждый элемент списка list[]: если он в начале строки, возвращает этот элемент или True/False
+    # проверяет каждый элемент списка list[]: если он в начале строки, возвращает найденное или True/False
     # type может быть 'item' или 'bool'
     for item in list:
-        if findSub(string,item,'index',False,lower,('','b')[stripList]) == 0: return (True,item)[type == 'item']
+        if findSub(string,item,'index',False,lower,('','b')[stripList]) == 0:
+            return string[:len(item)] if type == 'item' else True
     return (False,None)[type == 'item']
 
 # изменение (общие)
