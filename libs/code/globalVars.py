@@ -65,7 +65,14 @@ launchTypes = {
                      # ↓ какие настройки прочитать из userCfg
                      'getUserCfg'  :['suggestErrors','reorder'],    # с tuple'ами почему-то не работает
                      'forceUserCfg':{'autocorr':True,   # для вертикалей
-                                     'rmTitled':True}}, # для rmEmptyRC()
+                                     'rmTitled':True},  # для rmEmptyRC()
+                     # ↓ список настроек {название : ключ перевода}
+                     # внутри кортежа разделены группы настроек
+                     'configs'     :({'newSheet'     :'shared:newSheet',
+                                      'suggestErrors':'shared:suggestErrors',
+                                      'saveAfter'    :'shared:saveAfter'},
+                                     {'noBlanks'     :'phones:noBlanks',
+                                      'reorder'      :'titles:reorder'})},
     'reCalc'       :{'readRange'   :'shActive',
                      'toTD'        : True,
                      'addHeader'   : True,
@@ -231,6 +238,16 @@ launchTypes = {
                      'getUserCfg'  :['justRange','font'],
                      'forceUserCfg':{}}
     }
+
+# ↓ для настроек разных задач, которые открываются в правой части окна
+# check/radio/entryList ("да/нет"/радиовыбор/выпадающий список со свободным вводом)
+cfgTypes = {'shared:newSheet'     :'check',
+            'shared:suggestErrors':'check',
+            'shared:saveAfter'    :'check',
+            'phones:noBlanks'     :'check',
+            'titles:reorder'      :'check',
+            'vert:autocorr'       :'check',
+            'vert:onlyBlanks'     :'check'}
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки
 # checkList : валидация путём проверки, есть ли value в списке допустимых (extra)

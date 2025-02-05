@@ -16,9 +16,10 @@ def write_toFile(list:list,file:str,justAdd=False):
     with open(file,mode,encoding='utf-8') as f:
         for line in list: f.write(f"{line}\n")
 def get_initSettings():
-    return {'main'      :{'darkTheme': checkWinTheme()},
-            'capitalize':{'selected' :'Aa_aa'},
-            'fillBlanks':{'filler'   :'Unknown'}}
+    return {'main'       :{'darkTheme': checkWinTheme()},
+            'capitalize' :{'selected' :'Aa_aa'},
+            'fillBlanks' :{'filler'   :'Unknown'},
+            'formatSheet':{'font'     :'Calibri'}}
 def getIB(type:str,index:int):  # IB = index/boolean
     # служебная функция, которая возвращает либо сам index, либо true/false в зависимости от значения index
     return index if type == 'index' else index >= 0
