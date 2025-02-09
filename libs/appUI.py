@@ -3,8 +3,9 @@ import ttkbootstrap                     as TBS
 from   ttkbootstrap.dialogs.dialogs import Messagebox
 import globalsMain                      as G
 import strings                          as S
+import dictFuncs                        as dictF
 
-def cantReadLib(): Messagebox.ok(S.cantReadLib,G.UI.winTitle)
+def cantReadLib(): Messagebox.ok(S.layout['main']['msg']['cantReadLib'],G.UI.app['title'])
 
 class Window(TBS.Window):   # окно программы
     # конструкторы интерфейса
