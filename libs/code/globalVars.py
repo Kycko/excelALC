@@ -241,13 +241,18 @@ launchTypes = {
 
 # ↓ для настроек разных задач, которые открываются в правой части окна
 # check/radio/entryList ("да/нет"/радиовыбор/выпадающий список со свободным вводом)
-cfgTypes = {'shared:newSheet'     :'check',
-            'shared:suggestErrors':'check',
-            'shared:saveAfter'    :'check',
-            'phones:noBlanks'     :'check',
-            'titles:reorder'      :'check',
-            'vert:autocorr'       :'check',
-            'vert:onlyBlanks'     :'check'}
+cfgTypes = {'shared:newSheet'       :'check',
+            'shared:suggestErrors'  :'check',
+            'shared:saveAfter'      :'check',
+            'phones:noBlanks'       :'check',
+            'titles:reorder'        :'check',
+            'vert:autocorr'         :'check',
+            'vert:onlyBlanks'       :'check',
+            'rmEmptyRC:rmTitled'    :'check',
+            'capitalize:selected'   :'radio',
+            'formatSheet:justRange' :'check',
+            'formatSheet:changeFont':'check',
+            'formatSheet:font'      :'entryList'}
 
 # readLib   : прочитать подходящие варианты для валидации из библиотеки
 # checkList : валидация путём проверки, есть ли value в списке допустимых (extra)
