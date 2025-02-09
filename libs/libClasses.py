@@ -1,11 +1,10 @@
 from   sys import exit as SYSEXIT
 from   copy        import deepcopy
 import xlwings         as xw
-import globalVars      as G
+import globalsMain      as G
 from   excelRW     import Excel
 import libReading      as libR
 import stringFuncs     as strF
-import listFuncs       as listF
 
 # общие функции
 def get_vList(type:str):
@@ -105,9 +104,6 @@ class Cat(RegCatTemplate):
         for list in self.data.values():
             for  item in list: self.catVertList[item   ['id']]          = item   ['vert']
             if len(list) == 1: self.catVertList[list[0]['cat'].lower()] = list[0]['vert']
-    # def getVerts(self,cat:str):
-    #     try   : return self.data[cat.lower()]
-    #     except: 
 class Regions(RegCatTemplate):
     def __init__(self,table,ACvars:list):
         # table = объект tables.Table(); ACvars = ключи из autocorr regions для функции strF.RCtry()

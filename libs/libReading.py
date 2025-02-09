@@ -1,5 +1,4 @@
-from   sys import exit as SYSEXIT
-import listFuncs       as listF
+from sys import exit as SYSEXIT
 
 # преобразуем данные из справочника в словари и списки
 def parseDoubleDict(table:list):    # table = таблица[[]]
