@@ -1,6 +1,7 @@
-from sys         import exit as SYSEXIT
-from globalsUI   import globUI
-from globalsDict import globDicts
+from sys          import exit as SYSEXIT
+from userSettings import userCfg
+from globalsUI    import globUI
+from globalsDict  import globDicts
 
 # разное
 UI   = globUI   ()  # глобальные переменные интерфейса (UI)
@@ -11,6 +12,9 @@ files = {'lib'   :'справочник excelALC.xlsx',
          'config': UI.app['name'] +  '.config',
          'log'   :    'main.log',
          'errors':  'errors.log'}
+
+# настройки
+config = userCfg(files['config'])
 
 # защита от запуска модуля
 if __name__ == '__main__':

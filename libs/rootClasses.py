@@ -5,7 +5,9 @@ import libClasses      as lib
 # корневой класс: из него запускаются UI и код других модулей
 class Root():
     def __init__(self):
-        if lib.ready: pass
+        if lib.ready:
+            self.UI = appUI.Window(self)
+            self.UI.mainloop   ()
         else: appUI.cantReadLib()
 
 # защита от запуска модуля
