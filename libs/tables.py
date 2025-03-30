@@ -1,7 +1,13 @@
 from sys import exit as SYSEXIT
 
 # надкласс с общими функциями для Table() и CellTable()
-class TableTemplate(): pass
+class TableTemplate():
+    def rotate(self):
+        rotated = [[] for cell in self.data[0]]
+        for      r  in  range(len(self.data)):
+            for  c  in  range(len(self.data[r])):
+                rotated[c].append(self.data[r][c])
+        self.data = rotated
 
 # основные классы
 class Table(TableTemplate): # общий класс, можно копировать без изменений в другие программы

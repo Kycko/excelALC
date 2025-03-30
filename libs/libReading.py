@@ -41,6 +41,10 @@ def parseDict      (table:list,cols:list):
         if key in final.keys(): final[key].append(new)
         else:                   final[key]     = [new]
     return final
+def oneCol_toList  (table):         # table = объект tables.Table()
+    # функция отрезает первую строку (заголовок)
+    table.rotate()
+    return table.data[0][1:]
 
 # защита от запуска модуля
 if __name__ == '__main__':

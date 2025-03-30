@@ -1,17 +1,16 @@
-from sys       import exit as SYSEXIT
-from globalsUI import globUI
+from sys         import exit as SYSEXIT
+from globalsUI   import globUI
+from globalsDict import globDicts
 
-# глобальные переменные интерфейса (UI)
-UI = globUI()
+# разное
+UI   = globUI   ()  # глобальные переменные интерфейса (UI)
+dict = globDicts()  # прочее (всякие списки с текстовыми данными)
 
 # файлы
 files = {'lib'   :'справочник excelALC.xlsx',
          'config': UI.app['name'] +  '.config',
          'log'   :    'main.log',
          'errors':  'errors.log'}
-
-# прочее (всякие списки с текстовыми данными)
-dict = 
 
 # защита от запуска модуля
 if __name__ == '__main__':
