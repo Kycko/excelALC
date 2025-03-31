@@ -16,7 +16,7 @@ class Window(TBS.Window):   # окно программы
         super().__init__(title = G.UI.app['title'])
         self.setUItheme (G.config.get('main:darkTheme'))
         self.bindSpace()
-        self.buildUI  ('init',self)
+        self.buildUI  ('init')
         # self.setUIzoom()    # обязательно после buildUI() (обновляется кнопка)
         self.place_window_center()  # расположить в центре экрана
     def bindSpace (self):
@@ -27,18 +27,19 @@ class Window(TBS.Window):   # окно программы
             except KeyError: self.tk.call(event.widget,'invoke')
 
         self.bind_class('TButton','<Key-space>',callDefault,add='+')
-    def buildUI   (self,type:str,parent):
+    def buildUI   (self,type:str):
         build = G.UI.build[type]
         self.cleanUI  (build)   # внутри проверка (есть ли 'clean' в списке 'rules')
 
-        for    unit in build['layout']:
-            if unit['type']  ==  'fr' : widget = TBS.Frame(parent)
-            pack = unit['pack']
+        for unit in build['layout']:
+            parent = self.wx[unit['parent']] if 'parent' in unit.keys() else self
+            if unit['type'] == 'fr': widget = TBS.Frame(parent)
             widget.pack(
-                fill   = pack['fill'],
-                expand = pack['expand'],
-                padx   = pack['padx'],
-                pady   = pack['pady']
+                fill   = unit['pack']['fill'],
+                side   = unit['pack']['side'],
+                expand = unit['pack']['expand'],
+                padx   = unit['pack']['padx'],
+                pady   = unit['pack']['pady']
                 )
 
             if 'wxKey' in unit.keys(): self.wx[unit['wxKey']] = widget

@@ -39,9 +39,13 @@ class globUI(): # импортируется в G.UI (в глобальные п
             'init'          :{
                 'rules'     :('clean'), # необязательный параметр
                 'layout'    :[  # почему-то с кортежем возникает ошибка (если только один элемент)
-                    {'type' : 'fr',     # fr(ame), lf(labelFrame), lbl(label), btn(button), tt(toolTip)
-                     'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
-                     'wxKey': 'fRoot'}  # ключ для appUI.Window.wx {}, ДОЛЖЕН БЫТЬ УНИКАЛЕН
+                    # type   = fr(ame), lf(labelFrame), lbl(label), btn(button), tt(toolTip)
+                    # wxKey  = ключ для appUI.Window.wx {}, ОБЯЗАТЕЛЕН ДЛЯ ВСЕХ ФРЕЙМОВ
+                    # parent = родительский фрейм
+                    {'type' : 'fr' ,'wxKey':'fRoot',
+                     'pack' :{'fill':'both','side':'top' ,'expand':True ,'padx':10,'pady':10}}, 
+                    {'type' : 'fr' ,'wxKey':'fInitLeft'  ,'parent':'fRoot',
+                     'pack' :{'fill':'both','side':'left','expand':False,'padx': 5,'pady': 0}}
                     ]
                 },
             'run' :{'rules' :('clean')}}
