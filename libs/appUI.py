@@ -28,19 +28,27 @@ class Window(TBS.Window):   # окно программы
 
         self.bind_class('TButton','<Key-space>',callDefault,add='+')
     def buildUI   (self,type:str,parent):
-        props = G.UI.build[type]    # properties
-        self.cleanUI(props) # внутри проверка (есть ли 'clean' в списке 'rules')
+        pr = G.UI.build[type]   # pr = properties
+        self.cleanUI(pr)        # внутри проверка (есть ли 'clean' в списке 'rules')
 
-        if  props['type'] == 'fr': widget = TBS.Frame(parent)
-        widget.pack(fill   = props['pack']['fill'],
-                    side   = props['pack']['side'],
-                    expand = props['pack']['expand'],
-                    padx   = props['pack']['padx'],
-                    pady   = props['pack']['pady'])
+        match pr['type']:
+            case 'fr' : widget = TBS.     Frame (parent)
+            case 'lfr': widget = TBS.Labelframe (parent,text=S.UI[pr['title']])
+            case 'ic' : widget = TBS.Label      (parent,**pr['build'])
+            case 'cb' :
+                widget = TBS.Checkbutton(
+                    parent,
+                    variable  = BooleanVar(value=G.config.get(pr['var'])),
+                    bootstyle = pr['bst']
+                    )
+                ToolTip(widget,text=S.UI[pr['tt']])
+        widget.pack(**pr['pack'])
 
-        if 'wxKey' in props.keys(): self.wx[props['wxKey']] = widget
-        if 'stash' in props.keys():
-            for item in props['stash']: self.buildUI(item,widget)
+        if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
+        if 'stash' in pr.keys():
+            for item in pr['stash']:
+                # ↓ защита от бесконечного цикла
+                if item != type: self.buildUI(item,widget)
     def cleanUI(self,scheme):
         if 'rules' in scheme.keys() and 'clean' in scheme['rules']:
             try   : self.wx['fRoot'].destroy()

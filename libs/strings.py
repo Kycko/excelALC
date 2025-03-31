@@ -3,11 +3,11 @@ from globalsMain import files as gFiles
 
 # надписи элементов интерфейса
 # labels, labelFrames(lfr), buttons, checkBoxes, toolTips
-UI = {'init':{'btn':{  'cfgZoom'  :   'Масштаб: ',
-                     'closeApp'   :'❌ Закрыть'},
-              'lfr':{   'inCfg'   : '  Настройки  '},
-              'tt' :{  'cfgTheme' :   'Выбрать светлую/тёмную тему оформления.'},
-              'msg':{'cantReadLib':'Ошибка чтения файла "'+gFiles['lib']+'". Программа не может быть запущена.'}}}
+UI = {'init:cantReadLib':'Ошибка чтения файла "'+gFiles['lib']+'". Программа не может быть запущена.',
+      'init:btnCloseApp':'❌ Закрыть',
+      'inCfg:lfr'       : '  Настройки  ',
+      'inCfg:zoomBtn'   :   'Масштаб: ',
+      'inCfg:ttTheme'   :   'Выбрать светлую/тёмную тему оформления.'}
 
 # защита от запуска модуля
 if __name__ == '__main__':

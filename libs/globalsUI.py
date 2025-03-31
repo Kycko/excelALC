@@ -14,8 +14,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                        {'lbl':'150%','size':(1100,700)},
                        {'lbl':'175%','size':(1150,750)})
         self.fonts  =  {'iconBig':('Calibri',17)}   # только для label'ов (для кнопок всё сложнее)
-        self.icons  =  {'theme'  :{'light':{'pic':'🔆','side':'left' ,'padx':4},
-                                   'dark' :{'pic':'🌙','side':'right','padx':0}}}
+        self.icons  =  {'theme'  :{'light':'🔆','dark':'🌙'}}
 
         # цвета (разные для светлой[0] и тёмной[1] тем
         # !ИСП. G.UI.colors (он перезаписывается при смене темы, в appUI.Window.setUItheme())
@@ -36,16 +35,41 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
         # ВСЕ виджеты с их структурой и свойствами
         self.build = {
-            # type  = fr(ame), lf(labelFrame), tb(tabs), lbl(label), btn(button), tt(toolTip)
-            'init'  :{'rules':('clean'),    # необязательный параметр
-                      'type' : 'fr',
-                      'wxKey': 'fRoot', # ключ для appUI.Window.wx {}, ОБЯЗАТЕЛЕН ДЛЯ ВСЕХ ФРЕЙМОВ
-                      'pack' :{'fill':'both','side':'top' ,'expand':True ,'padx':10,'pady':10},
-                      'stash':['inLeft']},  # виджеты, вложенные в этот (с tuple'ами будет ошибка)
-            'inLeft':{'type' : 'fr',
-                      'pack' :{'fill':'both','side':'left','expand':False,'padx': 5,'pady': 0}},
+            'init'      :{'rules':('clean'),    # необязательный параметр (особые доп. правила)
+                          'type' : 'fr',        # fr(ame)
+                          'wxKey': 'fRoot',     # ключ для appUI.Window.wx {}, ОБЯЗАТЕЛЕН ДЛЯ ФРЕЙМОВ
+                          'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
+                          'stash':['inLeft']},  # виджеты, вложенные в этот (с tuple'ами будет ошибка)
+            'inLeft'    :{'type' : 'fr',
+                          'pack' :{'fill':'both','side':'left','padx': 5},
+                          'stash':['inBottom']},
+            'inBottom'  :{'type' : 'fr',
+                          'pack' :{'fill':'x','side':'bottom','pady': 5},
+                          'stash':['inCfg']},#,'btnCloseApp'
+            'inCfg'     :{'type' : 'lfr',       # labelFrame
+                          'title': 'inCfg:lfr',
+                          'pack' :{'fill':'x','side':'left'},
+                          'stash':['inCfgTheme']},
+            'inCfgTheme':{'type' : 'fr',
+                          'pack' :{'anchor':'w','pady':3},
+                          'stash':['icSun','icMoon','cbTheme']},
+            'icSun'     :{'type' : 'ic',        # ic(on)
+                          'build':{'text':self.icons['theme']['light'], # для иконок создаём Label
+                                   'font':self.fonts['iconBig']},
+                          'pack' :{'side':'left','padx':4}},
+            'icMoon'    :{'type' : 'ic',
+                          'build':{'text':self.icons['theme']['dark'],
+                                   'font':self.fonts['iconBig']},
+                          'pack':{'side':'right','padx':0}},
+            'cbTheme'   :{'type' : 'cb',                # checkButton
+                          'var'  : 'main:darkTheme',    # variable для BooleanVar
+                          'bst'  : 'round-toggle',      # свойство bootstyle
+                          'tt'   : 'inCfg:ttTheme',     # toolTip
+                          'pack' :{'expand':True}},
 
-            'run' :{'rules' :('clean')}}
+            'run'       :{'rules':('clean')}
+            }
+
 # защита от запуска модуля
 if __name__ == '__main__':
     print  ("This is module, please don't execute.")
