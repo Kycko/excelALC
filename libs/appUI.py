@@ -16,7 +16,7 @@ class Window(TBS.Window):   # окно программы
         super().__init__(title = G.UI.app['title'])
         self.setUItheme (G.config.get('main:darkTheme'))
         self.bindSpace()
-        self.buildUI  ('init')
+        self.buildUI  ('init',self)
         # self.setUIzoom()    # обязательно после buildUI() (обновляется кнопка)
         self.place_window_center()  # расположить в центре экрана
     def bindSpace (self):
@@ -27,22 +27,20 @@ class Window(TBS.Window):   # окно программы
             except KeyError: self.tk.call(event.widget,'invoke')
 
         self.bind_class('TButton','<Key-space>',callDefault,add='+')
-    def buildUI   (self,type:str):
-        build = G.UI.build[type]
-        self.cleanUI  (build)   # внутри проверка (есть ли 'clean' в списке 'rules')
+    def buildUI   (self,type:str,parent):
+        props = G.UI.build[type]    # properties
+        self.cleanUI(props) # внутри проверка (есть ли 'clean' в списке 'rules')
 
-        for unit in build['layout']:
-            parent = self.wx[unit['parent']] if 'parent' in unit.keys() else self
-            if unit['type'] == 'fr': widget = TBS.Frame(parent)
-            widget.pack(
-                fill   = unit['pack']['fill'],
-                side   = unit['pack']['side'],
-                expand = unit['pack']['expand'],
-                padx   = unit['pack']['padx'],
-                pady   = unit['pack']['pady']
-                )
+        if  props['type'] == 'fr': widget = TBS.Frame(parent)
+        widget.pack(fill   = props['pack']['fill'],
+                    side   = props['pack']['side'],
+                    expand = props['pack']['expand'],
+                    padx   = props['pack']['padx'],
+                    pady   = props['pack']['pady'])
 
-            if 'wxKey' in unit.keys(): self.wx[unit['wxKey']] = widget
+        if 'wxKey' in props.keys(): self.wx[props['wxKey']] = widget
+        if 'stash' in props.keys():
+            for item in props['stash']: self.buildUI(item,widget)
     def cleanUI(self,scheme):
         if 'rules' in scheme.keys() and 'clean' in scheme['rules']:
             try   : self.wx['fRoot'].destroy()

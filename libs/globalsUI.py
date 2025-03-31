@@ -36,18 +36,15 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
         # ВСЕ виджеты с их структурой и свойствами
         self.build = {
-            'init'          :{
-                'rules'     :('clean'), # необязательный параметр
-                'layout'    :[  # почему-то с кортежем возникает ошибка (если только один элемент)
-                    # type   = fr(ame), lf(labelFrame), lbl(label), btn(button), tt(toolTip)
-                    # wxKey  = ключ для appUI.Window.wx {}, ОБЯЗАТЕЛЕН ДЛЯ ВСЕХ ФРЕЙМОВ
-                    # parent = родительский фрейм
-                    {'type' : 'fr' ,'wxKey':'fRoot',
-                     'pack' :{'fill':'both','side':'top' ,'expand':True ,'padx':10,'pady':10}}, 
-                    {'type' : 'fr' ,'wxKey':'fInitLeft'  ,'parent':'fRoot',
-                     'pack' :{'fill':'both','side':'left','expand':False,'padx': 5,'pady': 0}}
-                    ]
-                },
+            # type  = fr(ame), lf(labelFrame), tb(tabs), lbl(label), btn(button), tt(toolTip)
+            'init'  :{'rules':('clean'),    # необязательный параметр
+                      'type' : 'fr',
+                      'wxKey': 'fRoot', # ключ для appUI.Window.wx {}, ОБЯЗАТЕЛЕН ДЛЯ ВСЕХ ФРЕЙМОВ
+                      'pack' :{'fill':'both','side':'top' ,'expand':True ,'padx':10,'pady':10},
+                      'stash':['inLeft']},  # виджеты, вложенные в этот (с tuple'ами будет ошибка)
+            'inLeft':{'type' : 'fr',
+                      'pack' :{'fill':'both','side':'left','expand':False,'padx': 5,'pady': 0}},
+
             'run' :{'rules' :('clean')}}
 # защита от запуска модуля
 if __name__ == '__main__':
