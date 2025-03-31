@@ -3,7 +3,7 @@ from sys import exit as SYSEXIT
 class globUI(): # импортируется в G.UI (в глобальные переменные)
     def __init__(self):
         # базовые переменные приложения
-        self.app = {'version':'v.103',
+        self.app = {'version':'v.106',
                     'name'   :'excelALC'}
         self.app   ['title'] = self.app['name']+' '+self.app['version'] # название главного окна
 
@@ -34,6 +34,17 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'lightRed':'#E36F47',
                              'sand'    :'#FFE5A7'})  # аналог lightYellow
 
+        # ВСЕ виджеты с их структурой и свойствами
+        self.build = {
+            'init'          :{
+                'rules'     :('clean'), # ОБЯЗАТЕЛЬНЫЙ параметр
+                'layout'    :[  # почему-то с кортежем возникает ошибка (если только один элемент)
+                    {'type' : 'fr',     # fr(ame), lf(labelFrame), lbl(label), btn(button), tt(toolTip)
+                     'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
+                     'wxKey': 'fRoot'}  # ключ, по которому будет доступен виджет в appUI.Window.wx {}
+                    ]
+                },
+            'run' :{'rules' :('clean')}}
 # защита от запуска модуля
 if __name__ == '__main__':
     print  ("This is module, please don't execute.")
