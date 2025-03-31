@@ -43,17 +43,22 @@ class Window(TBS.Window):   # окно программы
                     )
                 ToolTip(widget,text=S.UI[pr['tt']])
         widget.pack(**pr['pack'])
+        self.bindCmd(widget,type)   # внутри проверка по типу
 
         if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
         if 'stash' in pr.keys():
             for item in pr['stash']:
                 # ↓ защита от бесконечного цикла
                 if item != type: self.buildUI(item,widget)
-    def cleanUI(self,scheme):
+    def cleanUI(self,scheme:dict):
         if 'rules' in scheme.keys() and 'clean' in scheme['rules']:
             try   : self.wx['fRoot'].destroy()
             except: pass    # так проще, чем с доп. инициализацией self.wx и условиями
             self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
+    def bindCmd(self,widget,type:str):
+        match type:
+            case 'cbTheme':
+                widget.configure(command=lambda:self.switchBoolSetting('main:darkTheme'))
 
     # изменение оформления
     def setUItheme(self,theme:bool):    # theme=true/false для выбора из G.UI.themes()
