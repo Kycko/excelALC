@@ -37,11 +37,11 @@ class globUI(): # импортируется в G.UI (в глобальные п
         # ВСЕ виджеты с их структурой и свойствами
         self.build = {
             'init'          :{
-                'rules'     :('clean'), # ОБЯЗАТЕЛЬНЫЙ параметр
+                'rules'     :('clean'), # необязательный параметр
                 'layout'    :[  # почему-то с кортежем возникает ошибка (если только один элемент)
                     {'type' : 'fr',     # fr(ame), lf(labelFrame), lbl(label), btn(button), tt(toolTip)
                      'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
-                     'wxKey': 'fRoot'}  # ключ, по которому будет доступен виджет в appUI.Window.wx {}
+                     'wxKey': 'fRoot'}  # ключ для appUI.Window.wx {}, ДОЛЖЕН БЫТЬ УНИКАЛЕН
                     ]
                 },
             'run' :{'rules' :('clean')}}

@@ -29,10 +29,7 @@ class Window(TBS.Window):   # окно программы
         self.bind_class('TButton','<Key-space>',callDefault,add='+')
     def buildUI   (self,type:str,parent):
         build = G.UI.build[type]
-        if 'clean' in build['rules']:
-            try   : self.wx['fRoot'].destroy()
-            except: pass    # так проще, чем с доп. инициализацией self.wx и условиями
-            self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
+        self.cleanUI  (build)   # внутри проверка (есть ли 'clean' в списке 'rules')
 
         for    unit in build['layout']:
             if unit['type']  ==  'fr' : widget = TBS.Frame(parent)
@@ -45,6 +42,11 @@ class Window(TBS.Window):   # окно программы
                 )
 
             if 'wxKey' in unit.keys(): self.wx[unit['wxKey']] = widget
+    def cleanUI(self,scheme):
+        if 'rules' in scheme.keys() and 'clean' in scheme['rules']:
+            try   : self.wx['fRoot'].destroy()
+            except: pass    # так проще, чем с доп. инициализацией self.wx и условиями
+            self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
 
     # изменение оформления
     def setUItheme(self,theme:bool):    # theme=true/false для выбора из G.UI.themes()
