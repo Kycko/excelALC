@@ -3,7 +3,7 @@ from sys import exit as SYSEXIT
 class globUI(): # импортируется в G.UI (в глобальные переменные)
     def __init__(self):
         # базовые переменные приложения
-        self.app = {'version':'v.110',
+        self.app = {'version':'v.123',
                     'name'   :'excelALC'}
         self.app   ['title'] = self.app['name']+' '+self.app['version'] # название главного окна
 
@@ -14,7 +14,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                        {'lbl':'150%','size':(1100,700)},
                        {'lbl':'175%','size':(1150,750)})
         self.fonts  =  {'iconBig':('Calibri',17)}   # только для label'ов (для кнопок всё сложнее)
-        self.icons  =  {'theme'  :{'light':'🔆','dark':'🌙'}}
+        self.icons  =  {'moon':'🌙',
+                        'sun' :'🔆'}
 
         # цвета (разные для светлой[0] и тёмной[1] тем
         # !ИСП. G.UI.colors (он перезаписывается при смене темы, в appUI.Window.setUItheme())
@@ -35,9 +36,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
         # ВСЕ виджеты с их структурой и свойствами
         self.build = {
+            # 'build' исп. при создании самого виджета, а 'pack' для упаковки во фрейм
             'init'      :{'rules':('clean'),    # необязательный параметр (особые доп. правила)
                           'type' : 'fr',        # fr(ame)
-                          'wxKey': 'fRoot',     # ключ для appUI.Window.wx {}, ОБЯЗАТЕЛЕН ДЛЯ ФРЕЙМОВ
+                          'wxKey': 'fRoot',     # ключ для сохранения виджетов в памяти (wx{})
                           'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
                           'stash':['inLeft']},  # виджеты, вложенные в этот (с tuple'ами будет ошибка)
             'inLeft'    :{'type' : 'fr',
@@ -52,20 +54,20 @@ class globUI(): # импортируется в G.UI (в глобальные п
                           'stash':['inCfgTheme']},
             'inCfgTheme':{'type' : 'fr',
                           'pack' :{'anchor':'w','pady':3},
-                          'stash':['icSun','icMoon','cbTheme']},
-            'icSun'     :{'type' : 'ic',        # ic(on)
-                          'build':{'text':self.icons['theme']['light'], # для иконок создаём Label
+                          'stash':['lblSun','lblMoon','cbTheme']},
+            'lblSun'    :{'type' : 'lbl',       # label
+                          'build':{'text':self.icons['sun'],
                                    'font':self.fonts['iconBig']},
                           'pack' :{'side':'left','padx':4}},
-            'icMoon'    :{'type' : 'ic',
-                          'build':{'text':self.icons['theme']['dark'],
+            'lblMoon'   :{'type' : 'lbl',
+                          'build':{'text':self.icons['moon'],
                                    'font':self.fonts['iconBig']},
                           'pack':{'side':'right','padx':0}},
             'cbTheme'   :{'type' : 'cb',                # checkButton
                           'var'  : 'main:darkTheme',    # variable для BooleanVar
-                          'bst'  : 'round-toggle',      # свойство bootstyle
-                          'tt'   : 'inCfg:ttTheme',     # toolTip
-                          'pack' :{'expand':True}},
+                          'build':{'bootstyle':'round-toggle'},
+                          'pack' :{'expand'   : True},
+                          'tt'   : 'inCfg:ttTheme'},    # toolTip
 
             'run'       :{'rules':('clean')}
             }

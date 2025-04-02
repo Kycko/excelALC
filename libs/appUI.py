@@ -27,38 +27,36 @@ class Window(TBS.Window):   # окно программы
             except KeyError: self.tk.call(event.widget,'invoke')
 
         self.bind_class('TButton','<Key-space>',callDefault,add='+')
-    def buildUI   (self,type:str,parent):
-        pr = G.UI.build[type]   # pr = properties
+    def buildUI   (self,key:str,parent):    # key = build key (из G.UI.build{})
+        pr = G.UI.build[key]    # pr = properties
         self.cleanUI(pr)        # внутри проверка (есть ли 'clean' в списке 'rules')
 
         match pr['type']:
             case 'fr' : widget = TBS.     Frame (parent)
             case 'lfr': widget = TBS.Labelframe (parent,text=S.UI[pr['title']])
-            case 'ic' : widget = TBS.Label      (parent,**pr['build'])
+            case 'lbl': widget = TBS.Label      (parent,**pr['build'])
             case 'cb' :
                 widget = TBS.Checkbutton(
                     parent,
-                    variable  = BooleanVar(value=G.config.get(pr['var'])),
-                    bootstyle = pr['bst']
+                    variable = BooleanVar(value=G.config.get(pr['var'])),
+                    **pr['build']
                     )
                 ToolTip(widget,text=S.UI[pr['tt']])
         widget.pack(**pr['pack'])
-        self.bindCmd(widget,type)   # внутри проверка по типу
+        self.bindCmd(widget,key,pr) # внутри проверка по типу
 
         if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
         if 'stash' in pr.keys():
-            for item in pr['stash']:
-                # ↓ защита от бесконечного цикла
-                if item != type: self.buildUI(item,widget)
+            for    item in pr['stash']:
+                if item != key: self.buildUI(item,widget)   # защита от зацикливания
     def cleanUI(self,scheme:dict):
         if 'rules' in scheme.keys() and 'clean' in scheme['rules']:
             try   : self.wx['fRoot'].destroy()
             except: pass    # так проще, чем с доп. инициализацией self.wx и условиями
             self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
-    def bindCmd(self,widget,type:str):
-        match type:
-            case 'cbTheme':
-                widget.configure(command=lambda:self.switchBoolSetting('main:darkTheme'))
+    def bindCmd(self,widget,key:str,pr:dict):   # key,pr = ключ и свойства из G.UI.build{}
+        match pr['type']:
+            case 'cb': widget.configure(command=lambda:self.switchBoolSetting(pr['var']))
 
     # изменение оформления
     def setUItheme(self,theme:bool):    # theme=true/false для выбора из G.UI.themes()
