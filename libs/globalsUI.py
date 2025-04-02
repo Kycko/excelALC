@@ -4,8 +4,7 @@ import strings         as S
 class globUI(): # импортируется в G.UI (в глобальные переменные)
     def __init__(self):
         # базовые переменные приложения
-        self.app = {'version':'v.123',
-                    'name'   :'excelALC'}
+        self.app = {'version':'v.123',  'name':'excelALC'}
         self.app   ['title'] = self.app['name']+' '+self.app['version'] # название главного окна
 
         # стили оформления (темы, шрифты и т. п.)
@@ -37,7 +36,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
         # ВСЕ виджеты с их структурой и свойствами
         self.build = {
             # 'build' исп. при создании самого виджета, а 'pack' для упаковки во фрейм
-            'init'       :{'rules':('clean'),   # необязательный параметр (особые доп. правила)
+            'init'       :{'sRules':('clean'),  # (s=start) особые правила В НАЧАЛЕ buildUI()
                            'type' : 'fr',       # fr(ame)
                            'wxKey': 'fRoot',    # ключ для сохранения виджетов в памяти (wx{})
                            'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
@@ -51,7 +50,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
             'inCfg'      :{'type' : 'lfr',      # labelFrame
                            'build':{'text':S.UI['inCfg:lfr']},
                            'pack' :{'fill':'x','side':'left'},
-                           'stash':['inCfgTheme']},
+                           'stash':['inCfgTheme','btnCfgZoom']},
             'inCfgTheme' :{'type' : 'fr',
                            'pack' :{'anchor':'w','pady':3},
                            'stash':['lblSun','lblMoon','cbTheme']},
@@ -68,9 +67,13 @@ class globUI(): # импортируется в G.UI (в глобальные п
                            'build':{'bootstyle':'round-toggle'},
                            'pack' :{'expand'   : True},
                            'tt'   : 'inCfg:ttTheme'},   # toolTip
-            'btnCloseApp':{'type' : 'btn'},
+            'btnCfgZoom' :{'fRules':('buildZoomBtn'),   # (f=final) особые правила В КОНЦЕ buildUI()
+                           'type' : 'btn',
+                           'wxKey': 'btnCfgZoom',
+                           'build':{'bootstyle':'secondary'},
+                           'pack' :{'padx':4   ,'pady':4}},
 
-            'run'       :{'rules':('clean')}
+            'run'       :{'sRules':('clean')}
             }
 
 # защита от запуска модуля

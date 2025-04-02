@@ -19,7 +19,6 @@ class Window(TBS.Window):   # окно программы
         self.setUItheme (G.config.get('main:darkTheme'))
         self.bindSpace()
         self.buildUI  ('init',self)
-        # self.setUIzoom()    # обязательно после buildUI() (обновляется кнопка)
         self.place_window_center()  # расположить в центре экрана
     def bindSpace (self):
         def callDefault(event):
@@ -31,12 +30,13 @@ class Window(TBS.Window):   # окно программы
         self.bind_class('TButton','<Key-space>',callDefault,add='+')
     def buildUI   (self,key:str,parent):    # key = build key (из G.UI.build{})
         pr = G.UI.build[key]    # pr = properties
-        self.cleanUI(pr)        # внутри проверка (есть ли 'clean' в списке 'rules')
+        self.startRules(pr)     # запуск особых правил (проверки внутри)
 
         match pr['type']:
             case  'fr': widget = TBS.     Frame (parent)
             case 'lfr': widget = TBS.Labelframe (parent,**pr['build'])
             case 'lbl': widget = TBS.Label      (parent,**pr['build'])
+            case 'btn': widget = TBS.Button     (parent,**pr['build'])
             case 'cb' :
                 widget = TBS.Checkbutton(
                     parent,
@@ -51,14 +51,24 @@ class Window(TBS.Window):   # окно программы
         if 'stash' in pr.keys():
             for    item in pr['stash']:
                 if item != key: self.buildUI(item,widget)   # защита от зацикливания
-    def cleanUI(self,scheme:dict):
-        if 'rules' in scheme.keys() and 'clean' in scheme['rules']:
-            try   : self.wx['fRoot'].destroy()
-            except: pass    # так проще, чем с доп. инициализацией self.wx и условиями
-            self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
-    def bindCmd(self,widget,key:str,pr:dict):   # key,pr = ключ и свойства из G.UI.build{}
+
+        self.finalRules(pr) # запуск особых правил (проверки внутри)
+    def startRules(self,scheme:dict):
+        if    'sRules' in scheme .keys  ():
+            if 'clean' in scheme['sRules']:
+                try   :  self.wx['fRoot' ].destroy()
+                except:  pass   # так проще, чем с доп. инициализацией self.wx и условиями
+                self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
+    def finalRules(self,scheme:dict):
+        if     'fRules'       in scheme .keys  ():
+            if 'buildZoomBtn' in scheme['fRules']: self.setUIzoom()
+    def bindCmd   (self,w, key:str,pr:dict):
+        # w = widget; key,pr = ключ и свойства из G.UI.build{}
         match pr['type']:
-            case 'cb': widget.configure(command=lambda:self.switchBoolSetting(pr['var']))
+            case 'cb' : w.configure(command=lambda:self.switchBoolSetting(pr['var']))
+            case 'btn':
+                match key:
+                    case 'btnCfgZoom': w.configure(command=lambda:self.setUIzoom(True))
 
     # изменение оформления
     def setUItheme(self,theme:bool):    # theme=true/false для выбора из G.UI.themes()
@@ -73,7 +83,7 @@ class Window(TBS.Window):   # окно программы
             if cur == len(sList): cur = 0
             G .config.set(cfgName,cur)
 
-        self.zoomBtn.configure(text = S.UI['init']['btn']['cfgZoom'] + sList[cur]['lbl'])
+        self.wx['btnCfgZoom'].configure(text = S.UI['inCfg:zoomBtn']+sList[cur]['lbl'])
         x,y = sList[cur]['size']
         self.geometry(str(x)+'x'+str(y))
         self.minsize (x,y)
