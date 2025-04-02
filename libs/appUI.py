@@ -7,7 +7,9 @@ import globalsMain                      as G
 import strings                          as S
 from   globalFuncs                  import sysExit
 
-def cantReadLib(): Messagebox.ok(S.UI['init']['msg']['cantReadLib'],G.UI.app['title'])
+def cantReadLib():
+    Messagebox.ok(S.UI['init:cantReadLib'].replace('$FILE$',G.files['lib']),
+                  G.UI.app['title'])
 
 class Window(TBS.Window):   # окно программы
     # конструкторы интерфейса
@@ -32,8 +34,8 @@ class Window(TBS.Window):   # окно программы
         self.cleanUI(pr)        # внутри проверка (есть ли 'clean' в списке 'rules')
 
         match pr['type']:
-            case 'fr' : widget = TBS.     Frame (parent)
-            case 'lfr': widget = TBS.Labelframe (parent,text=S.UI[pr['title']])
+            case  'fr': widget = TBS.     Frame (parent)
+            case 'lfr': widget = TBS.Labelframe (parent,**pr['build'])
             case 'lbl': widget = TBS.Label      (parent,**pr['build'])
             case 'cb' :
                 widget = TBS.Checkbutton(

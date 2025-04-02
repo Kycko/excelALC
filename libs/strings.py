@@ -1,9 +1,8 @@
-from sys         import exit  as SYSEXIT
-from globalsMain import files as gFiles
+from sys import exit as SYSEXIT
 
 # надписи элементов интерфейса
 # labels, labelFrames(lfr), buttons, checkBoxes, toolTips
-UI = {'init:cantReadLib':'Ошибка чтения файла "'+gFiles['lib']+'". Программа не может быть запущена.',
+UI = {'init:cantReadLib':'Ошибка чтения файла "$FILE$". Программа не может быть запущена.',
       'init:btnCloseApp':'❌ Закрыть',
       'inCfg:lfr'       : '  Настройки  ',
       'inCfg:zoomBtn'   :   'Масштаб: ',
