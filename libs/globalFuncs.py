@@ -4,7 +4,7 @@ from sys import exit as SYSEXIT
 def sysExit(self=None): SYSEXIT()   # self для привязки к нажатию кнопок
 
 # глобальные
-def readFile(file:str):
+def readFile    (file:str):
     with open(file,'r',encoding='utf-8') as f: return [line.strip() for line in f]
 def write_toFile(list:list,file:str,justAdd=False):
     # если justAdd=True, предыдущие данные останутся в файле

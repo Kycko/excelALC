@@ -54,7 +54,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                            'stash':['inBottom']},
             'inBottom'   :{'type' : 'fr',
                            'pack' :{'fill':'x','side':'bottom','pady': 5},
-                           'stash':['inCfg']},#,'btnCloseApp'
+                           'stash':['inCfg','btnCloseApp']},
             'inCfg'      :{'type' : 'lfr',
                            'build':{'text':S.UI['inCfg:lfr']},
                            'pack' :{'fill':'x','side':'left'},
@@ -82,6 +82,11 @@ class globUI(): # импортируется в G.UI (в глобальные п
                            'wxKey': 'btnCfgZoom',
                            'build':{'bootstyle':'secondary'},
                            'pack' :{'padx':4   ,'pady':4}},
+            'btnCloseApp':{'type' : 'btn',
+                           'build':{'text'     :S.UI['init:btnCloseApp'],
+                                    'width'    :  29,
+                                    'bootstyle':  'danger'},
+                           'pack' :{'side':'left','anchor':'s','padx':18,'pady':4}},
 
             'run'        :{'rules':{'start':('clean')}}
             }

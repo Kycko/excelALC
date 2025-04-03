@@ -70,7 +70,8 @@ class Window(TBS.Window):   # окно программы
             case 'cb' : w.configure(command=lambda:self.switchBoolSetting(pr['var']))
             case 'btn':
                 match key:
-                    case 'btnCfgZoom': w.configure(command=lambda:self.setUIzoom(True))
+                    case 'btnCfgZoom' : w.configure(command=lambda:self.setUIzoom(True))
+                    case 'btnCloseApp': w.configure(command=sysExit)
 
     # изменение оформления
     def setUItheme(self,theme:bool):    # theme=true/false для выбора из G.UI.themes()
