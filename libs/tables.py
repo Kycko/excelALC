@@ -2,7 +2,8 @@ from sys import exit as SYSEXIT
 
 # надкласс с общими функциями для Table() и CellTable()
 class TableTemplate():
-    def rotate(self):
+    def getSize(self): return len(self.data),len(self.data[0])
+    def rotate (self):
         rotated = [[] for cell in self.data[0]]
         for      r  in  range(len(self.data)):
             for  c  in  range(len(self.data[r])):
@@ -12,10 +13,9 @@ class TableTemplate():
 # основные классы
 class Table(TableTemplate): # общий класс, можно копировать без изменений в другие программы
     def __init__ (self,values:list,initParams=('toStrings','trimAll')): # values – таблица[[]]
-        self.data = values
+        self.data       = values
         if 'toStrings' in initParams: self.stringAll()
         if 'trimAll'   in initParams: self.trimAll  ()
-    def getSize  (self): return len(self.data),len(self.data[0])
     def stringAll(self):
         # конвертирует каждую ячейку таблицы в строку
         for     r in range(len(self.data)):

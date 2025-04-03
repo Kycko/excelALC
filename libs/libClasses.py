@@ -35,8 +35,8 @@ class Columns ():
         self.vList = [params['title'] for params in self.data.values()]
 class Autocorr(AStemplate): pass
 class Sugg    (AStemplate): pass
-class Cat(RegCatTemplate):
-    def __init__(self,table):   # table = объект tables.Table()
+class Cat     (RegCatTemplate):
+    def __init__ (self,table):  # table = объект tables.Table()
         self.data = libR.parseDict(table.data,(0,3,4))
         self.initLists()
     def initLists(self):

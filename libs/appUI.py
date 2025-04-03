@@ -13,7 +13,7 @@ def cantReadLib():
 
 class Window(TBS.Window):   # окно программы
     # конструкторы интерфейса
-    def __init__(self,app):
+    def __init__  (self,app):
         def bindSpace():
             def callDefault(event):
                 try:
@@ -28,29 +28,34 @@ class Window(TBS.Window):   # окно программы
         bindSpace    ()
         self.buildUI ('init',self)
         self.place_window_center()  # расположить в центре экрана
-    def buildUI (self,key:str,parent):  # key = build key (из G.UI.build{})
+    def buildUI   (self,key:str,parent):    # key = build key (из G.UI.build{})
         # создание интерфейса
-        def startRules():
+        def startRules  ():
             try:
                 if 'clean' in pr['rules']['start']:
                     try   :  self.wx['fRoot'].destroy()
                     except:  pass   # так проще, чем с доп. инициализацией self.wx и условиями
                     self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
             except: pass            # так проще, чем с доп. условиями
-        def finalRules():
+        def finalRules  ():
             try:
                 if 'buildZoomBtn' in pr['rules']['final']: setUIzoom()
             except: pass    # так проще, чем с доп. условиями
-        def bindCmd   ():
-            # w = widget; key,pr = ключ и свойства из G.UI.build{}
+        def createWidget():
             match pr['type']:
-                case 'cb' : widget.configure(command=lambda:switchBoolSetting(pr['var']))
-                case 'btn':
-                    match key:
-                        case 'btnCfgZoom' : widget.configure(command=lambda:setUIzoom(True))
-                        case 'btnCloseApp': widget.configure(command=sysExit)
+                case   'fr' : return TBS.     Frame(parent)
+                case  'lfr' : return TBS.Labelframe(parent,**pr['build'])
+                case  'lbl' : return TBS.Label     (parent,**pr['build'])
+                case  'btn' : return TBS.Button    (parent,**pr['build'])
+                case  'tt'  : return     ToolTip   (parent,**pr['build'])
+                case  'cb'  :
+                    return TBS.Checkbutton(
+                        parent,
+                        variable = BooleanVar(value=G.config.get(pr['var'])),
+                        **pr['build']
+                        )
         # изменение оформления
-        def setUIzoom (change=False):
+        def setUIzoom(change=False):
             cfgName = 'main:zoom'
             sList   =  G.UI.sizes
             cur     =  G.config.get(cfgName)
@@ -64,6 +69,14 @@ class Window(TBS.Window):   # окно программы
             self.geometry(str(x)+'x'+str(y))
             self.minsize (x,y)
         # кнопки и переключатели
+        def bindCmd():
+            # w = widget; key,pr = ключ и свойства из G.UI.build{}
+            match pr['type']:
+                case 'cb' : widget.configure(command=lambda:switchBoolSetting(pr['var']))
+                case 'btn':
+                    match key:
+                        case 'btnCfgZoom' : widget.configure(command=lambda:setUIzoom(True))
+                        case 'btnCloseApp': widget.configure(command=sysExit)
         def switchBoolSetting(param:str):
             newVal = not G.config.get(param)
             G.config.set(param,newVal)
@@ -71,20 +84,8 @@ class Window(TBS.Window):   # окно программы
 
         pr = G.UI.build[key]    # pr = properties
         startRules()            # запуск особых правил (проверки внутри)
-
-        match pr['type']:
-            case  'fr': widget = TBS.     Frame(parent)
-            case 'lfr': widget = TBS.Labelframe(parent,**pr['build'])
-            case 'lbl': widget = TBS.Label     (parent,**pr['build'])
-            case 'btn': widget = TBS.Button    (parent,**pr['build'])
-            case 'tt' : widget =     ToolTip   (parent,**pr['build'])
-            case 'cb' :
-                widget = TBS.Checkbutton(
-                    parent,
-                    variable = BooleanVar(value=G.config.get(pr['var'])),
-                    **pr['build']
-                    )
-        bindCmd()   # внутри проверка по типу
+        widget = createWidget()
+        bindCmd()               # внутри проверка по типу
 
         if 'pack'  in pr.keys(): widget.pack(**pr['pack'])  # не требуется для toolTip
         if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
@@ -92,9 +93,7 @@ class Window(TBS.Window):   # окно программы
             for    item in pr['stash']:
                 if item != key: self.buildUI(item,widget)   # защита от зацикливания
         finalRules()    # запуск особых правил (проверки внутри)
-
-    # изменение оформления
-    def setUItheme(self,theme:bool):    # theme=true/false для выбора из G.UI.themes()
+    def setUItheme(self,theme:bool):        # theme=true/false для выбора из G.UI.themes()
         self.style.theme_use(G.UI.themes     [theme])
         G.UI.colors        = G.UI.themeColors[theme]
 
