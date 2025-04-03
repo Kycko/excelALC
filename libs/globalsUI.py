@@ -60,7 +60,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                            'pack' :{'fill':'x','side':'left'},
                            'stash':['inCfgTheme','btnCfgZoom']},
             'inCfgTheme' :{'type' : 'fr',
-                           'pack' :{'anchor':'w','pady':3},
+                           'pack' :{'pady':3},
                            'stash':['lblSun','lblMoon','cbTheme']},
             'lblSun'     :{'type' : 'lbl',
                            'build':{'text':self.icons['sun'],
