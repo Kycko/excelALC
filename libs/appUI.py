@@ -33,20 +33,20 @@ class Window(TBS.Window):   # окно программы
         self.startRules(pr)     # запуск особых правил (проверки внутри)
 
         match pr['type']:
-            case  'fr': widget = TBS.     Frame (parent)
-            case 'lfr': widget = TBS.Labelframe (parent,**pr['build'])
-            case 'lbl': widget = TBS.Label      (parent,**pr['build'])
-            case 'btn': widget = TBS.Button     (parent,**pr['build'])
+            case  'fr': widget = TBS.     Frame(parent)
+            case 'lfr': widget = TBS.Labelframe(parent,**pr['build'])
+            case 'lbl': widget = TBS.Label     (parent,**pr['build'])
+            case 'btn': widget = TBS.Button    (parent,**pr['build'])
+            case 'tt' : widget =     ToolTip   (parent,**pr['build'])
             case 'cb' :
                 widget = TBS.Checkbutton(
                     parent,
                     variable = BooleanVar(value=G.config.get(pr['var'])),
                     **pr['build']
                     )
-                ToolTip(widget,text=S.UI[pr['tt']])
-        widget.pack(**pr['pack'])
         self.bindCmd(widget,key,pr) # внутри проверка по типу
 
+        if 'pack'  in pr.keys(): widget.pack(**pr['pack'])  # не требуется для toolTip
         if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
         if 'stash' in pr.keys():
             for    item in pr['stash']:
@@ -54,14 +54,16 @@ class Window(TBS.Window):   # окно программы
 
         self.finalRules(pr) # запуск особых правил (проверки внутри)
     def startRules(self,scheme:dict):
-        if    'sRules' in scheme .keys  ():
-            if 'clean' in scheme['sRules']:
-                try   :  self.wx['fRoot' ].destroy()
+        try:
+            if 'clean' in scheme['rules']['start']:
+                try   :  self.wx['fRoot'].destroy()
                 except:  pass   # так проще, чем с доп. инициализацией self.wx и условиями
                 self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
+        except: pass            # так проще, чем с доп. условиями
     def finalRules(self,scheme:dict):
-        if     'fRules'       in scheme .keys  ():
-            if 'buildZoomBtn' in scheme['fRules']: self.setUIzoom()
+        try:
+            if 'buildZoomBtn' in scheme['rules']['final']: self.setUIzoom()
+        except: pass    # так проще, чем с доп. условиями
     def bindCmd   (self,w, key:str,pr:dict):
         # w = widget; key,pr = ключ и свойства из G.UI.build{}
         match pr['type']:

@@ -35,45 +35,55 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
         # ВСЕ виджеты с их структурой и свойствами
         self.build = {
-            # 'build' исп. при создании самого виджета, а 'pack' для упаковки во фрейм
-            'init'       :{'sRules':('clean'),  # (s=start) особые правила В НАЧАЛЕ buildUI()
-                           'type' : 'fr',       # fr(ame)
-                           'wxKey': 'fRoot',    # ключ для сохранения виджетов в памяти (wx{})
+            # rules{start:, особые правила В НАЧАЛЕ buildUI()
+            #       final:, ––||––         В КОНЦЕ  buildUI()
+            #       other:} ––||––  в разных местах buildUI(), НУЖНО ВСТРАИВАТЬ в основной код
+            # type  = fr(ame),lfr(labelFrame),lbl(label),cb(checkButton),tt(toolTip),btn(button),...
+            # wxKey = ключ для сохранения виджетов в памяти (в appUI.Window.wx{})
+            # var   = variable для BooleanVar, ОБЯЗАТЕЛЬНА для type = cb
+            # build = свойства для создания самого виджета
+            # pack  = параметры упаковки во фрейм
+            # stash = виджеты, вложенные в этот (исп. list[], т. к. с tuple'ами будет ошибка)
+            'init'       :{'rules':{'start':('clean')},
+                           'type' : 'fr',
+                           'wxKey': 'fRoot',
                            'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
-                           'stash':['inLeft']}, # виджеты, вложенные в этот (с tuple'ами будет ошибка)
+                           'stash':['inLeft']},
             'inLeft'     :{'type' : 'fr',
                            'pack' :{'fill':'both','side':'left','padx': 5},
                            'stash':['inBottom']},
             'inBottom'   :{'type' : 'fr',
                            'pack' :{'fill':'x','side':'bottom','pady': 5},
                            'stash':['inCfg']},#,'btnCloseApp'
-            'inCfg'      :{'type' : 'lfr',      # labelFrame
+            'inCfg'      :{'type' : 'lfr',
                            'build':{'text':S.UI['inCfg:lfr']},
                            'pack' :{'fill':'x','side':'left'},
                            'stash':['inCfgTheme','btnCfgZoom']},
             'inCfgTheme' :{'type' : 'fr',
                            'pack' :{'anchor':'w','pady':3},
                            'stash':['lblSun','lblMoon','cbTheme']},
-            'lblSun'     :{'type' : 'lbl',      # label
+            'lblSun'     :{'type' : 'lbl',
                            'build':{'text':self.icons['sun'],
                                     'font':self.fonts['iconBig']},
                            'pack' :{'side':'left','padx':4}},
             'lblMoon'    :{'type' : 'lbl',
                            'build':{'text':self.icons['moon'],
                                     'font':self.fonts['iconBig']},
-                           'pack':{'side':'right','padx':0}},
-            'cbTheme'    :{'type' : 'cb',               # checkButton
-                           'var'  : 'main:darkTheme',   # variable для BooleanVar
+                           'pack' :{'side':'right','padx':0}},
+            'cbTheme'    :{'type' : 'cb',
+                           'var'  : 'main:darkTheme',
                            'build':{'bootstyle':'round-toggle'},
                            'pack' :{'expand'   : True},
-                           'tt'   : 'inCfg:ttTheme'},   # toolTip
-            'btnCfgZoom' :{'fRules':('buildZoomBtn'),   # (f=final) особые правила В КОНЦЕ buildUI()
+                           'stash':['ttTheme']},
+            'ttTheme'    :{'type' : 'tt',
+                           'build':{'text' :S.UI['inCfg:ttTheme']}},
+            'btnCfgZoom' :{'rules':{'final':    ('buildZoomBtn')},
                            'type' : 'btn',
                            'wxKey': 'btnCfgZoom',
                            'build':{'bootstyle':'secondary'},
                            'pack' :{'padx':4   ,'pady':4}},
 
-            'run'       :{'sRules':('clean')}
+            'run'        :{'rules':{'start':('clean')}}
             }
 
 # защита от запуска модуля
