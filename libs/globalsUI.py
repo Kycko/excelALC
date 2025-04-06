@@ -3,6 +3,26 @@ import strings         as S
 
 class globUI(): # импортируется в G.UI (в глобальные переменные)
     def __init__(self):
+        def   getShared(type:str):
+            # функция, передающая в self.build одинаковые свойства для однотипных элементов
+            dict = {'inTab'    :{'rules'  :{'final':('packTab')},
+                                 'type'   : 'fr',
+                                 'pack'   :{'fill'   :'x'},
+                                 'packTab':{'padding': 7}}, # свойства для правила 'packTab'
+                    'inTaskBtn':{'type'   : 'btn',
+                                 'build'  :{'width'  :45},
+                                 'pack'   :{'pady'   : 5}}}
+            return dict[type]
+        def mergeShared(type:str,upd:dict):
+            # здесь придётся расписывать для каждого type свой алгоритм обновления
+            final = getShared(type)
+            match type:
+                case 'inTab':
+                    final['packTab']['text'] = upd['tabName']
+                    final['stash']           = upd['stash']
+                case 'inTaskBtn': final['build'].update(upd)
+            return final
+
         # базовые переменные приложения
         self.app = {'version':'v.123',  'name':'excelALC'}
         self.app   ['title'] = self.app['name']+' '+self.app['version'] # название главного окна
@@ -38,57 +58,69 @@ class globUI(): # импортируется в G.UI (в глобальные п
             # rules{start:, особые правила В НАЧАЛЕ buildUI()
             #       final:, ––||––         В КОНЦЕ  buildUI()
             #       other:} ––||––  в разных местах buildUI(), НУЖНО ВСТРАИВАТЬ в основной код
-            # type  = fr(ame),lfr(labelFrame),lbl(label),cb(checkButton),tt(toolTip),btn(button),...
+            # type  = fr(ame),lfr(labelFrame),cb(checkButton),tt(toolTip),tbs(tabs=TBS.Notebook),...
             # wxKey = ключ для сохранения виджетов в памяти (в appUI.Window.wx{})
             # var   = variable для BooleanVar, ОБЯЗАТЕЛЬНА для type = cb
             # build = свойства для создания самого виджета
             # pack  = параметры упаковки во фрейм
             # stash = виджеты, вложенные в этот (исп. list[], т. к. с tuple'ами будет ошибка)
-            'init'       :{'rules':{'start':('clean')},
-                           'type' : 'fr',
-                           'wxKey': 'fRoot',
-                           'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
-                           'stash':['inLeft']},
-            'inLeft'     :{'type' : 'fr',
-                           'pack' :{'fill':'both','side':'left','padx': 5},
-                           'stash':['inBottom']},
-            'inBottom'   :{'type' : 'fr',
-                           'pack' :{'fill':'x','side':'bottom','pady': 5},
-                           'stash':['inCfg','btnCloseApp']},
-            'inCfg'      :{'type' : 'lfr',
-                           'build':{'text':S.UI['inCfg:lfr']},
-                           'pack' :{'fill':'x','side':'left'},
-                           'stash':['inCfgTheme','btnCfgZoom']},
-            'inCfgTheme' :{'type' : 'fr',
-                           'pack' :{'pady':3},
-                           'stash':['lblSun','lblMoon','cbTheme']},
-            'lblSun'     :{'type' : 'lbl',
-                           'build':{'text':self.icons['sun'],
-                                    'font':self.fonts['iconBig']},
-                           'pack' :{'side':'left','padx':4}},
-            'lblMoon'    :{'type' : 'lbl',
-                           'build':{'text':self.icons['moon'],
-                                    'font':self.fonts['iconBig']},
-                           'pack' :{'side':'right','padx':0}},
-            'cbTheme'    :{'type' : 'cb',
-                           'var'  : 'main:darkTheme',
-                           'build':{'bootstyle':'round-toggle'},
-                           'pack' :{'expand'   : True},
-                           'stash':['ttTheme']},
-            'ttTheme'    :{'type' : 'tt',
-                           'build':{'text' :S.UI['inCfg:ttTheme']}},
-            'btnCfgZoom' :{'rules':{'final':    ('buildZoomBtn')},
-                           'type' : 'btn',
-                           'wxKey': 'btnCfgZoom',
-                           'build':{'bootstyle':'secondary'},
-                           'pack' :{'padx':4   ,'pady':4}},
-            'btnCloseApp':{'type' : 'btn',
-                           'build':{'text'     :S.UI['init:btnCloseApp'],
-                                    'width'    :  29,
-                                    'bootstyle':  'danger'},
-                           'pack' :{'side':'left','anchor':'s','padx':18,'pady':4}},
+            'init'         :{'rules':{'start':('clean')},
+                             'type' : 'fr',
+                             'wxKey': 'fRoot',
+                             'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
+                             'stash':['inLeft']},
+            'inLeft'       :{'type' : 'fr',
+                             'pack' :{'fill':'both','side':'left','padx': 5},
+                             'stash':['inTabs','inBottom']},
+            'inTabs'       :{'type' : 'tbs',
+                             'pack' :{'fill':'both','expand':True,'pady':5},
+                             'stash':['inTabMain','inTabSec']},
+            'inTabMain'    :  mergeShared( 'inTab',
+                                          {'tabName':S.UI['inTabMain'],
+                                           'stash'  :['inBtnCheckCat']}),
+            'inTabSec'     :  mergeShared( 'inTab',
+                                          {'tabName':S.UI['inTabSec' ],
+                                           'stash'  :[]}),
+            'inBtnCheckCat':  mergeShared('inTaskBtn',
+                                          {'text'     : S.UI['tasks']['checkCat']['inBtn'],
+                                           'bootstyle':'primary'}),
+            'inBottom'     :{'type' : 'fr',
+                             'pack' :{'fill':'x','side':'bottom','pady': 5},
+                             'stash':['inCfg','btnCloseApp']},
+            'inCfg'        :{'type' : 'lfr',
+                             'build':{'text':S.UI['inCfg:lfr']},
+                             'pack' :{'fill':'x','side':'left'},
+                             'stash':['inCfgTheme','btnCfgZoom']},
+            'inCfgTheme'   :{'type' : 'fr',
+                             'pack' :{'pady':3},
+                             'stash':['lblSun','lblMoon','cbTheme']},
+            'lblSun'       :{'type' : 'lbl',
+                             'build':{'text':self.icons['sun'],
+                                      'font':self.fonts['iconBig']},
+                             'pack' :{'side':'left','padx':4}},
+            'lblMoon'      :{'type' : 'lbl',
+                             'build':{'text':self.icons['moon'],
+                                      'font':self.fonts['iconBig']},
+                             'pack' :{'side':'right','padx':0}},
+            'cbTheme'      :{'type' : 'cb',
+                             'var'  : 'main:darkTheme',
+                             'build':{'bootstyle':'round-toggle'},
+                             'pack' :{'expand'   : True},
+                             'stash':['ttTheme']},
+            'ttTheme'      :{'type' : 'tt',
+                             'build':{'text' :S.UI['inCfg:ttTheme']}},
+            'btnCfgZoom'   :{'rules':{'final':    ('buildZoomBtn')},
+                             'type' : 'btn',
+                             'wxKey': 'btnCfgZoom',
+                             'build':{'bootstyle':'secondary'},
+                             'pack' :{'padx':4   ,'pady':4}},
+            'btnCloseApp'  :{'type' : 'btn',
+                             'build':{'text'     :S.UI['init:btnCloseApp'],
+                                      'width'    :  29,
+                                      'bootstyle':  'danger'},
+                             'pack' :{'side':'left','anchor':'s','padx':18,'pady':4}},
 
-            'run'        :{'rules':{'start':('clean')}}
+            'run'          :{'rules':{'start':('clean')}}
             }
 
 # защита от запуска модуля

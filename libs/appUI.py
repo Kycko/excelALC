@@ -32,14 +32,17 @@ class Window(TBS.Window):   # окно программы
         # создание интерфейса
         def startRules  ():
             try:
-                if 'clean' in pr['rules']['start']:
+                rules = pr['rules']['start']
+                if 'clean' in rules:
                     try   :  self.wx['fRoot'].destroy()
                     except:  pass   # так проще, чем с доп. инициализацией self.wx и условиями
                     self.wx = {}    # здесь все ссылки на виджеты, которые надо хранить в памяти
             except: pass            # так проще, чем с доп. условиями
         def finalRules  ():
             try:
-                if 'buildZoomBtn' in pr['rules']['final']: setUIzoom()
+                rules = pr['rules']['final']
+                if 'packTab'      in rules: parent.add(widget,**pr['packTab'])
+                if 'buildZoomBtn' in rules: setUIzoom()
             except: pass    # так проще, чем с доп. условиями
         def createWidget():
             match pr['type']:
@@ -48,6 +51,7 @@ class Window(TBS.Window):   # окно программы
                 case  'lbl' : return TBS.Label     (parent,**pr['build'])
                 case  'btn' : return TBS.Button    (parent,**pr['build'])
                 case  'tt'  : return     ToolTip   (parent,**pr['build'])
+                case  'tbs' : return TBS.Notebook  (parent)
                 case  'cb'  :
                     return TBS.Checkbutton(
                         parent,
