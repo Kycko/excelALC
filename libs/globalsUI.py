@@ -1,9 +1,10 @@
 from   sys import exit as SYSEXIT
+import dictFuncs       as dictF
 import strings         as S
 
 class globUI(): # импортируется в G.UI (в глобальные переменные)
     def __init__(self):
-        def   getShared(type:str):
+        def   getShared(type:str,upd={}):
             # функция, передающая в self.build одинаковые свойства для однотипных элементов
             dict = {'inTab'    :{'rules'  :{'final':('packTab')},
                                  'type'   : 'fr',
@@ -12,16 +13,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                     'inTaskBtn':{'type'   : 'btn',
                                  'build'  :{'width'  :45},
                                  'pack'   :{'pady'   : 5}}}
-            return dict[type]
-        def mergeShared(type:str,upd:dict):
-            # здесь придётся расписывать для каждого type свой алгоритм обновления
-            final = getShared(type)
-            match type:
-                case 'inTab':
-                    final['packTab']['text'] = upd['tabName']
-                    final['stash']           = upd['stash']
-                case 'inTaskBtn': final['build'].update(upd)
-            return final
+            return dictF.update(dict[type],**upd)
 
         # базовые переменные приложения
         self.app = {'version':'v.123',  'name':'excelALC'}
@@ -75,15 +67,15 @@ class globUI(): # импортируется в G.UI (в глобальные п
             'inTabs'       :{'type' : 'tbs',
                              'pack' :{'fill':'both','expand':True,'pady':5},
                              'stash':['inTabMain','inTabSec']},
-            'inTabMain'    :  mergeShared( 'inTab',
-                                          {'tabName':S.UI['inTabMain'],
-                                           'stash'  :['inBtnCheckCat']}),
-            'inTabSec'     :  mergeShared( 'inTab',
-                                          {'tabName':S.UI['inTabSec' ],
-                                           'stash'  :[]}),
-            'inBtnCheckCat':  mergeShared('inTaskBtn',
-                                          {'text'     : S.UI['tasks']['checkCat']['inBtn'],
-                                           'bootstyle':'primary'}),
+            'inTabMain'    :  getShared('inTab',
+                                       {'inner':{'packTab':{'text':S.UI['inTabMain']}},
+                                        'root' :{'stash'  :['inBtnCheckCat']}}),
+            'inTabSec'     :  getShared('inTab',
+                                       {'inner':{'packTab':{'text':S.UI['inTabSec']}},
+                                        'root' :{'stash'  :[]}}),
+            'inBtnCheckCat':  getShared('inTaskBtn',
+                                       {'inner':{'build':{'text'     : S.UI['tasks']['checkCat']['inBtn'],
+                                                          'bootstyle':'primary'}}}),
             'inBottom'     :{'type' : 'fr',
                              'pack' :{'fill':'x','side':'bottom','pady': 5},
                              'stash':['inCfg','btnCloseApp']},
