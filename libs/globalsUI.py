@@ -108,9 +108,9 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'pack' :{'padx':4   ,'pady':4}},
             'btnCloseApp'  :{'type' : 'btn',
                              'build':{'text'     :S.UI['init:btnCloseApp'],
-                                      'width'    :  29,
+                                      'width'    :  25,
                                       'bootstyle':  'danger'},
-                             'pack' :{'side':'left','anchor':'s','padx':18,'pady':4}},
+                             'pack' :{'side':'right','anchor':'s','padx':4,'pady':4}},
 
             'run'          :{'rules':{'start':('clean')}}
             }
