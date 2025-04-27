@@ -35,10 +35,13 @@ class Window(TBS.Window):  # окно программы
       def startRules  ():
          try:
             rules = pr['rules']['start']
-            if 'clean' in rules:
-               try   : self.wx['fRoot'].destroy()
+            if 'clean'     in rules:
+               try   : self.wx.pop('fRoot').destroy()
                except: pass   # так проще, чем с доп. инициализацией self.wx и условиями
                self.wx = {}   # здесь все ссылки на виджеты, которые надо хранить в памяти
+            if 'rmInRight' in rules:
+               try   : self.wx.pop('fInRight').destroy()
+               except: pass
          except: pass         # так проще, чем с доп. условиями
       def finalRules  ():
          try:
@@ -88,11 +91,9 @@ class Window(TBS.Window):  # окно программы
                   case    'UIzoom': widget.configure(command=lambda:setUIzoom(True))
                   case  'closeApp': widget.configure(command=sysExit)
                   case 'inTaskBtn': widget.configure(
-                     command = lambda t=cmd['lmb']: self.buildUI(
-                        'inRight',
-                        self.wx['fRoot'],
-                        t
-                        )
+                     command = lambda t=cmd['lmb']: self.buildUI('inRight',
+                                                                 self.wx['fRoot'],
+                                                                 t)
                      )
       def switchBoolSetting(param:str):
          newVal = not G.config.get(param)
