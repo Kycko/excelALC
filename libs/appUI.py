@@ -8,114 +8,114 @@ import strings                          as S
 from   globalFuncs                  import sysExit
 
 def cantReadLib():
-   Messagebox.ok(S.UI['init:cantReadLib'].replace('$FILE$',G.files['lib']),
-                 G.UI.app['title'])
+  Messagebox.ok(S.UI['init:cantReadLib'].replace('$FILE$',G.files['lib']),
+                G.UI.app['title'])
 
-class Window(TBS.Window):  # окно программы
-   # конструкторы интерфейса
-   def __init__  (self,app):
-      def bindSpace():
-         def callDefault(event):
-            try:
-               widget = self.nametowidget(event.widget)
-               widget.invoke()
-            except KeyError: self.tk.call(event.widget,'invoke')
-         self.bind_class('TButton','<Key-space>',callDefault,add='+')
+class Window(TBS.Window): # окно программы
+  # конструкторы интерфейса
+  def __init__  (self,app):
+    def _bindSpace():
+      def _call(event):
+        try:
+          widget = self.nametowidget(event.widget)
+          widget.invoke()
+        except KeyError: self.tk.call(event.widget,'invoke')
+      self.bind_class('TButton','<Key-space>',_call,add='+')
 
-      self.app = app # для вызова функций класса Root() при нажатии кнопок
-      super().__init__(title = G.UI.app['title'])
-      self.setUItheme (G.config.get('main:darkTheme'))
-      bindSpace    ()
-      self.buildUI ('init',self)
-      self.place_window_center() # расположить в центре экрана
-   def buildUI   (self,key:str,parent,params=None):
-      # key = build key (из G.UI.build{})
-      # в params передаём любые доп. данные (напр., тип задачи для фрейма 'inRight')
-      # создание интерфейса
-      def startRules  ():
-         try:
-            rules = pr['rules']['start']
-            if 'clean'     in rules:
-               try   : self.wx.pop('fRoot').destroy()
-               except: pass   # так проще, чем с доп. инициализацией self.wx и условиями
-               self.wx = {}   # здесь все ссылки на виджеты, которые надо хранить в памяти
-            if 'rmInRight' in rules:
-               try   : self.wx.pop('fInRight').destroy()
-               except: pass
-         except: pass         # так проще, чем с доп. условиями
-      def finalRules  ():
-         try:
-            rules = pr['rules']['final']
-            if 'packTab'      in rules: parent.add(widget,**pr['packTab'])
-            if 'buildZoomBtn' in rules:  setUIzoom()
-            if 'buildInRight' in rules:
-               self.wx['fInRight'].configure(text=S.UI['tasks'][params]['inLfr'])
-         except: pass   # так проще, чем с доп. условиями
-      def createWidget():
-         bld = pr['build'] if 'build' in pr.keys() else {}
-         match pr['type']:
-            case   'fr' : return TBS.     Frame(parent)
-            case  'lfr' : return TBS.Labelframe(parent,**bld)
-            case  'lbl' : return TBS.Label     (parent,**bld)
-            case  'btn' : return TBS.Button    (parent,**bld)
-            case  'tt'  : return     ToolTip   (parent,**bld)
-            case  'tbs' : return TBS.Notebook  (parent)
-            case  'cb'  :
-               return TBS.Checkbutton(
-                  parent,
-                  variable = BooleanVar(value=G.config.get(pr['var'])),
-                  **bld
-                  )
-      # изменение оформления
-      def setUIzoom(change=False):
-         cfgName = 'main:zoom'
-         sList   =  G.UI.sizes
-         cur     =  G.config.get(cfgName)
-         if change:
-            cur += 1
-            if cur == len(sList): cur = 0
-            G .config.set(cfgName,cur)
+    self.app = app  # для вызова функций класса Root() при нажатии кнопок
+    super().__init__(title = G.UI.app['title'])
+    self.setUItheme (G.config.get('main:darkTheme'))
+    _bindSpace   ()
+    self.buildUI ('init',self)
+    self.place_window_center()  # расположить в центре экрана
+  def buildUI   (self,key:str,parent,params=None):
+    # key = build key (из G.UI.build{})
+    # в params передаём любые доп. данные (напр., тип задачи для фрейма 'inRight')
+    # создание интерфейса
+    def _startRules  ():
+      try:
+        rules = pr['rules']['start']
+        if 'clean'     in rules:
+          try   : self.wx.pop('fRoot').destroy()
+          except: pass  # так проще, чем с доп. инициализацией self.wx и условиями
+          self.wx = {}  # здесь все ссылки на виджеты, которые надо хранить в памяти
+        if 'rmInRight' in rules:
+          try   : self.wx.pop('fInRight').destroy()
+          except: pass
+      except: pass  # так проще, чем с доп. условиями
+    def _finalRules  ():
+      try:
+        rules = pr['rules']['final']
+        if 'packTab'      in rules: parent.add(widget,**pr['packTab'])
+        if 'buildZoomBtn' in rules: _setUIzoom()
+        if 'buildInRight' in rules:
+          self.wx['fInRight'].configure(text=S.UI['tasks'][params]['inLfr'])
+      except: pass  # так проще, чем с доп. условиями
+    def _createWidget():
+      bld = pr['build'] if 'build' in pr.keys() else {}
+      match pr['type']:
+        case  'fr': return TBS.     Frame(parent)
+        case 'lfr': return TBS.Labelframe(parent,**bld)
+        case 'lbl': return TBS.Label     (parent,**bld)
+        case 'btn': return TBS.Button    (parent,**bld)
+        case 'tt' : return     ToolTip   (parent,**bld)
+        case 'tbs': return TBS.Notebook  (parent)
+        case 'cb' :
+          return TBS.Checkbutton(
+            parent,
+            variable = BooleanVar(value=G.config.get(pr['var'])),
+            **bld
+            )
+    # изменение оформления
+    def _setUIzoom(change=False):
+      cfgName = 'main:zoom'
+      sList   =  G.UI.sizes
+      cur     =  G.config.get(cfgName)
+      if change:
+        cur += 1
+        if cur == len(sList): cur = 0
+        G .config.set(cfgName,cur)
 
-         self.wx['btnCfgZoom'].configure(text = S.UI['inCfg:zoomBtn']+sList[cur]['lbl'])
-         x,y = sList[cur]['size']
-         self.geometry(str(x)+'x'+str(y))
-         self.minsize (x,y)
-      # кнопки и переключатели
-      def bindCmd():
-         # w = widget; key,pr = ключ и свойства из G.UI.build{}
-         match pr['type']:
-            case 'cb' : widget.configure(command=lambda:switchBoolSetting(pr['var']))
-            case 'btn':
-               cmd  = pr['cmd']
-               match cmd['type']:
-                  case    'UIzoom': widget.configure(command=lambda:setUIzoom(True))
-                  case  'closeApp': widget.configure(command=sysExit)
-                  case 'inTaskBtn': widget.configure(
-                     command = lambda t=cmd['lmb']: self.buildUI('inRight',
-                                                                 self.wx['fRoot'],
-                                                                 t)
-                     )
-      def switchBoolSetting(param:str):
-         newVal = not G.config.get(param)
-         G.config.set(param,newVal)
-         if param == 'main:darkTheme': self.setUItheme(newVal)
+      self.wx['btnCfgZoom'].configure(text = S.UI['inCfg:zoomBtn']+sList[cur]['lbl'])
+      x,y = sList[cur]['size']
+      self.geometry(str(x)+'x'+str(y))
+      self.minsize (x,y)
+    # кнопки и переключатели
+    def _bindCmd():
+      # w = widget; key,pr = ключ и свойства из G.UI.build{}
+      match pr['type']:
+        case 'cb' : widget.configure(command=lambda:_switchBoolSetting(pr['var']))
+        case 'btn':
+          cmd  =  pr['cmd']
+          match  cmd['type']:
+            case    'UIzoom': widget.configure(command=lambda:_setUIzoom(True))
+            case  'closeApp': widget.configure(command=sysExit)
+            case 'inTaskBtn': widget.configure(
+              command = lambda t=cmd['lmb']: self.buildUI('inRight',
+                                                          self.wx['fRoot'],
+                                                          t)
+              )
+    def _switchBoolSetting(param:str):
+      newVal = not G.config.get(param)
+      G.config.set(param,newVal)
+      if param == 'main:darkTheme': self.setUItheme(newVal)
 
-      pr = G.UI.build[key] # pr = properties
-      startRules()         # запуск особых правил (проверки внутри)
-      widget = createWidget()
-      bindCmd()            # внутри проверка по типу
+    pr = G.UI.build[key]  # pr = properties
+    _startRules()         # запуск особых правил (проверки внутри)
+    widget = _createWidget()
+    _bindCmd()            # внутри проверка по типу
 
-      if 'pack'  in pr.keys(): widget.pack(**pr['pack']) # не требуется для toolTip
-      if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
-      if 'stash' in pr.keys():
-         for   item in pr['stash']:
-            if item != key: self.buildUI(item,widget) # защита от зацикливания
-      finalRules()   # запуск особых правил (проверки внутри)
-   def setUItheme(self,theme:bool): # theme=true/false для выбора из G.UI.themes()
-      self.style.theme_use(G.UI.themes     [theme])
-      G.UI.colors        = G.UI.themeColors[theme]
+    if 'pack'  in pr.keys(): widget.pack(**pr['pack'])  # не требуется для toolTip
+    if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
+    if 'stash' in pr.keys():
+      for  item in pr['stash']:
+        if item != key: self.buildUI(item,widget) # защита от зацикливания
+    _finalRules() # запуск особых правил (проверки внутри)
+  def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
+    self.style.theme_use(G.UI.themes     [theme])
+    G.UI.colors        = G.UI.themeColors[theme]
 
 # защита от запуска модуля
 if __name__ == '__main__':
-   print  ("This is module, please don't execute.")
-   SYSEXIT()
+  print  ("This is module, please don't execute.")
+  SYSEXIT()
