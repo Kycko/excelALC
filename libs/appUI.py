@@ -38,10 +38,9 @@ class Window(TBS.Window): # окно программы
         if 'clean'     in rules:
           try   : self.wx.pop('fRoot').destroy()
           except: pass  # так проще, чем с доп. инициализацией self.wx и условиями
-          self.wx = {}  # здесь все ссылки на виджеты, которые надо хранить в памяти
-        if 'rmInRight' in rules:
-          try   : self.wx.pop('fInRight').destroy()
-          except: pass
+          self.props = {} # properties, что нужно запоминать для обработки UI
+          self.wx    = {} # здесь все ссылки на виджеты, которые надо хранить в памяти
+        if 'saveProps' in rules: self.props.update(params)
       except: pass  # так проще, чем с доп. условиями
     def _finalRules  ():
       try:
@@ -49,7 +48,7 @@ class Window(TBS.Window): # окно программы
         if 'packTab'      in rules: parent.add(widget,**pr['packTab'])
         if 'buildZoomBtn' in rules: _setUIzoom()
         if 'buildInRight' in rules:
-          self.wx['fInRight'].configure(text=S.UI['tasks'][params]['inLfr'])
+          self.wx['fInRight'].configure(text=S.UI['tasks'][params['taskOpened']]['inLfr'])
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -91,9 +90,7 @@ class Window(TBS.Window): # окно программы
             case    'UIzoom': widget.configure(command=lambda:_setUIzoom(True))
             case  'closeApp': widget.configure(command=sysExit)
             case 'inTaskBtn': widget.configure(
-              command = lambda t=cmd['lmb']: self.buildUI('inRight',
-                                                          self.wx['fRoot'],
-                                                          t)
+              command = lambda t=cmd['lmb']: self.openTask_inRight(t)
               )
     def _switchBoolSetting(param:str):
       newVal = not G.config.get(param)
@@ -114,6 +111,16 @@ class Window(TBS.Window): # окно программы
   def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
+  def openTask_inRight(self,type:str):
+    # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
+    def _build(): self.buildUI('inRight',self.wx['fRoot'],{TO:type})
+
+    try   : self.wx.pop('fInRight').destroy()
+    except: pass
+    TO,pr = 'taskOpened',self.props
+    if TO in pr.keys():
+      if  pr.pop(TO) != type: _build()
+    else: _build()
 
 # защита от запуска модуля
 if __name__ == '__main__':

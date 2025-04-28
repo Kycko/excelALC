@@ -66,7 +66,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'inLeft'     :{'type' : 'fr',
                      'pack' :{'fill':'both','side':'left','padx': 7},
                      'stash':['inTabs','inBottom']},
-      'inRight'    :{'rules':{'start':('rmInRight'),'final':('buildInRight')},
+      'inRight'    :{'rules':{'start':('saveProps'),'final':('buildInRight')},
                      'type' : 'lfr',
                      'wxKey': 'fInRight',
                      'pack' :{'fill':'both','side':'right','expand':True,'padx':6}},
