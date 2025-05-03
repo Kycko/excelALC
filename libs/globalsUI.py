@@ -58,7 +58,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
       # build = свойства для создания самого виджета
       # pack  = параметры упаковки во фрейм
       # stash = виджеты, вложенные в этот (исп. list[], т. к. с tuple'ами будет ошибка)
-      # il,ir=initLeft,initRight; rl,re,rb=runLog,runErrors,runButtons
+
+      # il,ir = initLeft,initRight
+      # tc = task cfg
+      # rl,re,rb = runLog,runErrors,runButtons
       'init'       :{'rules':{'start':('clean')},
                      'type' : 'fr',
                      'wxKey': 'fRoot',
@@ -110,7 +113,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                      'stash':['il:ttTheme']},
       'il:ttTheme' :{'type' : 'tt',
                      'build':{'text' :S.UI['ilCfg:ttTheme']}},
-      'il:cfgZoom' :{'rules':{'final':    ('buildZoomBtn')},
+      'il:cfgZoom' :{'rules':{'final':    ('build:zoomBtn')},
                      'type' : 'btn',
                      'wxKey': 'cfgZoom',
                      'cmd'  :{'type'     :'UIzoom'},
@@ -123,18 +126,29 @@ class globUI(): # импортируется в G.UI (в глобальные п
                               'bootstyle':  'danger'},
                      'pack' :{'side':'right','anchor':'s','padx':4,'pady':4}},
 
-      'ir'         :{'rules':{'start':('saveProps'),'final':('buildInRight')},
+      'ir'         :{'rules':{'start':('saveProps'),'final':('build:ir')},
                      'type' : 'lfr',
                      'wxKey': 'ir',
                      'pack' :{'fill':'both','side':'right','expand':True,'padx':6},
-                     'stash':['irDesc']},
+                     'stash':['irDesc','irCfg']},
       'irDesc'     :{'type' : 'lbl',
                      'wxKey': 'irDesc',
                      'build':{'wraplength':620},
                      'pack' :{'fill':'x','padx':8,'pady':5}},
+      'irCfg'      :{'rules':{'final':('build:irCfg')},
+                     'type' : 'fr',
+                     'pack' :{'fill':'x','padx':8},
+                     'stash':['irSep']},
+      'irSep'      :{'type' : 'sep',
+                     'pack' :{'fill':'x','padx':2,'pady':6}},
 
       'run'        :{'rules':{'start':('clean')}}
       }
+
+    # настройки для разных задач
+    self.irCfg = {'chkCat':{'tc:newSheet',
+                            'tc:suggErrors',
+                            'tc:saveAfter'}}
 
 # защита от запуска модуля
 if __name__ == '__main__':

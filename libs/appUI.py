@@ -45,11 +45,13 @@ class Window(TBS.Window): # окно программы
     def _finalRules  ():
       try:
         rules = pr['rules']['final']
-        if 'packTab'      in rules: parent.add(widget,**pr['packTab'])
-        if 'buildZoomBtn' in rules: _setUIzoom()
-        if 'buildInRight' in rules:
+        if 'packTab'       in rules: parent.add(widget,**pr['packTab'])
+        if 'build:zoomBtn' in rules: _setUIzoom()
+        if 'build:ir'      in rules:
           tOp = S.UI['tasks'][params['taskOpened']]
           for widg in ('ir','irDesc'): self.wx[widg].configure(text=tOp[widg])
+        if 'build:irCfg'   in rules:
+          pass
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -60,6 +62,7 @@ class Window(TBS.Window): # окно программы
         case 'btn': return TBS.Button    (parent,**bld)
         case 'tt' : return     ToolTip   (parent,**bld)
         case 'tbs': return TBS.Notebook  (parent)
+        case 'sep': return TBS.Separator (parent)
         case 'cb' :
           return TBS.Checkbutton(
             parent,
