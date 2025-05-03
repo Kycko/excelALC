@@ -67,10 +67,6 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il'         :{'type' : 'fr',
                      'pack' :{'fill':'both','side':'left','padx': 7},
                      'stash':['ilTabs','ilBottom']},
-      'ir'         :{'rules':{'start':('saveProps'),'final':('buildInRight')},
-                     'type' : 'lfr',
-                     'wxKey': 'fInRight',
-                     'pack' :{'fill':'both','side':'right','expand':True,'padx':6}},
       'ilTabs'     :{'type' : 'tbs',
                      'pack' :{'fill':'both','expand':True,'pady':7},
                      'stash':['ilTabMain','ilTabSec']},
@@ -126,6 +122,16 @@ class globUI(): # импортируется в G.UI (в глобальные п
                               'width'    :  25,
                               'bootstyle':  'danger'},
                      'pack' :{'side':'right','anchor':'s','padx':4,'pady':4}},
+
+      'ir'         :{'rules':{'start':('saveProps'),'final':('buildInRight')},
+                     'type' : 'lfr',
+                     'wxKey': 'ir',
+                     'pack' :{'fill':'both','side':'right','expand':True,'padx':6},
+                     'stash':['irDesc']},
+      'irDesc'     :{'type' : 'lbl',
+                     'wxKey': 'irDesc',
+                     'build':{'wraplength':620},
+                     'pack' :{'fill':'x','padx':8,'pady':5}},
 
       'run'        :{'rules':{'start':('clean')}}
       }

@@ -48,7 +48,8 @@ class Window(TBS.Window): # окно программы
         if 'packTab'      in rules: parent.add(widget,**pr['packTab'])
         if 'buildZoomBtn' in rules: _setUIzoom()
         if 'buildInRight' in rules:
-          self.wx['fInRight'].configure(text=S.UI['tasks'][params['taskOpened']]['irLfr'])
+          tOp = S.UI['tasks'][params['taskOpened']]
+          for widg in ('ir','irDesc'): self.wx[widg].configure(text=tOp[widg])
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -115,7 +116,7 @@ class Window(TBS.Window): # окно программы
     # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
     def _build(): self.buildUI('ir',self.wx['fRoot'],{TO:type})
 
-    try   : self.wx.pop('fInRight').destroy()
+    try   : self.wx.pop('ir').destroy()
     except: pass
     TO,pr = 'taskOpened',self.props
     if TO in pr.keys():
