@@ -30,7 +30,7 @@ class Window(TBS.Window): # окно программы
     self.place_window_center()  # расположить в центре экрана
   def buildUI   (self,key:str,parent,params=None):
     # key = build key (из G.UI.build{})
-    # в params передаём любые доп. данные (напр., тип задачи для фрейма 'inRight')
+    # в params передаём любые доп. данные (напр., тип задачи для фрейма 'ir')
     # создание интерфейса
     def _startRules  ():
       try:
@@ -48,7 +48,7 @@ class Window(TBS.Window): # окно программы
         if 'packTab'      in rules: parent.add(widget,**pr['packTab'])
         if 'buildZoomBtn' in rules: _setUIzoom()
         if 'buildInRight' in rules:
-          self.wx['fInRight'].configure(text=S.UI['tasks'][params['taskOpened']]['inLfr'])
+          self.wx['fInRight'].configure(text=S.UI['tasks'][params['taskOpened']]['irLfr'])
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -75,7 +75,7 @@ class Window(TBS.Window): # окно программы
         if cur == len(sList): cur = 0
         G .config.set(cfgName,cur)
 
-      self.wx['btnCfgZoom'].configure(text = S.UI['inCfg:zoomBtn']+sList[cur]['lbl'])
+      self.wx['cfgZoom'].configure(text = S.UI['ilCfg:zoomBtn']+sList[cur]['lbl'])
       x,y = sList[cur]['size']
       self.geometry(str(x)+'x'+str(y))
       self.minsize (x,y)
@@ -89,7 +89,7 @@ class Window(TBS.Window): # окно программы
           match  cmd['type']:
             case    'UIzoom': widget.configure(command=lambda:_setUIzoom(True))
             case  'closeApp': widget.configure(command=sysExit)
-            case 'inTaskBtn': widget.configure(
+            case 'ilTaskBtn': widget.configure(
               command = lambda t=cmd['lmb']: self.openTask_inRight(t)
               )
     def _switchBoolSetting(param:str):
@@ -113,7 +113,7 @@ class Window(TBS.Window): # окно программы
     G.UI.colors        = G.UI.themeColors[theme]
   def openTask_inRight(self,type:str):
     # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
-    def _build(): self.buildUI('inRight',self.wx['fRoot'],{TO:type})
+    def _build(): self.buildUI('ir',self.wx['fRoot'],{TO:type})
 
     try   : self.wx.pop('fInRight').destroy()
     except: pass
