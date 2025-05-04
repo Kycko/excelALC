@@ -41,6 +41,13 @@ class Window(TBS.Window): # окно программы
           self.props = {} # properties, что нужно запоминать для обработки UI
           self.wx    = {} # здесь все ссылки на виджеты, которые надо хранить в памяти
         if 'saveProps' in rules: self.props.update(params)
+        if 'mergeTC'   in rules:
+          pr['var'] = self.props['curTask']+':'+pr['tVar']
+          strings   = S.UI['tc'][pr['tVar']]
+          newKey    = 'tc:tt:' + pr['tVar']
+          pr['build']['text']  = strings['lbl']
+          pr['stash']          = [newKey]
+          G.UI.build [newKey]  = {'type':'tt','build':{'text':strings['tt']}}
       except: pass  # так проще, чем с доп. условиями
     def _finalRules  ():
       try:
@@ -48,10 +55,10 @@ class Window(TBS.Window): # окно программы
         if 'packTab'       in rules: parent.add(widget,**pr['packTab'])
         if 'build:zoomBtn' in rules: _setUIzoom()
         if 'build:ir'      in rules:
-          tOp = S.UI['tasks'][params['taskOpened']]
+          tOp = S.UI['tasks'][self.props['curTask']]
           for widg in ('ir','irDesc'): self.wx[widg].configure(text=tOp[widg])
         if 'build:irCfg'   in rules:
-          pass
+          for wKey in G.UI.irCfg[self.props['curTask']]: self.buildUI(wKey,widget)
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -121,7 +128,7 @@ class Window(TBS.Window): # окно программы
 
     try   : self.wx.pop('ir').destroy()
     except: pass
-    TO,pr = 'taskOpened',self.props
+    TO,pr = 'curTask',self.props  # curTask = выбранная задача
     if TO in pr.keys():
       if  pr.pop(TO) != type: _build()
     else: _build()

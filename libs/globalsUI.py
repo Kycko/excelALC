@@ -13,7 +13,14 @@ class globUI(): # импортируется в G.UI (в глобальные п
               'ilTaskBtn':{'type'   : 'btn',
                            'cmd'    :{'type' :'ilTaskBtn'},
                            'build'  :{'width': 45},
-                           'pack'   :{'pady' :  5}}}
+                           'pack'   :{'pady' :  5}},
+              'ir:tc:cb' :{'rules'  :{'start':('mergeTC')},
+                           'type'   : 'cb',
+                           'build'  :{'bootstyle':'round-toggle'},
+                           'pack'   :{'anchor'   :'nw',
+                                      'expand'   : True,
+                                      'padx'     : 5,
+                                      'pady'     : 5}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -51,104 +58,110 @@ class globUI(): # импортируется в G.UI (в глобальные п
       # rules{start:, особые правила В НАЧАЛЕ buildUI()
       #       final:, ––||––         В КОНЦЕ  buildUI()
       #       other:} ––||––  в разных местах buildUI(), НУЖНО ВСТРАИВАТЬ в основной код
-      # type  = fr(ame),lfr(labelFrame),cb(checkButton),tt(toolTip),tbs(tabs=TBS.Notebook),...
-      # wxKey = ключ для сохранения виджетов в памяти (в appUI.Window.wx{})
-      # var   = variable для BooleanVar, ОБЯЗАТЕЛЬНА для type = cb
-      # cmd   = {type = тип для _bindCmd(), lmb = для lambda}
-      # build = свойства для создания самого виджета
-      # pack  = параметры упаковки во фрейм
-      # stash = виджеты, вложенные в этот (исп. list[], т. к. с tuple'ами будет ошибка)
+      # type     = fr(ame),lfr(labelFrame),cb(checkButton),tt(toolTip),tbs(tabs=TBS.Notebook),...
+      # wxKey    = ключ для сохранения виджетов в памяти (в appUI.Window.wx{})
+      # var/tVar = variable для BooleanVar, ОБЯЗАТЕЛЬНА для type = cb
+      # cmd      = {type = тип для _bindCmd(), lmb = для lambda}
+      # build    = свойства для создания самого виджета
+      # pack     = параметры упаковки во фрейм
+      # stash    = виджеты, вложенные в этот (исп. list[], т. к. с tuple'ами будет ошибка)
 
       # il,ir = initLeft,initRight
       # tc = task cfg
       # rl,re,rb = runLog,runErrors,runButtons
-      'init'       :{'rules':{'start':('clean')},
-                     'type' : 'fr',
-                     'wxKey': 'fRoot',
-                     'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
-                     'stash':['il']},
-      'il'         :{'type' : 'fr',
-                     'pack' :{'fill':'both','side':'left','padx': 7},
-                     'stash':['ilTabs','ilBottom']},
-      'ilTabs'     :{'type' : 'tbs',
-                     'pack' :{'fill':'both','expand':True,'pady':7},
-                     'stash':['ilTabMain','ilTabSec']},
-      'ilTabMain'  :  getShared('ilTab',
-                               {'inner':{'packTab':{'text':S.UI['ilTabMain']}},
-                                'root' :{'stash'  :['il:chkCat',  # chk = check
-                                                    'il:chkSrc']}}),
-      'ilTabSec'   :  getShared('ilTab',
-                               {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
-                                'root' :{'stash'  :[]}}),
-      'il:chkCat'  :  getShared('ilTaskBtn',
-                               {'inner':{'cmd'  :{'lmb'      :'chkCat'},
-                                         'build':{'text'     : S.UI['tasks']['chkCat']['ilBtn'],
-                                                  'bootstyle':'primary'}}}),
-      'il:chkSrc'  :  getShared('ilTaskBtn',
-                               {'inner':{'cmd'  :{'lmb'      :'chkSrc'},
-                                         'build':{'text'     : S.UI['tasks']['chkSrc']['ilBtn'],
-                                                  'bootstyle':'primary'}}}),
-      'ilBottom'   :{'type' : 'fr',
-                     'pack' :{'fill':'x','side':'bottom','pady': 5},
-                     'stash':['ilCfg','il:closeApp']},
-      'ilCfg'      :{'type' : 'lfr',
-                     'build':{'text':S.UI['ilCfg:lfr']},
-                     'pack' :{'fill':'x','side':'left'},
-                     'stash':['il:cfgTheme','il:cfgZoom']},
-      'il:cfgTheme':{'type' : 'fr',
-                     'pack' :{'pady':3},
-                     'stash':['il:lblSun','il:lblMoon','il:cbTheme']},
-      'il:lblSun'  :{'type' : 'lbl',
-                     'build':{'text':self.icons['sun'],
-                              'font':self.fonts['iconBig']},
-                     'pack' :{'side':'left','padx':4}},
-      'il:lblMoon' :{'type' : 'lbl',
-                     'build':{'text':self.icons['moon'],
-                              'font':self.fonts['iconBig']},
-                     'pack' :{'side':'right','padx':0}},
-      'il:cbTheme' :{'type' : 'cb',
-                     'var'  : 'main:darkTheme',
-                     'build':{'bootstyle':'round-toggle'},
-                     'pack' :{'expand'   : True},
-                     'stash':['il:ttTheme']},
-      'il:ttTheme' :{'type' : 'tt',
-                     'build':{'text' :S.UI['ilCfg:ttTheme']}},
-      'il:cfgZoom' :{'rules':{'final':    ('build:zoomBtn')},
-                     'type' : 'btn',
-                     'wxKey': 'cfgZoom',
-                     'cmd'  :{'type'     :'UIzoom'},
-                     'build':{'bootstyle':'secondary'},
-                     'pack' :{'padx':4   ,'pady':4}},
-      'il:closeApp':{'type' : 'btn',
-                     'cmd'  :{'type'     :        'closeApp'},
-                     'build':{'text'     :S.UI['il:closeApp'],
-                              'width'    :  25,
-                              'bootstyle':  'danger'},
-                     'pack' :{'side':'right','anchor':'s','padx':4,'pady':4}},
+      'init'          :{'rules':{'start':('clean')},
+                        'type' : 'fr',
+                        'wxKey': 'fRoot',
+                        'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
+                        'stash':['il']},
+      'il'            :{'type' : 'fr',
+                        'pack' :{'fill':'both','side':'left','padx': 7},
+                        'stash':['ilTabs','ilBottom']},
+      'ilTabs'        :{'type' : 'tbs',
+                        'pack' :{'fill':'both','expand':True,'pady':7},
+                        'stash':['ilTabMain','ilTabSec']},
+      'ilTabMain'     :  getShared('ilTab',
+                                  {'inner':{'packTab':{'text':S.UI['ilTabMain']}},
+                                   'root' :{'stash'  :['il:chkCat',  # chk = check
+                                                       'il:chkSrc']}}),
+      'ilTabSec'      :  getShared('ilTab',
+                                  {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
+                                   'root' :{'stash'  :[]}}),
+      'il:chkCat'     :  getShared('ilTaskBtn',
+                                  {'inner':{'cmd'  :{'lmb'      :'chkCat'},
+                                            'build':{'text'     : S.UI['tasks']['chkCat']['ilBtn'],
+                                                     'bootstyle':'primary'}}}),
+      'il:chkSrc'     :  getShared('ilTaskBtn',
+                                  {'inner':{'cmd'  :{'lmb'      :'chkSrc'},
+                                            'build':{'text'     : S.UI['tasks']['chkSrc']['ilBtn'],
+                                                     'bootstyle':'primary'}}}),
+      'ilBottom'      :{'type' : 'fr',
+                        'pack' :{'fill':'x','side':'bottom','pady': 5},
+                        'stash':['ilCfg','il:closeApp']},
+      'ilCfg'         :{'type' : 'lfr',
+                        'build':{'text':S.UI['ilCfg:lfr']},
+                        'pack' :{'fill':'x','side':'left'},
+                        'stash':['il:cfgTheme','il:cfgZoom']},
+      'il:cfgTheme'   :{'type' : 'fr',
+                        'pack' :{'pady':3},
+                        'stash':['il:lblSun','il:lblMoon','il:cbTheme']},
+      'il:lblSun'     :{'type' : 'lbl',
+                        'build':{'text':self.icons['sun'],
+                                 'font':self.fonts['iconBig']},
+                        'pack' :{'side':'left','padx':4}},
+      'il:lblMoon'    :{'type' : 'lbl',
+                        'build':{'text':self.icons['moon'],
+                                 'font':self.fonts['iconBig']},
+                        'pack' :{'side':'right','padx':0}},
+      'il:cbTheme'    :{'type' : 'cb',
+                        'var'  : 'main:darkTheme',
+                        'build':{'bootstyle':'round-toggle'},
+                        'pack' :{'expand'   : True},
+                        'stash':['il:ttTheme']},
+      'il:ttTheme'    :{'type' : 'tt',
+                        'build':{'text' :S.UI['ilCfg:ttTheme']}},
+      'il:cfgZoom'    :{'rules':{'final':    ('build:zoomBtn')},
+                        'type' : 'btn',
+                        'wxKey': 'cfgZoom',
+                        'cmd'  :{'type'     :'UIzoom'},
+                        'build':{'bootstyle':'secondary'},
+                        'pack' :{'padx':4   ,'pady':4}},
+      'il:closeApp'   :{'type' : 'btn',
+                        'cmd'  :{'type'     :        'closeApp'},
+                        'build':{'text'     :S.UI['il:closeApp'],
+                                 'width'    :  25,
+                                 'bootstyle':  'danger'},
+                        'pack' :{'side':'right','anchor':'s','padx':4,'pady':4}},
 
-      'ir'         :{'rules':{'start':('saveProps'),'final':('build:ir')},
-                     'type' : 'lfr',
-                     'wxKey': 'ir',
-                     'pack' :{'fill':'both','side':'right','expand':True,'padx':6},
-                     'stash':['irDesc','irCfg']},
-      'irDesc'     :{'type' : 'lbl',
-                     'wxKey': 'irDesc',
-                     'build':{'wraplength':620},
-                     'pack' :{'fill':'x','padx':8,'pady':5}},
-      'irCfg'      :{'rules':{'final':('build:irCfg')},
-                     'type' : 'fr',
-                     'pack' :{'fill':'x','padx':8},
-                     'stash':['irSep']},
-      'irSep'      :{'type' : 'sep',
-                     'pack' :{'fill':'x','padx':2,'pady':6}},
+      'ir'            :{'rules':{'start':('saveProps'),'final':('build:ir')},
+                        'type' : 'lfr',
+                        'wxKey': 'ir',
+                        'pack' :{'fill':'both','side':'right','expand':True,'padx':6},
+                        'stash':['irDesc','irCfg']},
+      'irDesc'        :{'type' : 'lbl',
+                        'wxKey': 'irDesc',
+                        'build':{'wraplength':620},
+                        'pack' :{'fill':'x','padx':8,'pady':5}},
+      'irCfg'         :{'rules':{'final':('build:irCfg')},
+                        'type' : 'fr',
+                        'pack' :{'fill':'x','anchor':'nw','padx':8},
+                        'stash':['irSep']},
+      'irSep'         :{'type' : 'sep',
+                        'pack' :{'fill':'x','padx':2,'pady':6}},
+      'tc:newSheet'   :  getShared('ir:tc:cb',{'root':{'tVar':'newSheet'}}),  # tVar = task var
+      'tc:suggErrors' :  getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
+      'tc:saveAfter'  :  getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
 
-      'run'        :{'rules':{'start':('clean')}}
+      'run'           :{'rules':{'start':('clean')}}
       }
 
     # настройки для разных задач
-    self.irCfg = {'chkCat':{'tc:newSheet',
+    self.irCfg = {'chkCat':('tc:newSheet',
                             'tc:suggErrors',
-                            'tc:saveAfter'}}
+                            'tc:saveAfter'),
+                  'chkSrc':('tc:newSheet',
+                            'tc:suggErrors',
+                            'tc:saveAfter')}
 
 # защита от запуска модуля
 if __name__ == '__main__':
