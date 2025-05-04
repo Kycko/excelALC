@@ -24,20 +24,25 @@ class userCfg():
     if saveFile: self.write()
   def read    (self):
     def _toStorage(list:list):
+      def _setType():
+        match type:
+          case 'bool': return bool(val)
+          case 'int' : return  int(val)
+          case  _    : return      val
+
       self.storage = {}
       for line in list:
-        param,  value = line.split(' ',1)
-        try   : value = int(value)
-        except:
-          if value in ('True','False'): value = value == 'True'
-        self.set(param,value,False)
+        key,type,val = line.split(' ',2)
+        self.set(key,_setType(),False)
     _toStorage    (GF.readFile(self.file))
   def write   (self):
     def _parse():
       final = []
       for section,paramDict in self.storage.items():
         for   key,value     in paramDict   .items():
-          final.append(section+':'+key+' '+str(value))
+          final.append(section+':'+key     +' '+  # ключ
+                       type(value).__name__+' '+  # тип данных
+                       str (value))               # значение
       return final
     GF.write_toFile(_parse(),self.file)
 
