@@ -3,6 +3,11 @@ from   sys import exit as SYSEXIT
 import xlwings         as xw
 from   tables      import *
 
+class exBooks():  # Excel books
+  def update(self):
+    try   : self.cur = xw.books.active
+    except: self.cur = None
+
 class Excel():  # общий класс, можно копировать без изменений в другие программы
   # чтение
   def __init__(self,book:xw.Book,read='shActive',readParams=('toStrings','trimAll')):

@@ -52,14 +52,14 @@ class Window(TBS.Window): # окно программы
     def _finalRules  ():
       try:
         rules = pr['rules']['final']
-        if 'packTab'            in rules: parent.add(widget,**pr['packTab'])
-        if 'build:zoomBtn'      in rules: _setUIzoom()
-        if 'build:ir'           in rules:
+        if 'packTab'        in rules: parent.add(widget,**pr['packTab'])
+        if 'build:zoomBtn'  in rules: _setUIzoom()
+        if 'build:ir'       in rules:
           tOp = S.UI['tasks'][self.props['curTask']]
           for widg in ('ir','irDesc'): self.wx[widg].configure(text=tOp[widg])
-        if 'build:irCfg'        in rules:
+        if 'build:irCfg'    in rules:
           for wKey in G.UI.irCfg[self.props['curTask']]: self.buildUI(wKey,widget)
-        if 'build:ir:launchBtn' in rules: _setLaunchBtnState()
+        if 'build:irBottom' in rules: _updFile()
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -91,8 +91,6 @@ class Window(TBS.Window): # окно программы
       x,y = sList[cur]['size']
       self.geometry(str(x)+'x'+str(y))
       self.minsize (x,y)
-    def _setLaunchBtnState():
-      self.wx['ir:launchBtn'].configure(text=S.UI['ir:launchBtn']['ready'],state='normal')
     # кнопки и переключатели
     def _bindCmd():
       # w = widget; key,pr = ключ и свойства из G.UI.build{}
@@ -121,6 +119,17 @@ class Window(TBS.Window): # окно программы
       if TO in pr.keys():
         if  pr.pop(TO) != type: _build()
       else: _build()
+    def _updFile          ():
+      lbl,btn = self.wx['ir:fileLbl'],self.wx['ir:launchBtn']
+      G.exBooks.update()
+      if G.exBooks.cur is None:
+        FNC = S.UI['ir:fileNotChosen']
+        lbl.configure(text=FNC,foreground=G.UI.colors['red'])
+        btn.configure(text=FNC,state='disabled')
+      else:
+        lblText = S.UI['ir:fileLbl'].replace('$FILE$',G.exBooks.cur.name)
+        lbl.configure(text=lblText,foreground=None)
+        btn.configure(text=S.UI['ir:launchBtn'],state='normal')
     def _launchClicked    (): pass
 
     pr = G.UI.build[key]  # pr = properties
