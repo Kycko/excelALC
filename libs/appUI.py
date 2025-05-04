@@ -104,13 +104,23 @@ class Window(TBS.Window): # окно программы
             case 'UIzoom'      : widget.configure(command=lambda:_setUIzoom(True))
             case 'closeApp'    : widget.configure(command=sysExit)
             case 'il:taskBtn'  : widget.configure(
-              command = lambda t=cmd['lmb']: self.openTask_inRight(t)
+              command = lambda t=cmd['lmb']: _openTask_inRight(t)
               )
             case 'ir:launchBtn': widget.configure(command=_launchClicked())
     def _switchBoolSetting(param:str):
       newVal = not G.config.get(param)
       G.config.set(param,newVal)
       if param == 'main:darkTheme': self.setUItheme(newVal)
+    def _openTask_inRight (type :str):
+      # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
+      def _build(): self.buildUI('ir',self.wx['fRoot'],{TO:type})
+
+      try   : self.wx.pop('ir').destroy()
+      except: pass
+      TO,pr = 'curTask',self.props  # curTask = выбранная задача
+      if TO in pr.keys():
+        if  pr.pop(TO) != type: _build()
+      else: _build()
     def _launchClicked    (): pass
 
     pr = G.UI.build[key]  # pr = properties
@@ -127,18 +137,6 @@ class Window(TBS.Window): # окно программы
   def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
-
-  # кнопки и переключатели
-  def openTask_inRight(self,type:str):
-    # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
-    def _build(): self.buildUI('ir',self.wx['fRoot'],{TO:type})
-
-    try   : self.wx.pop('ir').destroy()
-    except: pass
-    TO,pr = 'curTask',self.props  # curTask = выбранная задача
-    if TO in pr.keys():
-      if  pr.pop(TO) != type: _build()
-    else: _build()
 
 # защита от запуска модуля
 if __name__ == '__main__':
