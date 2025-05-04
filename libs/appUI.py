@@ -52,13 +52,14 @@ class Window(TBS.Window): # окно программы
     def _finalRules  ():
       try:
         rules = pr['rules']['final']
-        if 'packTab'       in rules: parent.add(widget,**pr['packTab'])
-        if 'build:zoomBtn' in rules: _setUIzoom()
-        if 'build:ir'      in rules:
+        if 'packTab'            in rules: parent.add(widget,**pr['packTab'])
+        if 'build:zoomBtn'      in rules: _setUIzoom()
+        if 'build:ir'           in rules:
           tOp = S.UI['tasks'][self.props['curTask']]
           for widg in ('ir','irDesc'): self.wx[widg].configure(text=tOp[widg])
-        if 'build:irCfg'   in rules:
+        if 'build:irCfg'        in rules:
           for wKey in G.UI.irCfg[self.props['curTask']]: self.buildUI(wKey,widget)
+        if 'build:ir:launchBtn' in rules: _setLaunchBtnState()
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -90,23 +91,27 @@ class Window(TBS.Window): # окно программы
       x,y = sList[cur]['size']
       self.geometry(str(x)+'x'+str(y))
       self.minsize (x,y)
+    def _setLaunchBtnState():
+      self.wx['ir:launchBtn'].configure(text=S.UI['ir:launchBtn']['ready'],state='normal')
     # кнопки и переключатели
     def _bindCmd():
       # w = widget; key,pr = ключ и свойства из G.UI.build{}
       match pr['type']:
         case 'cb' : widget.configure(command=lambda:_switchBoolSetting(pr['var']))
         case 'btn':
-          cmd  =  pr['cmd']
-          match  cmd['type']:
-            case    'UIzoom': widget.configure(command=lambda:_setUIzoom(True))
-            case  'closeApp': widget.configure(command=sysExit)
-            case 'ilTaskBtn': widget.configure(
+          cmd  = pr['cmd']
+          match cmd['type']:
+            case 'UIzoom'      : widget.configure(command=lambda:_setUIzoom(True))
+            case 'closeApp'    : widget.configure(command=sysExit)
+            case 'il:taskBtn'  : widget.configure(
               command = lambda t=cmd['lmb']: self.openTask_inRight(t)
               )
+            case 'ir:launchBtn': widget.configure(command=_launchClicked())
     def _switchBoolSetting(param:str):
       newVal = not G.config.get(param)
       G.config.set(param,newVal)
       if param == 'main:darkTheme': self.setUItheme(newVal)
+    def _launchClicked    (): pass
 
     pr = G.UI.build[key]  # pr = properties
     _startRules()         # запуск особых правил (проверки внутри)
@@ -122,6 +127,8 @@ class Window(TBS.Window): # окно программы
   def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
+
+  # кнопки и переключатели
   def openTask_inRight(self,type:str):
     # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
     def _build(): self.buildUI('ir',self.wx['fRoot'],{TO:type})
