@@ -160,7 +160,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                         'pack' :{'side':'right','padx':5}},
       'ir:fileUpd'    :{'type' : 'btn',
                         'cmd'  :{'type'     :      'ir:fileUpd'},
-                        'build':{'text'     : S.UI['ir:fileUpd'],
+                        'build':{'text'     : S.UI['ir:fileUpd'], # норм. иконку в конпке не сделать
                                  'bootstyle':'secondary'},
                         'pack' :{'side'     :'right'}},
       'ir:launchBtn'  :{'type' : 'btn',

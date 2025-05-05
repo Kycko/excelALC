@@ -26,9 +26,9 @@ class userCfg():
     def _toStorage(list:list):
       def _setType():
         match type:
-          case 'bool': return bool(val)
-          case 'int' : return  int(val)
-          case  _    : return      val
+          case 'bool': return val == 'True'
+          case 'int' : return int(val)
+          case  _    : return     val
 
       self.storage = {}
       for line in list:
