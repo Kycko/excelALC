@@ -1,5 +1,4 @@
 from sys          import exit as SYSEXIT
-from excelRW      import exBooks
 from userSettings import userCfg
 from globalsUI    import globUI
 from globalsDict  import globDicts
@@ -16,9 +15,6 @@ files = {'lib'   :'справочник excelALC.xlsx',
 
 # настройки
 config = userCfg(files['config'])
-
-# прочее
-exBooks = exBooks()
 
 # защита от запуска модуля
 if __name__ == '__main__':

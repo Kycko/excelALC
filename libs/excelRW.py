@@ -3,10 +3,9 @@ from   sys import exit as SYSEXIT
 import xlwings         as xw
 from   tables      import *
 
-class exBooks():  # Excel books
-  def update(self):
-    try   : self.cur = xw.books.active
-    except: self.cur = None
+def getCurExcel():
+  try   : return xw.books.active
+  except: return None
 
 class Excel():  # общий класс, можно копировать без изменений в другие программы
   # чтение

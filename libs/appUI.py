@@ -6,6 +6,7 @@ from   ttkbootstrap.dialogs.dialogs import Messagebox
 import globalsMain                      as G
 import strings                          as S
 from   globalFuncs                  import sysExit
+from   excelRW                      import getCurExcel
 
 def cantReadLib():
   Messagebox.ok(S.UI['init:cantReadLib'].replace('$FILE$',G.files['lib']),
@@ -122,16 +123,23 @@ class Window(TBS.Window): # окно программы
       else: _build()
     def _updFile          ():
       lbl,btn = self.wx['ir:fileLbl'],self.wx['ir:launchBtn']
-      G.exBooks.update()
-      if G.exBooks.cur is None:
+      book = getCurExcel()
+      if book is None:
         FNC = S.UI['ir:fileNotChosen']
         lbl.configure(text=FNC,foreground=G.UI.colors['red'])
         btn.configure(text=FNC,state='disabled')
       else:
-        lblText = S.UI['ir:fileLbl'].replace('$FILE$',G.exBooks.cur.name)
+        lblText = S.UI['ir:fileLbl'].replace('$FILE$',book.name)
         lbl.configure(text=lblText,foreground=G.UI.colors['green'])
         btn.configure(text=S.UI['ir:launchBtn'],state='normal')
-    def _launchClicked    (): pass
+      return book
+    def _launchClicked    (): # это запуск проверок
+      book = _updFile()
+      if book:
+        # for param in G.launchTypes[type]['getOnLaunch']:
+        #   G.config.set(type+':'+param,self.onLaunch[param].get())
+        self   .buildUI('run',self)
+        # self.app.launch( book,self.props['curTask'])
 
     pr = G.UI.build[key]  # pr = properties
     _startRules()         # запуск особых правил (проверки внутри)

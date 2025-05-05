@@ -6,7 +6,11 @@ class globUI(): # импортируется в G.UI (в глобальные п
   def __init__(self):
     def getShared(type:str,upd={}):
       # функция, передающая в self.build одинаковые свойства для однотипных элементов
-      dict = {'ilTab'     :{'rules'  :{'final':('packTab')},
+      dict = {'fRoot'     :{'rules':{'start':('clean')},
+                            'type' : 'fr',
+                            'wxKey': 'fRoot',
+                            'pack' :{'fill':'both','expand':True,'padx':10,'pady':10}},
+              'ilTab'     :{'rules'  :{'final':('packTab')},
                            'type'   : 'fr',
                            'pack'   :{'fill'   :'x'},
                            'packTab':{'padding': 7}}, # свойства для правила 'packTab'
@@ -69,11 +73,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       # il,ir = initLeft,initRight
       # tc = task cfg
       # rl,re,rb = runLog,runErrors,runButtons
-      'init'          :{'rules':{'start':('clean')},
-                        'type' : 'fr',
-                        'wxKey': 'fRoot',
-                        'pack' :{'fill':'both','expand':True,'padx':10,'pady':10},
-                        'stash':['il']},
+      'init'          :  getShared('fRoot',{'root':{'stash':['il']}}),
       'il'            :{'type' : 'fr',
                         'pack' :{'fill':'both','side':'left','padx': 7},
                         'stash':['ilTabs','ilBottom']},
@@ -173,7 +173,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:suggErrors' :  getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
       'tc:saveAfter'  :  getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
 
-      'run'           :{'rules':{'start':('clean')}}
+      'run'           :  getShared('fRoot',{'root':{'stash':[]}})
       }
 
     # настройки для разных задач
