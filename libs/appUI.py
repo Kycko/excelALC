@@ -104,7 +104,8 @@ class Window(TBS.Window): # окно программы
             case 'il:taskBtn'  : widget.configure(
               command = lambda t=cmd['lmb']: _openTask_inRight(t)
               )
-            case 'ir:launchBtn': widget.configure(command=_launchClicked())
+            case 'ir:fileUpd'  : widget.configure(command=_updFile)
+            case 'ir:launchBtn': widget.configure(command=_launchClicked)
     def _switchBoolSetting(param:str):
       newVal = not G.config.get(param)
       G.config.set(param,newVal)
@@ -128,7 +129,7 @@ class Window(TBS.Window): # окно программы
         btn.configure(text=FNC,state='disabled')
       else:
         lblText = S.UI['ir:fileLbl'].replace('$FILE$',G.exBooks.cur.name)
-        lbl.configure(text=lblText,foreground=None)
+        lbl.configure(text=lblText,foreground=G.UI.colors['green'])
         btn.configure(text=S.UI['ir:launchBtn'],state='normal')
     def _launchClicked    (): pass
 
