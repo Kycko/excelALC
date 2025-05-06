@@ -4,7 +4,11 @@ import xlwings         as xw
 from   tables      import *
 
 def getCurExcel():
-  try   : return xw.books.active
+  try:
+    book = xw.books.active
+    return {'obj'  :book,                     # сама книга (объект из xlwings)
+            'file' :book.name,                # название книги
+            'sheet':book.sheets.active.name}  # название листа
   except: return None
 
 class Excel():  # общий класс, можно копировать без изменений в другие программы

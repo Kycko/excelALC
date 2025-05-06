@@ -57,7 +57,7 @@ class Window(TBS.Window): # окно программы
         if 'build:zoomBtn'  in rules: _setUIzoom()
         if 'build:ir'       in rules:
           tOp = S.UI['tasks'][self.props['curTask']]
-          for widg in ('ir','irDesc'): self.wx[widg].configure(text=tOp[widg])
+          for widg in ('ir','irDesc'): self.wx[widg].config(text=tOp[widg])
         if 'build:irCfg'    in rules:
           for wKey in G.UI.irCfg[self.props['curTask']]: self.buildUI(wKey,widget)
         if 'build:irBottom' in rules: _updFile()
@@ -88,7 +88,7 @@ class Window(TBS.Window): # окно программы
         if cur == len(sList): cur = 0
         G .config.set(cfgName,cur)
 
-      self.wx['cfgZoom'].configure(text = S.UI['ilCfg:zoomBtn']+sList[cur]['lbl'])
+      self.wx['cfgZoom'].config(text = S.UI['ilCfg:zoomBtn']+sList[cur]['lbl'])
       x,y = sList[cur]['size']
       self.geometry(str(x)+'x'+str(y))
       self.minsize (x,y)
@@ -96,17 +96,17 @@ class Window(TBS.Window): # окно программы
     def _bindCmd():
       # w = widget; key,pr = ключ и свойства из G.UI.build{}
       match pr['type']:
-        case 'cb' : widget.configure(command=lambda:_switchBoolSetting(pr['var']))
+        case 'cb' : widget.config(command=lambda:_switchBoolSetting(pr['var']))
         case 'btn':
           cmd  = pr['cmd']
           match cmd['type']:
-            case 'UIzoom'      : widget.configure(command=lambda:_setUIzoom(True))
-            case 'closeApp'    : widget.configure(command=sysExit)
-            case 'il:taskBtn'  : widget.configure(
+            case 'UIzoom'      : widget.config(command=lambda:_setUIzoom(True))
+            case 'closeApp'    : widget.config(command=sysExit)
+            case 'il:taskBtn'  : widget.config(
               command = lambda t=cmd['lmb']: _openTask_inRight(t)
               )
-            case 'ir:fileUpd'  : widget.configure(command=_updFile)
-            case 'ir:launchBtn': widget.configure(command=_launchClicked)
+            case 'irFile:upd'  : widget.config(command=_updFile)
+            case 'ir:launchBtn': widget.config(command=_launchClicked)
     def _switchBoolSetting(param:str):
       newVal = not G.config.get(param)
       G.config.set(param,newVal)
@@ -122,16 +122,29 @@ class Window(TBS.Window): # окно программы
         if  pr.pop(TO) != type: _build()
       else: _build()
     def _updFile          ():
-      lbl,btn = self.wx['ir:fileLbl'],self.wx['ir:launchBtn']
-      book = getCurExcel()
-      if book is None:
-        FNC = S.UI['ir:fileNotChosen']
-        lbl.configure(text=FNC,foreground=G.UI.colors['red'])
-        btn.configure(text=FNC,state='disabled')
-      else:
-        lblText = S.UI['ir:fileLbl'].replace('$FILE$',book.name)
-        lbl.configure(text=lblText,foreground=G.UI.colors['green'])
-        btn.configure(text=S.UI['ir:launchBtn'],state='normal')
+      def _getProps():  # props = properties
+        if book is None:
+          FNC = S.UI['ir:fileNotChosen']
+          return {'color' :'red',
+                  'file'  : FNC,
+                  'sheet' :'',
+                  'btn'   : FNC,
+                  'bState':'disabled'}
+        else:
+          return {'color' :'green',
+                  'file'  : S.UI[keys['file' ]] + book['file'],
+                  'sheet' : S.UI[keys['sheet']] + book['sheet'],
+                  'btn'   : S.UI[keys['btn'  ]],
+                  'bState':'normal'}
+
+      keys = {'file' :'irFile:file',
+              'sheet':'irFile:sheet',
+              'btn'  :'ir:launchBtn'}
+      book =  getCurExcel()
+      p    = _getProps()
+      for k    in ('file','sheet'): self.wx[keys[k]].config(foreground = G.UI.colors[p['color']])
+      for k,it in     keys.items(): self.wx[it]     .config(text       = p[k])
+      self.wx[keys['btn']].config(state=p['bState'])
       return book
     def _launchClicked    (): # это запуск проверок
       book = _updFile()

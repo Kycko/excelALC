@@ -19,12 +19,14 @@ class globUI(): # импортируется в G.UI (в глобальные п
                             'build'  :{'width': 45},
                             'pack'   :{'pady' :  5}},
               'ir:tc:cb'  :{'rules'  :{'start':('mergeTC')},
-                           'type'   : 'cb',
-                           'build'  :{'bootstyle':'round-toggle'},
-                           'pack'   :{'anchor'   :'nw',
-                                      'expand'   : True,
-                                      'padx'     : 5,
-                                      'pady'     : 5}}}
+                            'type'   : 'cb',
+                            'build'  :{'bootstyle':'round-toggle'},
+                            'pack'   :{'anchor'   :'nw',
+                                       'expand'   : True,
+                                       'padx'     : 5,
+                                       'pady'     : 5}},
+              'irFileLbl' :{'type'   : 'lbl',
+                            'pack'   :{'anchor':'w','padx':5}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -154,15 +156,18 @@ class globUI(): # импортируется в G.UI (в глобальные п
                         'stash':['ir:launchBtn','irFile']},
       'irFile'        :{'type' : 'fr',
                         'pack' :{'side':'left'},
-                        'stash':['ir:fileLbl','ir:fileUpd']},
-      'ir:fileLbl'    :{'type' : 'lbl',
-                        'wxKey': 'ir:fileLbl',
-                        'pack' :{'side':'right','padx':5}},
-      'ir:fileUpd'    :{'type' : 'btn',
-                        'cmd'  :{'type'     :      'ir:fileUpd'},
-                        'build':{'text'     : S.UI['ir:fileUpd'], # норм. иконку в конпке не сделать
+                        'stash':['irFile:desc','irFile:upd']},
+      'irFile:desc'   :{'type' : 'fr',
+                        'pack' :{'side':'right'},
+                        'stash':['irFile:file','irFile:sheet']},
+      'irFile:file'   :  getShared('irFileLbl',{'root':{'wxKey':'irFile:file' }}),
+      'irFile:sheet'  :  getShared('irFileLbl',{'root':{'wxKey':'irFile:sheet'}}),
+      'irFile:upd'    :{'type' : 'btn',
+                        'cmd'  :{'type'     :      'irFile:upd'},
+                        'build':{'text'     : S.UI['irFile:upd'], # норм. иконку в конпке не сделать
                                  'bootstyle':'secondary'},
-                        'pack' :{'side'     :'right'}},
+                        'pack' :{'side'     :'right',
+                                 'fill'     :'both'}},
       'ir:launchBtn'  :{'type' : 'btn',
                         'wxKey': 'ir:launchBtn',
                         'cmd'  :{'type':'ir:launchBtn'},
