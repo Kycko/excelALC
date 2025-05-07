@@ -225,14 +225,6 @@ class globUI(): # импортируется в G.UI (в глобальные п
                         'stash':[]}
       }
 
-    # настройки для разных задач
-    self.irCfg = {'chkCat':('tc:newSheet',
-                            'tc:suggErrors',
-                            'tc:saveAfter'),
-                  'chkSrc':('tc:newSheet',
-                            'tc:suggErrors',
-                            'tc:saveAfter')}
-
 # защита от запуска модуля
 if __name__ == '__main__':
   print  ("This is module, please don't execute.")

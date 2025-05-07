@@ -37,7 +37,7 @@ class ScrollFrame(TBS.Frame):
     cObj  .pack(side='left' ,fill='both',expand=True)
     cWin = cObj.create_window((4,4),window=self.frame,anchor='nw')
     _bind()
-class Window(TBS.Window): # окно программы
+class Window     (TBS.Window):  # окно программы
   # конструкторы интерфейса
   def __init__  (self,app):
     def _bindSpace():
@@ -84,7 +84,8 @@ class Window(TBS.Window): # окно программы
           tOp = S.UI['tasks'][self.props['curTask']]
           for widg in ('ir','irDesc'): self.wx[widg].config(text=tOp[widg])
         if 'build:irCfg'    in rules:
-          for wKey in G.UI.irCfg[self.props['curTask']]: self.buildUI(wKey,widget)
+          for cKey in G.dict.tasks[self.props['curTask']]['cfg']:
+            self.buildUI('tc:'+cKey,widget)
         if 'build:irBottom' in rules: _updFile()
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
@@ -177,8 +178,9 @@ class Window(TBS.Window): # окно программы
       if book:
         # for param in G.launchTypes[type]['getOnLaunch']:
         #   G.config.set(type+':'+param,self.onLaunch[param].get())
+        task = self.props['curTask']  # self.props очищается в self.buildUI()
         self   .buildUI('run',self)
-        # self.app.launch( book,self.props['curTask'])
+        self.app.launch( book,task)
 
     pr = G.UI.build[key]  # pr = properties
     _startRules()         # запуск особых правил (проверки внутри)
