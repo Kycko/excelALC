@@ -10,10 +10,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
                             'type' : 'fr',
                             'wxKey': 'fRoot',
                             'pack' :{'fill':'both','expand':True,'padx':10,'pady':10}},
-              'ilTab'     :{'rules'  :{'final':('packTab')},
-                           'type'   : 'fr',
-                           'pack'   :{'fill'   :'x'},
-                           'packTab':{'padding': 7}}, # свойства для правила 'packTab'
+              'tab'       :{'rules'  :{'final':('packTab')},
+                            'type'   : 'fr',
+                            'pack'   :{'fill'   :'both'},
+                            'packTab':{'padding': 7}},  # свойства для правила 'packTab'
               'il:taskBtn':{'type'   : 'btn',
                             'cmd'    :{'type' :'il:taskBtn'},
                             'build'  :{'width': 45},
@@ -74,7 +74,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
       # il,ir = initLeft,initRight
       # tc = task cfg
-      # rl,re,rb = runLog,runErrors,runButtons
+      # rl,rr,re,rb = runLog,runRight:[runErrors,runButtons]
       'init'          :  getShared('fRoot',{'root':{'stash':['il']}}),
       'il'            :{'type' : 'fr',
                         'pack' :{'fill':'both','side':'left','padx': 7},
@@ -82,11 +82,11 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'ilTabs'        :{'type' : 'tbs',
                         'pack' :{'fill':'both','expand':True,'pady':7},
                         'stash':['ilTabMain','ilTabSec']},
-      'ilTabMain'     :  getShared('ilTab',
+      'ilTabMain'     :  getShared('tab',
                                   {'inner':{'packTab':{'text':S.UI['ilTabMain']}},
                                    'root' :{'stash'  :['il:chkCat',  # chk = check
                                                        'il:chkSrc']}}),
-      'ilTabSec'      :  getShared('ilTab',
+      'ilTabSec'      :  getShared('tab',
                                   {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
                                    'root' :{'stash'  :[]}}),
       'il:chkCat'     :  getShared('il:taskBtn',
@@ -178,7 +178,47 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:suggErrors' :  getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
       'tc:saveAfter'  :  getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
 
-      'run'           :  getShared('fRoot',{'root':{'stash':[]}})
+      'run'           :  getShared('fRoot',{'root':{'stash':['rl','rr']}}),
+      'rl'            :{'type' : 'fr',
+                        'pack' :{'fill':'both','expand':True,'side':'left'},
+                        'stash':['rlLbl','rlTabs']},
+      'rr'            :{'type' : 'fr',
+                        'pack' :{'fill':'both','expand':True,'side':'right','padx':5},
+                        'stash':['rb','re']},
+      'rlLbl'         :{'type' : 'lbl',
+                        'build':{'text':S.UI['rl:lbl']},
+                        'pack' :{'anchor':'w','padx':10}},
+      'rlTabs'        :{'type' : 'tbs',
+                        'pack' :{'fill':'both','expand':True,'padx':5,'pady':7},
+                        'stash':['rlTabMain','rlTabChanged','rlTabErrors']},
+      'rlTabMain'     :  getShared('tab',
+                                  {'inner':{'packTab':{'text':S.UI['rl:main']}},
+                                   'root' :{'wxKey'  : 'rlMain'}}),
+      'rlTabChanged'  :  getShared('tab',
+                                  {'inner':{'packTab':{'text':S.UI['rl:changed']}},
+                                   'root' :{'wxKey'  : 'rlChng'}}),
+      'rlTabErrors'   :  getShared('tab',
+                                  {'inner':{'packTab':{'text':S.UI['rl:errors']}},
+                                   'root' :{'wxKey'  : 'rlErr'}}),
+      'rb'            :{'type' :   'lfr',
+                        'wxKey': 'rbLfr',
+                        'build':{'text':S.UI['rb:init']},
+                        'pack' :{'fill':'both','expand':True},
+                        'stash':['rbRoot']},
+      'rbRoot'        :{'type' : 'fr',
+                        'wxKey': 'rbRoot',
+                        'pack' :{'fill':'both','expand':True},
+                        'stash':['rbe:cur']}, # e в rbe = errors (обработка ошибок)
+      'rbe:cur'       :{'type' : 'fr',
+                        'pack' :{'fill':'x','side':'top','padx':10,'pady':5},
+                        'stash':['rbe:curLbl']},
+      'rbe:curLbl'    :{'type' : 'lbl',
+                        'build':{'text':S.UI['rbe:curLbl']},
+                        'pack' :{'side':'left'}},
+      're'            :{'type' : 'lfr',
+                        'build':{'text':S.UI['re:lfr']},
+                        'pack' :{'fill':'both','expand':True,'pady':7},
+                        'stash':[]}
       }
 
     # настройки для разных задач
