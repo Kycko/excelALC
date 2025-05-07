@@ -12,6 +12,31 @@ def cantReadLib():
   Messagebox.ok(S.UI['init:cantReadLib'].replace('$FILE$',G.files['lib']),
                 G.UI.app['title'])
 
+class ScrollFrame(TBS.Frame):
+  def  __init__(self,parent):
+    def _bind():
+      def _onFrameConfigure (e): cObj.    config  (scrollregion=cObj.bbox('all'))
+      def _onCanvasConfigure(e): cObj.itemconfig  (cWin,  width=e.width)
+      def _onMouseWheel     (e): cObj.yview_scroll(int(-1* (e.delta/120)),'units')
+      def _onEnter          (e): cObj.  bind_all  ('<MouseWheel>',_onMouseWheel)
+      def _onLeave          (e): cObj.unbind_all  ('<MouseWheel>')
+
+      self.frame.bind('<Configure>',_onFrameConfigure)
+      cObj .bind('<Configure>',_onCanvasConfigure)
+      self.frame.bind('<Enter>',_onEnter)
+      self.frame.bind('<Leave>',_onLeave)
+      _onFrameConfigure(None)
+
+    super().__init__(parent)
+    cObj       = TBS.Canvas   (self)
+    self.frame = TBS.Frame    (cObj)  # надо запомнить для wxKey и stash
+    scroll     = TBS.Scrollbar(self,orient='vertical',command=cObj.yview)
+    cObj.config               (yscrollcommand=scroll.set)
+
+    scroll.pack(side='right',fill='y')
+    cObj  .pack(side='left' ,fill='both',expand=True)
+    cWin = cObj.create_window((4,4),window=self.frame,anchor='nw')
+    _bind()
 class Window(TBS.Window): # окно программы
   # конструкторы интерфейса
   def __init__  (self,app):
@@ -67,6 +92,7 @@ class Window(TBS.Window): # окно программы
       match pr['type']:
         case  'fr': return TBS.     Frame(parent)
         case 'lfr': return TBS.Labelframe(parent,**bld)
+        case 'sfr': return    ScrollFrame(parent)
         case 'lbl': return TBS.Label     (parent,**bld)
         case 'btn': return TBS.Button    (parent,**bld)
         case 'tt' : return     ToolTip   (parent,**bld)
@@ -160,10 +186,13 @@ class Window(TBS.Window): # окно программы
     _bindCmd()            # внутри проверка по типу
 
     if 'pack'  in pr.keys(): widget.pack(**pr['pack'])  # не требуется для toolTip
-    if 'wxKey' in pr.keys(): self.wx[pr['wxKey']] = widget
+    if 'wxKey' in pr.keys():
+      wdg = widget.frame if pr['type'] == 'sfr' else widget
+      self.wx[pr['wxKey']] = wdg
     if 'stash' in pr.keys():
+      wdg = widget.frame if pr['type'] == 'sfr' else widget
       for  item in pr['stash']:
-        if item != key: self.buildUI(item,widget) # защита от зацикливания
+        if item != key: self.buildUI(item,wdg)  # защита от зацикливания
     _finalRules() # запуск особых правил (проверки внутри)
   def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
