@@ -1,7 +1,9 @@
-from sys import exit as SYSEXIT
+from sys      import exit as SYSEXIT
+from datetime import datetime
 
 # системные
 def sysExit(self=None): SYSEXIT() # self для привязки к нажатию кнопок
+def curDateTime(): return datetime.now().strftime('%d.%m.%Y %H:%M:%S')
 
 # глобальные
 def readFile    (file:str):

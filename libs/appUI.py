@@ -9,7 +9,7 @@ from   globalFuncs                  import sysExit
 from   excelRW                      import getCurExcel
 
 def cantReadLib():
-  Messagebox.ok(S.UI['init:cantReadLib'].replace('$FILE$',G.files['lib']),
+  Messagebox.ok(S.UI['init:cantReadLib'].replace('$file$',G.files['lib']),
                 G.UI.app['title'])
 
 class ScrollFrame(TBS.Frame):
@@ -87,6 +87,7 @@ class Window     (TBS.Window):  # окно программы
           for cKey in G.dict.tasks[self.props['curTask']]['cfg']:
             self.buildUI('tc:'+cKey,widget)
         if 'build:irBottom' in rules: _updFile()
+        if 'addLog'         in rules: widget.config(**params)
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -199,6 +200,14 @@ class Window     (TBS.Window):  # окно программы
   def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
+
+  # вспомогательные
+  def log(self,string:str,unit:str,file:str):
+    try   : color = G.colors[G.dict.log['colors'][unit]]
+    except: color = None
+    self.buildUI(        'log:'+file,
+                 self.wx['rl:' +file],
+                 {'text':string,'foreground':color})
 
 # защита от запуска модуля
 if __name__ == '__main__':

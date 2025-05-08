@@ -30,7 +30,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                        'padx'     : 5,
                                        'pady'     : 5}},
               'irFileLbl' :{'type'   : 'lbl',
-                            'pack'   :{'anchor':'w','padx':5}}}
+                            'pack'   :{'anchor':'w','padx':5}},
+              'log'       :{'rules'  :{'final' :('addLog')},
+                            'type'   : 'lbl',
+                            'pack'   :{'fill':'x'}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -198,13 +201,13 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'stash':['rlTabMain','rlTabChanged','rlTabErrors']},
       'rlTabMain'      : _getShared('scrollTab',
                                    {'inner':{'packTab':{'text':S.UI['rl:main']}},
-                                    'root' :{'wxKey'  : 'rlMain'}}),
+                                    'root' :{'wxKey'  : 'rl:main'}}),
       'rlTabChanged'   : _getShared('scrollTab',
                                    {'inner':{'packTab':{'text':S.UI['rl:changed']}},
-                                    'root' :{'wxKey'  : 'rlChng'}}),
+                                    'root' :{'wxKey'  : 'rl:changes'}}),
       'rlTabErrors'    : _getShared('scrollTab',
                                    {'inner':{'packTab':{'text':S.UI['rl:errors']}},
-                                    'root' :{'wxKey'  : 'rlErr'}}),
+                                    'root' :{'wxKey'  : 'rl:errors'}}),
       'rb'             :{'type' :   'lfr',
                          'wxKey': 'rbLfr',
                          'build':{'text':S.UI['rb:init']},
@@ -223,7 +226,11 @@ class globUI(): # импортируется в G.UI (в глобальные п
       're'             :{'type' : 'lfr',
                          'build':{'text':S.UI['re:lfr']},
                          'pack' :{'fill':'both','expand':True,'pady':7},
-                         'stash':[]}
+                         'stash':[]},
+
+      'log:main'        : _getShared('log',{'root':{'wxKey':'lastLog'}}),
+      'log:changes'     : _getShared('log'),
+      'log:errors'      : _getShared('log')
       }
 
 # защита от запуска модуля
