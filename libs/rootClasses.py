@@ -17,7 +17,7 @@ class Root():
     def _initLE():  # LE = log & errors
       self.log =   Log(self.UI)
       self.log.add    ('mainLaunch',{'time':curDateTime(),'file':book['file']})
-      # self.log.add    ('launchType',  type)
+      self.log.add    ('launchType',{'str' :S.UI['tasks'][type]['log']})
       # self.errors = Errors(self.UI.errors,self.log,initStr)
 
     self.pr   =  G.dict.tasks[type]
@@ -39,12 +39,12 @@ class Log():  # журнал
       write_toFile(newStr,self.files[file],True)
       self.UI.log (newStr,unit,file)
     def _getType():
-      unit  =  G.dict.log ['units'][type]
+      unit  =  G.dict.log[type]['unit']
       final = '['+unit+'] ' + S.log[type]
       for key,val in rpl.items(): final = final.replace('$'+key+'$',val)
       return final,unit
     newStr,unit = _getType()
-    for file in G.dict.log['files'][unit]: _write()
+    for file in G.dict.log[type]['files']: _write()
 
 # защита от запуска модуля
 if __name__ == '__main__':

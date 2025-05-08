@@ -88,6 +88,7 @@ class Window     (TBS.Window):  # окно программы
             self.buildUI('tc:'+cKey,widget)
         if 'build:irBottom' in rules: _updFile()
         if 'addLog'         in rules: widget.config(**params)
+        # if 'errorsInit'     in rules: self.errors = Errors(widget) # ОТСЮДА
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -203,7 +204,7 @@ class Window     (TBS.Window):  # окно программы
 
   # вспомогательные
   def log(self,string:str,unit:str,file:str):
-    try   : color = G.colors[G.dict.log['colors'][unit]]
+    try   : color = G.colors[G.UI.log[unit]]
     except: color = None
     self.buildUI(        'log:'+file,
                  self.wx['rl:' +file],

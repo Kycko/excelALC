@@ -21,31 +21,24 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     self.tasks = {'chkCat':_taskShared('chk',{'root':{'AStype':'cat'}}),
                   'chkSrc':_taskShared('chk',{'root':{'AStype':'source'}})}
 
-    self.log   = {'units' :{'mainLaunch'     : 'core',
-                            'launchType'     : 'core',  # отсутствует в S.log: читается из S.UI['tasks]
-                            'readSheet'      : 'core',
-                            'readFile'       : 'core',
-                            'ACsuccess'      : 'autocorr',  # используется и при запуске capitalize
-                            'errorsFound'    : 'errors',
-                            'suggFinished'   : 'sugg',
-                            'columnAdded'    : 'titles',
-                            'titlesReordered': 'titles',
-                            'RCremoved'      : 'rmRC',
-                            'vertChanged'    : 'warning',
-                            'blanksFilled'   : 'autocorr',
-                            'finalWrite'     : 'finalWrite',
-                            'colorErrors'    : 'finalWrite',
-                            'fileSaved'      : 'finalWrite'},
-                  'files' :{'core'           :('main','changes','errors')},
-                  'colors':{'core'           :  None,
-                            'autocorr'       : 'sand',
-                            'capitalize'     : 'sand',
-                            'errors'         : 'red',
-                            'rmRC'           : 'pink',
-                            'warning'        : 'red',
-                            'sugg'           : 'magenta',
-                            'titles'         : 'blue',
-                            'finalWrite'     : 'green'}}
+    self.log   = {
+      'mainLaunch'     :{'unit':'core','files':['main','changes','errors']},
+      'launchType'     :{'unit':'core','files':['main']}, # с typle'ами ошибка
+      'suggCancelled'  :{'unit':'sugg','files':['chMain','changes']}, # change before main
+      'suggAccepted'   :{'unit':'sugg','files':['chMain','changes']},
+      'readSheet'      : 'core',
+      'readFile'       : 'core',
+      'ACsuccess'      : 'autocorr',
+      'errorsFound'    : 'errors',
+      'columnAdded'    : 'titles',
+      'titlesReordered': 'titles',
+      'RCremoved'      : 'rmRC',
+      'vertChanged'    : 'warning',
+      'blanksFilled'   : 'autocorr',
+      'finalWrite'     : 'finalWrite',
+      'colorErrors'    : 'finalWrite',
+      'fileSaved'      : 'finalWrite'
+      }
 
 # защита от запуска модуля
 if __name__ == '__main__':

@@ -226,12 +226,26 @@ class globUI(): # импортируется в G.UI (в глобальные п
       're'             :{'type' : 'lfr',
                          'build':{'text':S.UI['re:lfr']},
                          'pack' :{'fill':'both','expand':True,'pady':7},
-                         'stash':[]},
+                         'stash':['reInner']},
+      'reInner'        :{'rules':{'final':('errorsInit')},
+                         'type' : 'fr', # внутренний фрейм с нужными отступами
+                         'pack' :{'fill':'both','expand':True,'padx':10,'pady':5}},
 
       'log:main'        : _getShared('log',{'root':{'wxKey':'lastLog'}}),
       'log:changes'     : _getShared('log'),
       'log:errors'      : _getShared('log')
       }
+
+    # цвета журнала (выбираются по юниту)
+    self.log = {'core'      : None,
+                'autocorr'  :'sand',
+                'capitalize':'sand',
+                'errors'    :'red',
+                'rmRC'      :'pink',
+                'warning'   :'red',
+                'sugg'      :'magenta',
+                'titles'    :'blue',
+                'finalWrite':'green'}
 
 # защита от запуска модуля
 if __name__ == '__main__':

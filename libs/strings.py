@@ -56,7 +56,8 @@ UI = {'init:cantReadLib':'Ошибка чтения файла "$file$". Про�
           }
         }}
 
-log = {'mainLaunch':'[$time$] Файл: $file$'}
+log = {'mainLaunch':'[$time$] Файл: $file$',
+       'launchType':'$str$'}
 
 # защита от запуска модуля
 if __name__ == '__main__':
