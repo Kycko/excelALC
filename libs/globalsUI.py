@@ -30,10 +30,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                        'padx'     : 5,
                                        'pady'     : 5}},
               'irFileLbl' :{'type'   : 'lbl',
-                            'pack'   :{'anchor':'w','padx':5}},
-              'log'       :{'rules'  :{'final' :('addLog')},
-                            'type'   : 'lbl',
-                            'pack'   :{'fill':'x'}}}
+                            'pack'   :{'anchor':'w','padx':5}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -198,13 +195,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'pack' :{'anchor':'w','padx':10}},
       'rlTabs'         :{'type' : 'tbs',
                          'pack' :{'fill':'both','expand':True,'padx':5,'pady':7},
-                         'stash':['rlTabMain','rlTabChanged','rlTabErrors']},
+                         'stash':['rlTabMain','rlTabErrors']},
       'rlTabMain'      : _getShared('scrollTab',
                                    {'inner':{'packTab':{'text':S.UI['rl:main']}},
                                     'root' :{'wxKey'  : 'rl:main'}}),
-      'rlTabChanged'   : _getShared('scrollTab',
-                                   {'inner':{'packTab':{'text':S.UI['rl:changed']}},
-                                    'root' :{'wxKey'  : 'rl:changes'}}),
       'rlTabErrors'    : _getShared('scrollTab',
                                    {'inner':{'packTab':{'text':S.UI['rl:errors']}},
                                     'root' :{'wxKey'  : 'rl:errors'}}),
@@ -231,9 +225,9 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'type' : 'fr', # внутренний фрейм с нужными отступами
                          'pack' :{'fill':'both','expand':True,'padx':10,'pady':5}},
 
-      'log:main'        : _getShared('log',{'root':{'wxKey':'lastLog'}}),
-      'log:changes'     : _getShared('log'),
-      'log:errors'      : _getShared('log')
+      'log'            :{'rules':{'final':('addLog')},
+                         'type' : 'lbl',
+                         'pack' :{'fill':'x'}},
       }
 
     # цвета журнала (выбираются по юниту)

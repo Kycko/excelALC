@@ -10,9 +10,8 @@ dict = globDicts()  # прочее (всякие списки с текстов�
 # файлы
 files = {'lib'   :'справочник excelALC.xlsx',
          'config': UI.app['name'] +  '.config',
-         'mLog'  :    'main.log',
-         'chLog' : 'changes.log',
-         'errLog':  'errors.log'}
+         'log'   :    'main.log',
+         'errors':  'errors.log'}
 
 # настройки
 config = userCfg(files['config'])

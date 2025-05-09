@@ -15,9 +15,9 @@ class Root():
   def launch  (self,book,type:str):
     # book = {obj:,file:,sheet:}; type = например, 'chkCat'
     def _initLE():  # LE = log & errors
-      self.log =   Log(self.UI)
-      self.log.add    ('mainLaunch',{'time':curDateTime(),'file':book['file']})
-      self.log.add    ('launchType',{'str' :S.UI['tasks'][type]['log']})
+      self.log = Log(self.UI)
+      initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
+      self.log.add           ('launchType',{'str' :S.UI['tasks'][type]['log']})
       # self.errors = Errors(self.UI.errors,self.log,initStr)
 
     self.pr   =  G.dict.tasks[type]
@@ -29,22 +29,19 @@ class Root():
 class Log():  # журнал
   def __init__(self,UI:appUI.Window):
     self.UI   = UI
-    self.files = {'main'   :G.files[  'mLog'],
-                  'changes':G.files[ 'chLog'],
-                  'errors' :G.files['errLog']}
-    for file in self.files.values(): write_toFile([],file)
+    self.file = G.files['log']
+    write_toFile([],self.file)
   def add(self,type:str,rpl:dict=None):
     # rpl=replace (словарь строк для замены переменных)
-    def _write  ():
-      write_toFile(newStr,self.files[file],True)
-      self.UI.log (newStr,unit,file)
     def _getType():
-      unit  =  G.dict.log[type]['unit']
+      unit  =  G.dict.log[type]
       final = '['+unit+'] ' + S.log[type]
       for key,val in rpl.items(): final = final.replace('$'+key+'$',val)
       return final,unit
     newStr,unit = _getType()
-    for file in G.dict.log[type]['files']: _write()
+    write_toFile(newStr,self.file,True)
+    self.UI.log (newStr,unit)
+    return newStr # пока что нужно только для _initLE()
 
 # защита от запуска модуля
 if __name__ == '__main__':

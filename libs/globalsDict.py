@@ -21,24 +21,22 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     self.tasks = {'chkCat':_taskShared('chk',{'root':{'AStype':'cat'}}),
                   'chkSrc':_taskShared('chk',{'root':{'AStype':'source'}})}
 
-    self.log   = {
-      'mainLaunch'     :{'unit':'core','files':['main','changes','errors']},
-      'launchType'     :{'unit':'core','files':['main']}, # с typle'ами ошибка
-      'suggCancelled'  :{'unit':'sugg','files':['chMain','changes']}, # change before main
-      'suggAccepted'   :{'unit':'sugg','files':['chMain','changes']},
-      'readSheet'      : 'core',
-      'readFile'       : 'core',
-      'ACsuccess'      : 'autocorr',
-      'errorsFound'    : 'errors',
-      'columnAdded'    : 'titles',
-      'titlesReordered': 'titles',
-      'RCremoved'      : 'rmRC',
-      'vertChanged'    : 'warning',
-      'blanksFilled'   : 'autocorr',
-      'finalWrite'     : 'finalWrite',
-      'colorErrors'    : 'finalWrite',
-      'fileSaved'      : 'finalWrite'
-      }
+    self.log = {'mainLaunch'     :'core',
+                'launchType'     :'core',
+                'suggCancelled'  :'sugg',
+                'suggAccepted'   :'sugg',
+                'readSheet'      :'core',
+                'readFile'       :'core',
+                'ACsuccess'      :'autocorr',
+                'errorsFound'    :'errors',
+                'columnAdded'    :'titles',
+                'titlesReordered':'titles',
+                'RCremoved'      :'rmRC',
+                'vertChanged'    :'warning',
+                'blanksFilled'   :'autocorr',
+                'finalWrite'     :'finalWrite',
+                'colorErrors'    :'finalWrite',
+                'fileSaved'      :'finalWrite'}
 
 # защита от запуска модуля
 if __name__ == '__main__':

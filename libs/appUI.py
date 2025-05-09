@@ -203,12 +203,10 @@ class Window     (TBS.Window):  # окно программы
     G.UI.colors        = G.UI.themeColors[theme]
 
   # вспомогательные
-  def log(self,string:str,unit:str,file:str):
+  def log(self,string:str,unit:str):
     try   : color = G.colors[G.UI.log[unit]]
     except: color = None
-    self.buildUI(        'log:'+file,
-                 self.wx['rl:' +file],
-                 {'text':string,'foreground':color})
+    self.buildUI('log',self.wx['rl:main'],{'text':string,'foreground':color})
 
 # защита от запуска модуля
 if __name__ == '__main__':
