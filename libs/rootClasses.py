@@ -18,7 +18,7 @@ class Root():
       self.log = Log(self.UI)
       initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
       self.log.add           ('launchType',{'str' :S.UI['tasks'][type]['log']})
-      # self.errors = Errors(self.UI.errors,self.log,initStr)
+      self.errors = Errors(self.UI.errors,self.log,initStr)
 
     self.pr   =  G.dict.tasks[type]
     self.type =  type
