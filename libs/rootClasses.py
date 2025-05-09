@@ -4,8 +4,9 @@ import globalsMain     as G
 import appUI
 from   excelRW     import Excel
 from   tables      import Table,CellTable
-import strings         as S
-import stringFuncs     as strF
+import strings         as  S
+import stringFuncs     as  strF
+import listFuncs       as listF
 import libClasses      as lib
 
 # корневой класс: из него запускаются UI и код других модулей
@@ -49,12 +50,73 @@ class Root():
           # if rmRC: self.rmEmptyRC(self.unkTD)
           # self.init_curTD()
         else: self.table = CellTable(tObj['table'])
+    def _runType():
+      match self.pr['launch']:
+        case _: self.rangeChecker(self.table.data,type)
 
     self.pr   =  G.dict.tasks[type]
     self.type =  type
     self.cfg  = {param:G.config.get(type+':'+param) for param in self.pr['cfg']}
     _initLE ()
     _getData(rmRC=self.pr['rmRC_onRead'])
+    _runType()
+
+  # основные алгоритмы проверки
+  def rangeChecker(self,table:list,type:str):
+    # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
+    # т. е. table – это всегда [[Cell,...],...]
+    self.rTable = table # range table, понадобится в self.finalizeErrors()
+    errors      = {}    # {initLow:ErrorObj,...}
+    for   r in range(len(table)):
+      for c in range(len(table[r])):
+        cell   =   table[r][c]
+        errPos = {'r':r,'c':c}
+
+        low = cell.value.lower()
+        if low in errors.keys (): errors[low].addPos(errPos)
+        else:
+          tempVal = cell.value
+          VAL     = self.validate_andCapitalize(type,tempVal)
+          if not VAL['valid'] and not self.pr['justVerify']:
+            tempVal = self.autocorr(type,tempVal) # ДАЛЬШЕ ОТСЮДА
+            VAL     = self.validate_andCapitalize(type,tempVal)
+
+          if VAL['valid']:
+            if VAL['value'] != cell.value:
+              # ↑ если они равны, ничего делать не надо (ошибки нет)
+              errors[low] = ErrorObj(type,
+                                     cell.value,
+                                     errPos,
+                                     not self.justVerify,
+                                     (VAL['value'],None)[self.justVerify])
+              if not self.justVerify: # это только про autocorr?
+                self.log.add('ACsuccess',
+                            {'type':type,'from':cell.value,'to':VAL['value']})
+                cell.value = VAL['value']
+          else: errors[low] = ErrorObj(type,cell.value,errPos)
+
+    self.errors.addCur(errors,type)
+    self     .nextSugg()
+
+  # работа с ошибками
+  def validate_andCapitalize(self,type:str,value:str,extra=None):
+    # в extra можно передать любые необходимые доп. данные
+    params = G.dict.AStypes[type]
+    # ↓ передаём в extra suggList из appUI.suggInvalidUD()
+    if extra is None and params['readLib']: extra = lib.get_vList(type)
+    final   = {'type'  :type,
+               'value' :value,
+               'valid' :None,
+               'errKey':''} # ключ сообщения для suggUI
+
+    if params['checkList']:
+      found          = listF.searchStr(extra,value,'item',True,not self.pr['justVerify'])
+      final['valid'] = bool(found)
+      if final['valid']:
+        if not self.pr['justVerify']: final['value'] = found[0]
+      else: final['errKey'] = 'notInList'
+    else: strF.validateCell(final,self.uCfg)  # final обновляется внутри
+    return final
 
   # чтение данных из таблицы
   def searchTitleRow(self,table:Table):
@@ -63,7 +125,7 @@ class Root():
     return 0
 
 # журнал и ошибки
-class Log():    # журнал
+class Log():      # журнал
   def __init__(self,UI:appUI.Window):
     self.UI   = UI
     self.file = G.files['log']
@@ -79,7 +141,7 @@ class Log():    # журнал
     write_toFile(newStr,self.file,True)
     self.UI.log (newStr,unit)
     return newStr # пока что нужно только для _initLE()
-class Errors(): # хранилище ошибок
+class Errors():   # хранилище ошибок
   def __init__ (self,log:Log,UI:appUI.Window,initLogStr:str):
     self.curQueue   = []  # очередь текущей проверки, в ней же будут ссылки на UI labels
     self.errorsLeft = []  # что не исправлено (нужно для подсвечивания в файле)
@@ -91,6 +153,15 @@ class Errors(): # хранилище ошибок
   def write(self,str:str,justAdd=True):
     write_toFile   ([str],self.file,justAdd)
     self.UI.buildUI('log',self.UI.wx['rl:errors'],{'text':str})
+class ErrorObj(): # объект одной ошибки, используется в хранилище Errors()
+  def __init__(self,type:str,initValue:str,pos:dict,initFixed=False,newVal=None):
+    # pos={'r':row,'c':col}
+    self.type    =  type  # тип ошибки, один из G.AStypes
+    self.initVal =  initValue
+    self. newVal =   newVal
+    self.fixed   =  initFixed
+    self.pos     = [pos]  # список всех позиций в диапазоне проверки [{'r':,'c':},...]
+  def addPos  (self,pos :dict): self.pos.append(pos)
 
 # защита от запуска модуля
 if __name__ == '__main__':

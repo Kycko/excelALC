@@ -5,6 +5,16 @@ import globalsMain     as G
 from   excelRW     import Excel
 import libReading      as libR
 
+# общие функции
+def get_vList(type:str):
+  match type:
+    case 'title'    : return columns.vList
+    case 'region'   : return regions.vList
+    case 'ACregions': return regions.vListAC
+    case 'cat'      : return cat    .vList
+    case 'vert'     : return cat    .parentList
+    case 'source'   : return sources.data
+
 # шаблоны классов
 class AStemplate    (): # autocorr & sugg
   def __init__(self,table,vList=False): # table = объект tables.Table()
