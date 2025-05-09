@@ -4,6 +4,7 @@ import xlwings         as xw
 import globalsMain     as G
 from   excelRW     import Excel
 import libReading      as libR
+import stringFuncs     as strF
 
 # общие функции
 def get_vList(type:str):
@@ -20,6 +21,12 @@ class AStemplate    (): # autocorr & sugg
   def __init__(self,table,vList=False): # table = объект tables.Table()
     # vList: будет несколько 'to'[] (True для sugg) или только один (False для autocorr)
     self.data = libR.parseAS(table.data,vList)
+  def get(self,type:str,value:str,fullText:bool):
+    # fullText = True для autocorr, False для sugg
+    if type in self.data.keys():
+      keys = strF.findSubList(value,tuple(self.data[type].keys()),'item',True,fullText)
+      return [self.data[type][key] for key in keys]
+    else: return []
 class RegCatTemplate():
   def initLists(self,core:str,parent:str):
     self.vList      = []      # validation list, список допустимых значений
@@ -43,7 +50,12 @@ class Columns ():
     # vList = validation list, список допустимых значений
     self.data  = libR.parseDoubleDict(table.data)
     self.vList = [params['title'] for params in self.data.values()]
-class Autocorr(AStemplate): pass
+class Autocorr(AStemplate):
+  def get    (self,type:str,value:str):
+    res = super().get(type,value,True)
+    return {'fixed': bool(res),
+            'value': res [0]['val'] if bool(res) else value}
+  def getSugg(self,type:str,value:str): return super().get(type,value,False)
 class Sugg    (AStemplate): pass
 class Cat     (RegCatTemplate):
   def __init__ (self,table):  # table = объект tables.Table()

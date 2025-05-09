@@ -22,6 +22,22 @@ def inclDoublesStr(oldList:list,lower=False):
     if inclStr(newList,item,True,lower): return True  # здесь оптимизация
     else:                                newList.append(item)
   return False
+def searchAny_from_strList(root:list,vars:list,type='item',fullText=True,lower=True,strip=''):
+  # если в первом списке есть хотя бы один элемент второго списка, вернёт index/item из первого списка
+  # type может быть 'item' или 'index'
+  for i in range(len(root)):
+    if inclStr(vars,root[i],fullText,lower,strip): return (i,root[i])[type == 'item']
+  return (-1,None)[type == 'item']
+
+# изменение
+def rmDoublesStr(oldList:list,lower=False):
+  newList = []
+  for item in oldList:
+    if not inclStr(newList,item,True,lower): newList.append(item)
+  return newList
+def rmBlankStr(list:list):  # оставлю такую функцию для простоты
+  while '' in list: list.remove('')
+  return list
 
 # защита от запуска модуля
 if __name__ == '__main__':

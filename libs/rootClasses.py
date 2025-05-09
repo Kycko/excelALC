@@ -78,7 +78,7 @@ class Root():
           tempVal = cell.value
           VAL     = self.validate_andCapitalize(type,tempVal)
           if not VAL['valid'] and not self.pr['justVerify']:
-            tempVal = self.autocorr(type,tempVal) # ДАЛЬШЕ ОТСЮДА
+            tempVal = self.autocorr(type,tempVal)
             VAL     = self.validate_andCapitalize(type,tempVal)
 
           if VAL['valid']:
@@ -99,6 +99,18 @@ class Root():
     self     .nextSugg()
 
   # работа с ошибками
+  def autocorr(self,type:str,value:str):
+    initVal  = value
+    value    = strF.autocorrCell(type,value,self.cfg) # выполн. не для всех type (кроме strip())
+    if type == 'region':
+      # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после них
+      AC = lib.autocorr.get(type,value)
+      if AC['fixed']: return AC['value']
+      else:  value = strF.ACcity(value,lib.regions.parentList,lib.get_vList('ACregions')) # ИЗМ. PARENTLIST
+    AC = lib.autocorr.get(type,value) # выполнится не для всех type
+    if type == 'region' and not listF.inclStr(lib.regions.vList,AC['value']):
+      return lib.regions.ACregionID(initVal)
+    else: return AC['value']
   def validate_andCapitalize(self,type:str,value:str,extra=None):
     # в extra можно передать любые необходимые доп. данные
     params = G.dict.AStypes[type]
