@@ -202,7 +202,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'rlTabErrors'    : _getShared('scrollTab',
                                    {'inner':{'packTab':{'text':S.UI['rl:errors']}},
                                     'root' :{'wxKey'  : 'rl:errors'}}),
-      'rb'             :{'type' :   'lfr',
+      'rb'             :{'type' : 'lfr',
                          'wxKey': 'rbLfr',
                          'build':{'text':S.UI['rb:init']},
                          'pack' :{'fill':'both','expand':True},
@@ -219,11 +219,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'pack' :{'side':'left'}},
       're'             :{'type' : 'lfr',
                          'build':{'text':S.UI['re:lfr']},
-                         'pack' :{'fill':'both','expand':True,'pady':7},
-                         'stash':['reInner']},
-      'reInner'        :{'rules':{'final':('errorsInit')},
-                         'type' : 'fr', # внутренний фрейм с нужными отступами
-                         'pack' :{'fill':'both','expand':True,'padx':10,'pady':5}},
+                         'pack' :{'fill':'both','expand':True,'pady':7}},
 
       'log'            :{'rules':{'final':('addLog')},
                          'type' : 'lbl',

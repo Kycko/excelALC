@@ -18,7 +18,7 @@ class Root():
       self.log = Log(self.UI)
       initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
       self.log.add           ('launchType',{'str' :S.UI['tasks'][type]['log']})
-      self.errors = Errors(self.UI.errors,self.log,initStr)
+      self.errors = Errors(self.log,self.UI,initStr)
 
     self.pr   =  G.dict.tasks[type]
     self.type =  type
@@ -26,7 +26,7 @@ class Root():
     _initLE()
 
 # журнал и ошибки
-class Log():  # журнал
+class Log():    # журнал
   def __init__(self,UI:appUI.Window):
     self.UI   = UI
     self.file = G.files['log']
@@ -42,6 +42,18 @@ class Log():  # журнал
     write_toFile(newStr,self.file,True)
     self.UI.log (newStr,unit)
     return newStr # пока что нужно только для _initLE()
+class Errors(): # хранилище ошибок
+  def __init__ (self,log:Log,UI:appUI.Window,initLogStr:str):
+    self.curQueue   = []  # очередь текущей проверки, в ней же будут ссылки на UI labels
+    self.errorsLeft = []  # что не исправлено (нужно для подсвечивания в файле)
+    self.log        = log # основной журнал Root().log
+    self.UI         = UI
+    self.file       = G.files['errors']
+    self.write(initLogStr,False)
+  # def add_noFix(self) потом доработать, это запись ошибок без исправления
+  def write(self,str:str,justAdd=True):
+    write_toFile   ([str],self.file,justAdd)
+    self.UI.buildUI('log',self.UI.wx['rl:errors'],{'text':str})
 
 # защита от запуска модуля
 if __name__ == '__main__':

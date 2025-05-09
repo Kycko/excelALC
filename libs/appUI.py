@@ -88,7 +88,6 @@ class Window     (TBS.Window):  # окно программы
             self.buildUI('tc:'+cKey,widget)
         if 'build:irBottom' in rules: _updFile()
         if 'addLog'         in rules: widget.config(**params)
-        if 'errorsInit'     in rules: self.errors = Errors(widget)
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -207,15 +206,6 @@ class Window     (TBS.Window):  # окно программы
     try   : color = G.colors[G.UI.log[unit]]
     except: color = None
     self.buildUI('log',self.wx['rl:main'],{'text':string,'foreground':color})
-
-class Errors(): # фрейм очереди ошибок
-  def __init__(self,frame:TBS.Frame):
-    self.storage = []     # [TBS.Label,...]
-    self.frame   = frame  # в него будем вкладывать все label'ы
-  def add     (self,text:str):
-    self.storage  .append(TBS.Label(self.frame,text=text))
-    self.storage[-1].pack(fill='x')
-  def rmFirst (self): self.storage.pop(0).destroy()
 
 # защита от запуска модуля
 if __name__ == '__main__':
