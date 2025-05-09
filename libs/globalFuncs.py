@@ -17,6 +17,9 @@ def write_toFile(list:list,file:str,justAdd=False):
     for line in list: f.write(f"{line}\n")
 def get_initSettings(): return {'main':{'darkTheme':checkWinTheme(),
                                         'zoom'     :0}}
+def getIB(type:str,index:int):  # IB = index/boolean
+  # служебная функция; возвращает сам index либо true/false
+  return index if type == 'index' else index >= 0
 
 # GUI
 def checkWinTheme(): 

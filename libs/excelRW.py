@@ -24,15 +24,12 @@ class Excel():  # общий класс, можно копировать без 
     def _range    (range:xw.Range,getAll=False):
       # getAll чтобы прочитать в 'table' весь лист, но в 'addr' и 'range' оставить только изнач. range
       # (нужно для type == 'shSelection')
-      def _getValues(range:xw.Range):
-        return range.options(ndim=2,empty='',numbers=int).value # ndim=2 всегда даёт двумерный массив
-
       readRange = range.sheet.used_range if getAll else range
       self.data  [range.sheet.name] = {
         'addr' :range.address,
         'range':range,
         'sheet':range.sheet,
-        'table':Table(_getValues(readRange),params)
+        'table':Table(self.getValues(readRange),params)
         }
 
     match type:
@@ -41,6 +38,8 @@ class Excel():  # общий класс, можно копировать без 
       case 'shActive'   : _fullSheet(self.file.sheets.active)
       case 'shSelection': _range    (self.file.selection,True)
       case   'selection': _range    (self.file.selection)
+  def getValues(self,range:xw.Range):
+    return range.options(ndim=2,empty='',numbers=int).value # ndim=2 всегда даёт двумерный массив
 
 # защита от запуска модуля
 if __name__ == '__main__':

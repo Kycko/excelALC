@@ -1,8 +1,11 @@
 from   sys         import exit as SYSEXIT
 from   globalFuncs import curDateTime,write_toFile
 import globalsMain     as G
-import strings         as S
 import appUI
+from   excelRW     import Excel
+from   tables      import Table,CellTable
+import strings         as S
+import stringFuncs     as strF
 import libClasses      as lib
 
 # корневой класс: из него запускаются UI и код других модулей
@@ -14,16 +17,50 @@ class Root():
     else: appUI.cantReadLib()
   def launch  (self,book,type:str):
     # book = {obj:,file:,sheet:}; type = например, 'chkCat'
-    def _initLE():  # LE = log & errors
+    def _initLE (): # LE = log & errors
       self.log = Log(self.UI)
       initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
       self.log.add           ('launchType',{'str' :S.UI['tasks'][type]['log']})
       self.errors = Errors(self.log,self.UI,initStr)
+    def _getData(logging=True,rmRC=False):
+      def _getLog():
+        rng  = ('range','full')[self.pr['read'] == 'shActive']
+        type = 'readRange:'+rng
+
+        rpl = {'addr':tObj['addr']}
+        c   =     len(tObj['table'].data[0])
+        r   =     len(tObj['table'].data) - 1*(rng == 'full') # без заголовка
+        rpl['cols'] = str(c)+' '+S.wordEndings['столбцы'][strF.ending_byCount(c)]
+        rpl['rows'] = str(r)+' '+S.wordEndings['строки' ][strF.ending_byCount(r)]
+        return type,rpl
+      self.file = Excel(book['obj'],self.pr['read'],('toStrings'))
+      for shName,tObj in self.file.data.items():
+        # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
+        self.shName = shName
+        if self.pr['read'] == 'shActive':
+          tObj['table'].cutUp(self.searchTitleRow(tObj['table']))
+        if logging:
+          self.log.add('readSheet',{'sheet':shName})  # имя листа
+          self.log.add(*_getLog())                    # диапазон
+
+        if self.pr['toTD']:
+          pass
+          # self.unkTD = TableDict(tObj['table'])
+          # if rmRC: self.rmEmptyRC(self.unkTD)
+          # self.init_curTD()
+        else: self.table = CellTable(tObj['table'])
 
     self.pr   =  G.dict.tasks[type]
     self.type =  type
     self.cfg  = {param:G.config.get(type+':'+param) for param in self.pr['cfg']}
-    _initLE()
+    _initLE ()
+    _getData(rmRC=self.pr['rmRC_onRead'])
+
+  # чтение данных из таблицы
+  def searchTitleRow(self,table:Table):
+    for r in range(len(table.data)):
+      if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
+    return 0
 
 # журнал и ошибки
 class Log():    # журнал

@@ -8,14 +8,15 @@ class globDicts():  # импортируется в G.dict (в глобальн�
       # функция, передающая в self.tasks одинаковые свойства для однотипных элементов
       if type == 'cfg': return ['newSheet','suggErrors','confirmWrite','saveAfter']
       else:
-        dict = {'chk':{'cfg'       :_taskShared('cfg'),
-                       'read'      :'selection',
-                       'toTD'      : False,
-                       'addHeader' : False,
-                       'launch'    :'rangeChecker',
-                       'justVerify': False,
-                       'resetBg'   :'selection',
-                       'hlTitles'  : False}}
+        dict = {'chk':{'cfg'        :_taskShared('cfg'),
+                       'read'       :'selection',
+                       'rmRC_onRead': False,
+                       'toTD'       : False,
+                       'addHeader'  : False,
+                       'launch'     :'rangeChecker',
+                       'justVerify' : False,
+                       'resetBg'    :'selection',
+                       'hlTitles'   : False}}
         return dictF.update(dict[type],**upd)
 
     self.tasks = {'chkCat':_taskShared('chk',{'root':{'AStype':'cat'}}),
@@ -23,12 +24,13 @@ class globDicts():  # импортируется в G.dict (в глобальн�
 
     self.log = {'mainLaunch'     :'core',
                 'launchType'     :'core',
-                'suggCancelled'  :'sugg',
-                'suggAccepted'   :'sugg',
                 'readSheet'      :'core',
-                'readFile'       :'core',
+                'readRange:full' :'core',
+                'readRange:range':'core',
                 'ACsuccess'      :'autocorr',
                 'errorsFound'    :'errors',
+                'suggCancelled'  :'sugg',
+                'suggAccepted'   :'sugg',
                 'columnAdded'    :'titles',
                 'titlesReordered':'titles',
                 'RCremoved'      :'rmRC',
