@@ -217,7 +217,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'rbe:curLbl'     :{'type' : 'lbl',
                          'build':{'text':S.UI['rbe:curLbl']},
                          'pack' :{'side':'left'}},
-      're'             :{'type' : 'lfr',
+      're'             :{'rules':{'final':('initErrQueue')},
+                         'type' : 'lfr',
                          'build':{'text':S.UI['re:lfr']},
                          'pack' :{'fill':'both','expand':True,'pady':7}},
 

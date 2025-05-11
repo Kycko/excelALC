@@ -287,6 +287,9 @@ def trimOverHyphens(string:str):
 def      fixHyphens(string:str): return string.replace('—','-').replace('–','-')
 def replaceIndex   (string:str,index:int,newChar:str):
     return string[:index] + newChar + string[index+1:]
+def replaceVars(string:str,vars:dict):  # заменяет в string'е все $var$ на значения из vars{}
+  for key,val in vars.items(): string = string.replace('$'+key+'$',val)
+  return string
 
 # защита от запуска модуля
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ class Root():
       self.log = Log(self.UI)
       initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
       self.log.add           ('launchType',{'str' :S.UI['tasks'][type]['log']})
-      self.errors = Errors(self.log,self.UI,initStr)
+      self.errors = Errors(self.log,self.UI.errors,initStr)
     def _getData(logging=True,rmRC=False):
       def _getLog():
         rng  = ('range','full')[self.pr['read'] == 'shActive']
@@ -65,6 +65,8 @@ class Root():
   def rangeChecker(self,table:list,type:str):
     # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
     # т. е. table – это всегда [[Cell,...],...]
+    def _addError(): errors[low] = ErrorObj(type,cell.value,errPos)
+
     self.rTable = table # range table, понадобится в self.finalizeErrors()
     errors      = {}    # {initLow:ErrorObj,...}
     for   r in range(len(table)):
@@ -75,42 +77,29 @@ class Root():
         low = cell.value.lower()
         if low in errors.keys (): errors[low].addPos(errPos)
         else:
+          JV      = self.pr['justVerify']
           tempVal = cell.value
           VAL     = self.validate_andCapitalize(type,tempVal)
-          if not VAL['valid'] and not self.pr['justVerify']:
+          if not VAL['valid'] and not JV:
             tempVal = self.autocorr(type,tempVal)
             VAL     = self.validate_andCapitalize(type,tempVal)
 
           if VAL['valid']:
-            if VAL['value'] != cell.value:
-              # ↑ если они равны, ничего делать не надо (ошибки нет)
-              errors[low] = ErrorObj(type,
-                                     cell.value,
-                                     errPos,
-                                     not self.justVerify,
-                                     (VAL['value'],None)[self.justVerify])
-              if not self.justVerify: # это только про autocorr?
-                self.log.add('ACsuccess',
-                            {'type':type,'from':cell.value,'to':VAL['value']})
+            if VAL['value'] != cell.value:  # иначе ничего делать не надо (ошибки нет)
+              if JV: _addError()
+              else: # это только про autocorr?
+                self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
                 cell.value = VAL['value']
-          else: errors[low] = ErrorObj(type,cell.value,errPos)
+          else: _addError()
 
-    self.errors.addCur(errors,type)
-    self     .nextSugg()
+    self.errors.addCur(errors)
+    self     .nextSugg()# ДАЛЬШЕ ОТСЮДА (+заменить класс appUI.ErrQueue на функцию errQueue(add/rm)?)
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
-    initVal  = value
-    value    = strF.autocorrCell(type,value,self.cfg) # выполн. не для всех type (кроме strip())
-    if type == 'region':
-      # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после них
-      AC = lib.autocorr.get(type,value)
-      if AC['fixed']: return AC['value']
-      else:  value = strF.ACcity(value,lib.regions.parentList,lib.get_vList('ACregions')) # ИЗМ. PARENTLIST
-    AC = lib.autocorr.get(type,value) # выполнится не для всех type
-    if type == 'region' and not listF.inclStr(lib.regions.vList,AC['value']):
-      return lib.regions.ACregionID(initVal)
-    else: return AC['value']
+    value = strF.autocorrCell(type,value,self.cfg)  # выполн. не для всех type (кроме strip())
+    AC    = lib .autocorr.get(type,value)           # выполнится не для всех type
+    return   AC['value']
   def validate_andCapitalize(self,type:str,value:str,extra=None):
     # в extra можно передать любые необходимые доп. данные
     params = G.dict.AStypes[type]
@@ -146,21 +135,31 @@ class Log():      # журнал
     # rpl=replace (словарь строк для замены переменных)
     def _getType():
       unit  =  G.dict.log[type]
-      final = '['+unit+'] ' + S.log[type]
-      for key,val in rpl.items(): final = final.replace('$'+key+'$',val)
+      final = '['+unit+'] ' + strF.replaceVars(S.log[type],rpl)
       return final,unit
     newStr,unit = _getType()
     write_toFile(newStr,self.file,True)
     self.UI.log (newStr,unit)
     return newStr # пока что нужно только для _initLE()
 class Errors():   # хранилище ошибок
-  def __init__ (self,log:Log,UI:appUI.Window,initLogStr:str):
-    self.curQueue   = []  # очередь текущей проверки, в ней же будут ссылки на UI labels
+  def __init__ (self,log:Log,UI:appUI.ErrQueue,initLogStr:str):
     self.errorsLeft = []  # что не исправлено (нужно для подсвечивания в файле)
     self.log        = log # основной журнал Root().log
     self.UI         = UI
     self.file       = G.files['errors']
     self.write(initLogStr,False)
+  def addCur(self,errors:dict): # errors={initLow:ErrorObj,...}
+    def _addUI():
+      vars = {'type' :        err.type,
+              'count':str(len(err.pos)),
+              'value':        err.initVal}
+      txt  = strF.replaceVars(S.log['errQueue'],vars)
+      return self.UI.add(txt)
+    self.curQueue = list(errors.values())
+    for  err  in self.curQueue: _addUI()
+    if errors: self.log.add('errorsFound',
+                           {'type' :    self.curQueue[0].type,
+                            'count':len(self.curQueue)})
   # def add_noFix(self) потом доработать, это запись ошибок без исправления
   def write(self,str:str,justAdd=True):
     write_toFile   ([str],self.file,justAdd)
