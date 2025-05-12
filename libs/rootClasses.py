@@ -66,6 +66,20 @@ class Root():
     # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
     # т. е. table – это всегда [[Cell,...],...]
     def _addError(): errors[low] = ErrorObj(type,cell.value,errPos)
+    def _nextSugg():
+      def _getSuggList(errObj):
+        type,val = errObj.type,errObj.initVal
+        if AST[type]['getLibSugg']: return lib .sugg   .get(type,val)
+        else:                       return strF.getSuggList(type,val)
+
+      queue = self.errors.queue
+      AST   = G.dict.AStypes
+      if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
+        suggList   = _getSuggList(queue[0])
+        self.UI    .suggInvalidUD(queue[0],suggList,len(queue)) # ДАЛЬШЕ ОТСЮДА
+      else:
+        if not JV      : self.UI.setSuggState(False)
+        if     self.type != 'reCalc': self.finalizeErrors (self.type == 'allChecks')
 
     self.rTable = table # range table, понадобится в self.finalizeErrors()
     errors      = {}    # {initLow:ErrorObj,...}
@@ -93,7 +107,7 @@ class Root():
           else: _addError()
 
     self.errors.addCur(errors)
-    self     .nextSugg()  # ДАЛЬШЕ ОТСЮДА
+    _nextSugg()
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
@@ -155,11 +169,11 @@ class Errors():   # хранилище ошибок
                 'value':        err.initVal}
       txt    = strF.replaceVars(S.log['errQueue'],vars)
       err.UI = self.UI.buildUI('re:entry',self.UI.wx['errQueue'],{'text':txt})
-    self.curQueue = list(errors.values())
-    for  err  in self.curQueue: _addUI()
+    self.queue = list(errors.values())
+    for  err  in self.queue: _addUI()
     if errors: self.log.add('errorsFound',
-                           {'type' :    self.curQueue[0].type,
-                            'count':len(self.curQueue)})
+                           {'type' :    self.queue[0].type,
+                            'count':len(self.queue)})
   # def add_noFix(self) потом доработать, это запись ошибок без исправления
   def write(self,str:str,justAdd=True):
     write_toFile   ([str],self.file,justAdd)

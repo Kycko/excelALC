@@ -24,7 +24,7 @@ def parseAS        (table:list,vList=False):
     if rType not in final.keys(): final[rType] = {}
     tCur = final[rType]
 
-    new = {'val':row[2],'btn':row[3]}
+    new = get_ACto(row[2],row[3])
     if vList:
       if   not rFrom in tCur.keys(): tCur[rFrom] = []
       tCur    [rFrom].append(new)
@@ -45,6 +45,11 @@ def oneCol_toList  (table): # table = объект tables.Table()
   # функция отрезает первую строку (заголовок)
   table.rotate()
   return table.data[0][1:]
+
+# вспомогательные
+def get_ACto(val:str,btn:str=None): # исп. также в libClasses.Regions()
+  return {'val':val,
+          'btn':val if btn is None else btn}
 
 # защита от запуска модуля
 if __name__ == '__main__':

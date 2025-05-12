@@ -125,8 +125,45 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
       vObj['errKey'] = 'format'
       return
   vObj['valid'] = True
+def  getSuggList(type:str ,value:str):
+  final = []
+  if type in ('mail','website'):
+    new = value.replace(' ','').replace('|',',')
+    if new != value:
+      vObj = {'type':type,'value':new,'valid':None,'errKey':''}
+      validateCell(vObj)
+      if vObj['valid']: final.append({'val':new,'btn':new})
+  elif type ==  'date':
+    parts = trySplitDate(value.strip('00:00:00').strip())
+    if parts:
+      for    i in range(3):
+        for  j in range(3):
+          if i != j:
+            new = parts[i]+'.'+parts[j]+'.'+parts[3-i-j]
+            if validateDate(new): final.append({'val':new,'btn':new})
+  return final
+def trySplitDate(date:str):
+  for symb in G.dict.dateSplitters:
+    parts = date.split(symb)
+    if len(parts) == 3: return parts
+def validateDate(date:str):
+  if not date: return True
+  else:
+    parts = date.split('.')
+    if len(parts) == 3:
+      try:
+        for i in range(len(parts)): parts[i] = int(parts[i])
+      except: return False
+
+      d,m,y = parts
+      y = y in range(2000,2100)
+      m = m in range(1,13)
+      d = d in range(1,G.dict.monthDays[m]+1)
+      if y and m and d: return True
+  return False
 
 # исправление регионов/городов; RC = region/city
+# НАДО БУДЕТ ПЕРЕПИСАТЬ
 def ACcity(city:str,regions:list,ACregions:list):
   # ошибка при импорте lib сюда, поэтому передаём аргументами regions и ACregions
   def _fixOblast():
