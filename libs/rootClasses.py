@@ -75,8 +75,7 @@ class Root():
       queue = self.errors.queue
       AST   = G.dict.AStypes
       if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
-        suggList   = _getSuggList(queue[0])
-        self.UI    .suggInvalidUD(queue[0],suggList,len(queue))
+        self.UI.suggInvalidUD(queue,_getSuggList(queue[0]))
       else:
         if not JV      : self.UI.setSuggState(False)
         if     self.type != 'reCalc': self.finalizeErrors (self.type == 'allChecks')

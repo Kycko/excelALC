@@ -5,6 +5,7 @@ from   ttkbootstrap.tooltip         import ToolTip
 from   ttkbootstrap.dialogs.dialogs import Messagebox
 import globalsMain                      as G
 import strings                          as S
+from   stringFuncs                  import replaceVars
 from   globalFuncs                  import sysExit
 from   excelRW                      import getCurExcel
 
@@ -88,6 +89,7 @@ class Window     (TBS.Window):  # окно программы
             self.buildUI('tc:'+cKey,widget)
         if 'build:irBottom' in rules: _updFile()
         if 'paramsConfig'   in rules: widget.config(**params)
+        if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
         if 'returnWidget'   in rules: return widget
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
@@ -127,15 +129,17 @@ class Window     (TBS.Window):  # окно программы
       match pr['type']:
         case 'cb' : widget.config(command=lambda:_switchBoolSetting(pr['var']))
         case 'btn':
-          cmd  = pr['cmd']
-          match cmd['type']:
-            case 'UIzoom'      : widget.config(command=lambda:_setUIzoom(True))
-            case 'closeApp'    : widget.config(command=sysExit)
-            case 'il:taskBtn'  : widget.config(
-              command = lambda t=cmd['lmb']: _openTask_inRight(t)
-              )
-            case 'irFile:upd'  : widget.config(command=_updFile)
-            case 'ir:launchBtn': widget.config(command=_launchClicked)
+          try:  # у некоторых кнопок нет pr['cmd']: команда присваивается позже
+            cmd  = pr['cmd']
+            match cmd['type']:
+              case 'UIzoom'      : widget.config(command=lambda:_setUIzoom(True))
+              case 'closeApp'    : widget.config(command=sysExit)
+              case 'il:taskBtn'  : widget.config(
+                command = lambda t=cmd['lmb']: _openTask_inRight(t)
+                )
+              case 'irFile:upd'  : widget.config(command=_updFile)
+              case 'ir:launchBtn': widget.config(command=_launchClicked)
+          except: pass
     def _switchBoolSetting(param:str):
       newVal = not G.config.get(param)
       G.config.set(param,newVal)
@@ -202,7 +206,30 @@ class Window     (TBS.Window):  # окно программы
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
 
-  # вспомогательные
+  # работа с ошибками
+  def  suggInvalidUD(self,queue,suggList:list):
+    def _config():
+      self.wx['rbe:curType'].config(text    = S.UI['rbe:curType'] + S.AStypes[errObj.type])
+      self.wx['rbe:curBtn'] .config(text    = errObj.initVal,
+                                    command = lambda:self.suggVarClicked(errObj.initVal))
+      self.wx['re']         .config(text    = replaceVars(S.UI['re:lfr'],
+                                                         {'count':str(len(queue))}))
+
+    self.curError,errObj = queue[0],queue[0]  # надо запомнить, но чтобы здесь было проще
+    _config()
+    # self.setSuggState(True)
+    # self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
+    # self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
+  def   setSuggState(self,enabled:bool):
+    if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
+    # for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
+    # if not enabled: self.lblSuggType.configure(text='')
+  def suggVarClicked(self,value:str):
+    self.suggWidgets['entry'].delete(0,TBS.END)
+    self.suggWidgets['entry'].insert(0,value)
+    self.setSuggErrorState(False)
+
+  # прочие, вспомогательные
   def log(self,string:str,unit:str):
     try   : color = G.UI.colors[G.UI.log[unit]]
     except: color = None
