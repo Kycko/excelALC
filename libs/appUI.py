@@ -87,8 +87,8 @@ class Window     (TBS.Window):  # окно программы
           for cKey in G.dict.tasks[self.props['curTask']]['cfg']:
             self.buildUI('tc:'+cKey,widget)
         if 'build:irBottom' in rules: _updFile()
-        if 'addLog'         in rules: widget.config(**params)
-        if 'initErrQueue'   in rules: self.errors = ErrQueue(widget)
+        if 'paramsConfig'   in rules: widget.config(**params)
+        if 'returnWidget'   in rules: return widget
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
@@ -197,7 +197,7 @@ class Window     (TBS.Window):  # окно программы
       wdg = widget.frame if pr['type'] == 'sfr' else widget
       for  item in pr['stash']:
         if item != key: self.buildUI(item,wdg)  # защита от зацикливания
-    _finalRules() # запуск особых правил (проверки внутри)
+    return    _finalRules() # запуск особых правил (проверки внутри)
   def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
@@ -207,12 +207,6 @@ class Window     (TBS.Window):  # окно программы
     try   : color = G.colors[G.UI.log[unit]]
     except: color = None
     self.buildUI('log',self.wx['rl:main'],{'text':string,'foreground':color})
-class ErrQueue   ():
-  def __init__(self,parent:TBS.LabelFrame): self.parent,self.queue = parent,[]
-  def   add   (self,str:str):
-    self.queue  .append(TBS.Label(self.parent,text=str))
-    self.queue[-1].pack(fill='x')
-  def   rm    (self): self.queue.pop(0).destroy()
 
 # защита от запуска модуля
 if __name__ == '__main__':

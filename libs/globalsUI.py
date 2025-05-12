@@ -30,7 +30,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                        'padx'     : 5,
                                        'pady'     : 5}},
               'irFileLbl' :{'type'   : 'lbl',
-                            'pack'   :{'anchor':'w','padx':5}}}
+                            'pack'   :{'anchor':'w','padx':5}},
+              'log'       :{'rules'  :{'final':('paramsConfig')},
+                            'type'   : 'lbl',
+                            'pack'   :{'fill':'x'}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -217,14 +220,14 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'rbe:curLbl'     :{'type' : 'lbl',
                          'build':{'text':S.UI['rbe:curLbl']},
                          'pack' :{'side':'left'}},
-      're'             :{'rules':{'final':('initErrQueue')},
-                         'type' : 'lfr',
-                         'build':{'text':S.UI['re:lfr']},
-                         'pack' :{'fill':'both','expand':True,'pady':7}},
+      're'             :{'type' : 'lfr',
+                         'wxKey': 'errQueue',
+                         'build':{'text' : S.UI['re:lfr']},
+                         'pack' :{'fill' :'both','expand':True,'pady':7}},
+      're:entry'       : _getShared('log',{'root':{'rules':{'final':('paramsConfig',
+                                                                     'returnWidget')}}}),
 
-      'log'            :{'rules':{'final':('addLog')},
-                         'type' : 'lbl',
-                         'pack' :{'fill':'x'}},
+      'log'            : _getShared('log'),
       }
 
     # цвета журнала (выбираются по юниту)

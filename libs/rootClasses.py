@@ -22,7 +22,7 @@ class Root():
       self.log = Log(self.UI)
       initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
       self.log.add           ('launchType',{'str' :S.UI['tasks'][type]['log']})
-      self.errors = Errors(self.log,self.UI.errors,initStr)
+      self.errors = Errors(self.log,self.UI,initStr)
     def _getData(logging=True,rmRC=False):
       def _getLog():
         rng  = ('range','full')[self.pr['read'] == 'shActive']
@@ -93,7 +93,7 @@ class Root():
           else: _addError()
 
     self.errors.addCur(errors)
-    self     .nextSugg()# ДАЛЬШЕ ОТСЮДА (+заменить класс appUI.ErrQueue на функцию errQueue(add/rm)?)
+    self     .nextSugg()  # ДАЛЬШЕ ОТСЮДА
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
@@ -142,7 +142,7 @@ class Log():      # журнал
     self.UI.log (newStr,unit)
     return newStr # пока что нужно только для _initLE()
 class Errors():   # хранилище ошибок
-  def __init__ (self,log:Log,UI:appUI.ErrQueue,initLogStr:str):
+  def __init__ (self,log:Log,UI:appUI.Window,initLogStr:str):
     self.errorsLeft = []  # что не исправлено (нужно для подсвечивания в файле)
     self.log        = log # основной журнал Root().log
     self.UI         = UI
@@ -150,11 +150,11 @@ class Errors():   # хранилище ошибок
     self.write(initLogStr,False)
   def addCur(self,errors:dict): # errors={initLow:ErrorObj,...}
     def _addUI():
-      vars = {'type' :        err.type,
-              'count':str(len(err.pos)),
-              'value':        err.initVal}
-      txt  = strF.replaceVars(S.log['errQueue'],vars)
-      return self.UI.add(txt)
+      vars   = {'type' :        err.type,
+                'count':str(len(err.pos)),
+                'value':        err.initVal}
+      txt    = strF.replaceVars(S.log['errQueue'],vars)
+      err.UI = self.UI.buildUI('re:entry',self.UI.wx['errQueue'],{'text':txt})
     self.curQueue = list(errors.values())
     for  err  in self.curQueue: _addUI()
     if errors: self.log.add('errorsFound',
@@ -172,6 +172,7 @@ class ErrorObj(): # объект одной ошибки, используетс
     self. newVal =   newVal
     self.fixed   =  initFixed
     self.pos     = [pos]  # список всех позиций в диапазоне проверки [{'r':,'c':},...]
+    self.UI      =  None  # при создании очереди queue тут появится ссылка на label
   def addPos  (self,pos :dict): self.pos.append(pos)
 
 # защита от запуска модуля
