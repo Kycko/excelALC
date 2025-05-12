@@ -52,10 +52,10 @@ class Root():
         else: self.table = CellTable(tObj['table'])
     def _runType():
       match self.pr['launch']:
-        case _: self.rangeChecker(self.table.data,type)
+        case _: self.rangeChecker(self.table.data,self.pr['AStype'])
 
-    self.pr   =  G.dict.tasks[type]
     self.type =  type
+    self.pr   =  G.dict.tasks[type]
     self.cfg  = {param:G.config.get(type+':'+param) for param in self.pr['cfg']}
     _initLE ()
     _getData(rmRC=self.pr['rmRC_onRead'])
@@ -76,7 +76,7 @@ class Root():
       AST   = G.dict.AStypes
       if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
         suggList   = _getSuggList(queue[0])
-        self.UI    .suggInvalidUD(queue[0],suggList,len(queue)) # ДАЛЬШЕ ОТСЮДА
+        self.UI    .suggInvalidUD(queue[0],suggList,len(queue))
       else:
         if not JV      : self.UI.setSuggState(False)
         if     self.type != 'reCalc': self.finalizeErrors (self.type == 'allChecks')
@@ -164,16 +164,15 @@ class Errors():   # хранилище ошибок
     self.write(initLogStr,False)
   def addCur(self,errors:dict): # errors={initLow:ErrorObj,...}
     def _addUI():
-      vars   = {'type' :        err.type,
-                'count':str(len(err.pos)),
+      vars   = {'count':str(len(err.pos)),
                 'value':        err.initVal}
       txt    = strF.replaceVars(S.log['errQueue'],vars)
       err.UI = self.UI.buildUI('re:entry',self.UI.wx['errQueue'],{'text':txt})
     self.queue = list(errors.values())
     for  err  in self.queue: _addUI()
     if errors: self.log.add('errorsFound',
-                           {'type' :    self.queue[0].type,
-                            'count':len(self.queue)})
+                           {'type' :        self.queue[0].type,
+                            'count':str(len(self.queue))})
   # def add_noFix(self) потом доработать, это запись ошибок без исправления
   def write(self,str:str,justAdd=True):
     write_toFile   ([str],self.file,justAdd)

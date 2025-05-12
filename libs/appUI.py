@@ -204,7 +204,7 @@ class Window     (TBS.Window):  # окно программы
 
   # вспомогательные
   def log(self,string:str,unit:str):
-    try   : color = G.colors[G.UI.log[unit]]
+    try   : color = G.UI.colors[G.UI.log[unit]]
     except: color = None
     self.buildUI('log',self.wx['rl:main'],{'text':string,'foreground':color})
 

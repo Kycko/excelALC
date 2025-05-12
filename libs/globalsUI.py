@@ -221,11 +221,14 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'build':{'text':S.UI['rbe:curLbl']},
                          'pack' :{'side':'left'}},
       're'             :{'type' : 'lfr',
-                         'wxKey': 'errQueue',
                          'build':{'text' : S.UI['re:lfr']},
-                         'pack' :{'fill' :'both','expand':True,'pady':7}},
-      're:entry'       : _getShared('log',{'root':{'rules':{'final':('paramsConfig',
-                                                                     'returnWidget')}}}),
+                         'pack' :{'fill' :'both','expand':True,'pady':7},
+                         'stash':['reInner']},
+      'reInner'        :{'type' : 'fr',
+                         'wxKey': 'errQueue',
+                         'pack' :{'fill':'both','expand':True,'padx':8,'pady':3}},
+      're:entry'       : _getShared('log',{'root' :{'rules':{'final':('paramsConfig',
+                                                                      'returnWidget')}}}),
 
       'log'            : _getShared('log'),
       }
