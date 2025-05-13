@@ -16,6 +16,9 @@ files = {'lib'   :'справочник excelALC.xlsx',
 # настройки
 config = userCfg(files['config'])
 
+# прочее
+enterKeys = ('<Key-Return>','<KP_Enter>')
+
 # защита от запуска модуля
 if __name__ == '__main__':
   print  ("This is module, please don't execute.")

@@ -6,34 +6,36 @@ class globUI(): # импортируется в G.UI (в глобальные п
   def __init__(self):
     def _getShared(type:str,upd={}):
       # функция, передающая в self.build одинаковые свойства для однотипных элементов
-      dict = {'fRoot'     :{'rules'  :{'start':('clean')},
-                            'type'   : 'fr',
-                            'wxKey'  : 'fRoot',
-                            'pack'   :{'fill':'both','expand':True,'padx':10,'pady':10}},
-              'ilTab'     :{'rules'  :{'final':('packTab')},
-                            'type'   : 'fr',
-                            'pack'   :{'fill'   :'both'},
-                            'packTab':{'padding': 7}},  # свойства для правила 'packTab'
-              'scrollTab' :{'rules'  :{'final':('packTab')},
-                            'type'   : 'sfr', # ScrollFrame
-                            'pack'   :{'fill'   :'both'},
-                            'packTab':{'padding': 7}},
-              'il:taskBtn':{'type'   : 'btn',
-                            'cmd'    :{'type' :'il:taskBtn'},
-                            'build'  :{'width': 45},
-                            'pack'   :{'pady' :  5}},
-              'ir:tc:cb'  :{'rules'  :{'start':('mergeTC')},
-                            'type'   : 'cb',
-                            'build'  :{'bootstyle':'round-toggle'},
-                            'pack'   :{'anchor'   :'nw',
-                                       'expand'   : True,
-                                       'padx'     : 5,
-                                       'pady'     : 5}},
-              'irFileLbl' :{'type'   : 'lbl',
-                            'pack'   :{'anchor':'w','padx':5}},
-              'log'       :{'rules'  :{'final':('paramsConfig')},
-                            'type'   : 'lbl',
-                            'pack'   :{'fill':'x'}}}
+      dict = {'fRoot'      :{'rules'  :{'start':('clean')},
+                             'type'   : 'fr',
+                             'wxKey'  : 'fRoot',
+                             'pack'   :{'fill':'both','expand':True,'padx':10,'pady':10}},
+              'ilTab'      :{'rules'  :{'final':('packTab')},
+                             'type'   : 'fr',
+                             'pack'   :{'fill'   :'both'},
+                             'packTab':{'padding': 7}},  # свойства для правила 'packTab'
+              'scrollTab'  :{'rules'  :{'final':('packTab')},
+                             'type'   : 'sfr', # ScrollFrame
+                             'pack'   :{'fill'   :'both'},
+                             'packTab':{'padding': 7}},
+              'il:taskBtn' :{'type'   : 'btn',
+                             'cmd'    :{'type' :'il:taskBtn'},
+                             'build'  :{'width': 45},
+                             'pack'   :{'pady' :  5}},
+              'ir:tc:cb'   :{'rules'  :{'start':('mergeTC')},
+                             'type'   : 'cb',
+                             'build'  :{'bootstyle':'round-toggle'},
+                             'pack'   :{'anchor'   :'nw',
+                                        'expand'   : True,
+                                        'padx'     : 5,
+                                        'pady'     : 5}},
+              'irFileLbl'  :{'type'   : 'lbl',
+                             'pack'   :{'anchor':'w','padx':5}},
+              'log'        :{'rules'  :{'final':('paramsConfig')},
+                             'type'   : 'lbl',
+                             'pack'   :{'fill':'x'}},
+              'rbeOkCancel':{'type'   : 'btn',
+                             'pack'   :{'side':'left'}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -47,7 +49,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                    {'lbl':'150%','size':(1100,700)},
                    {'lbl':'175%','size':(1150,750)})
     self.fonts  =  {'iconBig':('Calibri',17)} # только для label'ов (для кнопок всё сложнее)
-    self.icons  =  {'moon':'🌙','sun':'🔆'}
+    self.icons  =  {'moon':'🌙','sun'   :'🔆',
+                    'done':'✔' ,'cancel':'❌'}
 
     # цвета (разные для светлой[0] и тёмной[1] тем
     # !ИСП. G.UI.colors (он перезаписывается при смене темы, в appUI.Window.setUItheme())
@@ -71,7 +74,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       # rules{start:, особые правила В НАЧАЛЕ buildUI()
       #       final:, ––||––         В КОНЦЕ  buildUI()
       #       other:} ––||––  в разных местах buildUI(), НУЖНО ВСТРАИВАТЬ в основной код
-      # type     = fr(ame),lfr(labelFrame),cb(checkButton),tt(toolTip),tbs(tabs=TBS.Notebook),...
+      # type     = fr(ame),lfr(labelFrame),cb(checkButton),ent(entry),tbs(tabs=TBS.Notebook),...
       # wxKey    = ключ для сохранения виджетов в памяти (в appUI.Window.wx{})
       # var/tVar = variable для BooleanVar, ОБЯЗАТЕЛЬНА для type = cb
       # cmd      = {type = тип для _bindCmd(), lmb = для lambda}
@@ -205,6 +208,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'rlTabErrors'    : _getShared('scrollTab',
                                    {'inner':{'packTab':{'text':S.UI['rl:errors']}},
                                     'root' :{'wxKey'  : 'rl:errors'}}),
+
       'rb'             :{'type' : 'lfr',
                          'wxKey': 'rbLfr',
                          'build':{'text':S.UI['rb:init']},
@@ -212,15 +216,38 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'stash':['rbRoot']},
       'rbRoot'         :{'type' : 'fr',
                          'wxKey': 'rbRoot',
-                         'pack' :{'fill':'both','expand':True,'padx':10,'pady':2},
-                         'stash':['rbe:cur','rbe:sep']},  # e в rbe = errors (обработка ошибок)
-      'rbe:cur'        :{'type' : 'fr',
-                         'pack' :{'fill':'x','side':'top'},
-                         'stash':['rbe:curType','rbe:curVal']},
+                         'pack' :{'fill':'both','padx':10,'pady':2},
+                         'stash':['rbeEntry', # e в rbe = errors (обработка ошибок)
+                                  'rbe:sep',
+                                  'rbe:cur']},
+      'rbeEntry'       :{'type' : 'fr',
+                         'pack' :{'fill':'x','anchor':'n'},
+                         'stash':['rbeEntry:lbl','rbe:curType','rbeEntry:bottom']},
+      'rbeEntry:lbl'   :{'type' : 'lbl',
+                         'build':{'text': S.UI['rbeEntry:lbl']},
+                         'pack' :{'fill':'x','padx':2}},
       'rbe:curType'    :{'rules':{'final':('color:lightRed')},
                          'type' : 'lbl',
                          'wxKey': 'rbe:curType',
-                         'pack' :{'fill':'x'}},
+                         'pack' :{'fill':'x','padx':2}},
+      'rbeEntry:bottom':{'type' : 'fr',
+                         'pack' :{'fill':'x'},
+                         'stash':['rbeEntry:entry','rbeEntry:ok','rbeEntry:cancel']},
+      'rbeEntry:entry' :{'rules':{'final':('rbeEntry')},
+                         'type' : 'ent',
+                         'wxKey': 'rbeEntry',
+                         'pack' :{'fill':'x','expand':True,'side':'left','padx':4,'pady':7}},
+      'rbeEntry:ok'    : _getShared('rbeOkCancel',
+                                    {'root':{'build':{'text':self.icons['done'],
+                                                      'bootstyle':'success'}}}),
+      'rbeEntry:cancel': _getShared('rbeOkCancel',
+                                    {'root':{'build':{'text':self.icons['cancel'],
+                                                      'bootstyle':'danger'}}}),
+      'rbe:sep'        :{'type' : 'sep',
+                         'pack' :{'fill':'x','expand':True,'anchor':'n','padx':2,'pady':3}},
+      'rbe:cur'        :{'type' : 'fr',
+                         'pack' :{'fill':'x','expand':True,'anchor':'n','pady':4},
+                         'stash':['rbe:curVal']},
       'rbe:curVal'     :{'type' : 'fr',
                          'pack' :{'fill':'x'},
                          'stash':['rbe:curLbl','rbe:curBtn']},
@@ -231,8 +258,6 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'wxKey': 'rbe:curBtn',
                          'build':{'bootstyle':'warning-outline'},
                          'pack' :{'fill':'x','side':'right'}},
-      'rbe:sep'        :{'type' : 'sep',
-                         'pack' :{'fill':'x','padx':2,'pady':10}},
 
       're'             :{'type' : 'lfr',
                          'wxKey': 're',

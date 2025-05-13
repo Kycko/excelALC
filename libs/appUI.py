@@ -90,25 +90,28 @@ class Window     (TBS.Window):  # окно программы
         if 'build:irBottom' in rules: _updFile()
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
+        if 'rbeEntry'       in rules:
+          for key in G.enterKeys:
+            self.wx['rbeEntry'].bind(key,lambda:_suggFinalClicked('ok'))
         if 'returnWidget'   in rules: return widget
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
       match pr['type']:
-        case  'fr': return TBS.     Frame(parent)
-        case 'lfr': return TBS.Labelframe(parent,**bld)
-        case 'sfr': return    ScrollFrame(parent)
-        case 'lbl': return TBS.Label     (parent,**bld)
-        case 'btn': return TBS.Button    (parent,**bld)
-        case 'tt' : return     ToolTip   (parent,**bld)
-        case 'tbs': return TBS.Notebook  (parent)
-        case 'sep': return TBS.Separator (parent)
-        case 'cb' :
-          return TBS.Checkbutton(
-            parent,
-            variable = BooleanVar(value=G.config.get(pr['var'])),
-            **bld
-            )
+        case 'btn': return TBS.     Button(parent,**bld)
+        case 'cb' : return TBS.Checkbutton(
+          parent,
+          variable = BooleanVar(value=G.config.get(pr['var'])),
+          **bld
+          )
+        case 'ent': return TBS.Entry      (parent)
+        case  'fr': return TBS.Frame      (parent)
+        case 'lbl': return TBS.Label      (parent,**bld)
+        case 'lfr': return TBS.Labelframe (parent,**bld)
+        case 'sep': return TBS.Separator  (parent)
+        case 'sfr': return     ScrollFrame(parent)
+        case 'tbs': return TBS.Notebook   (parent)
+        case 'tt' : return     ToolTip    (parent,**bld)
     # изменение оформления
     def _setUIzoom(change=False):
       cfgName = 'main:zoom'
@@ -179,7 +182,7 @@ class Window     (TBS.Window):  # окно программы
       for k,it in     keys.items(): self.wx[it]     .config(text       = p[k])
       self.wx[keys['btn']].config(state=p['bState'])
       return book
-    def _launchClicked    (): # это запуск проверок
+    def _launchClicked    ():         # это запуск проверок
       book = _updFile()
       if book:
         # for param in G.launchTypes[type]['getOnLaunch']:
@@ -187,6 +190,15 @@ class Window     (TBS.Window):  # окно программы
         task = self.props['curTask']  # self.props очищается в self.buildUI()
         self   .buildUI('run',self)
         self.app.launch( book,task)
+    def _suggFinalClicked (btn:str):  # btn = ok/cancel/rejectAll(отменить всю очередь)
+      self.setErrorMsg()
+      match btn:
+        case 'ok':
+          VAL = self.app.validate_andCapitalize(self.curError.type,
+                                                self.wx['rbeEntry'].get())
+          if VAL['valid']: self.app.suggFinalClicked(True,VAL['value'])
+          else:            self         .setErrorMsg(True,VAL)
+        case 'cancel': self.app.suggFinalClicked(False)
 
     pr = G.UI.build[key]  # pr = properties
     _startRules()         # запуск особых правил (проверки внутри)
@@ -224,6 +236,9 @@ class Window     (TBS.Window):  # окно программы
     if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
     # for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
     # if not enabled: self.lblSuggType.configure(text='')
+  def   setErrorMsg (self,vObj=None): # показывает проблему введённого значения
+    # vObj={type:,value:,valid:,errKey:}
+    self.lblInvalidUD.configure(text = S.errInput[vObj['type']][vObj['errKey']] if error else '')
   def suggVarClicked(self,value:str):
     self.suggWidgets['entry'].delete(0,TBS.END)
     self.suggWidgets['entry'].insert(0,value)

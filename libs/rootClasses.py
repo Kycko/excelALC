@@ -66,19 +66,6 @@ class Root():
     # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
     # т. е. table – это всегда [[Cell,...],...]
     def _addError(): errors[low] = ErrorObj(type,cell.value,errPos)
-    def _nextSugg():
-      def _getSuggList(errObj):
-        type,val = errObj.type,errObj.initVal
-        if AST[type]['getLibSugg']: return lib .sugg   .get(type,val)
-        else:                       return strF.getSuggList(type,val)
-
-      queue = self.errors.queue
-      AST   = G.dict.AStypes
-      if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
-        self.UI.suggInvalidUD(queue,_getSuggList(queue[0]))
-      else:
-        if not JV      : self.UI.setSuggState(False)
-        if     self.type != 'reCalc': self.finalizeErrors (self.type == 'allChecks')
 
     self.rTable = table # range table, понадобится в self.finalizeErrors()
     errors      = {}    # {initLow:ErrorObj,...}
@@ -106,7 +93,7 @@ class Root():
           else: _addError()
 
     self.errors.addCur(errors)
-    _nextSugg()
+    self.nextSugg()
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
@@ -131,6 +118,23 @@ class Root():
       else: final['errKey'] = 'notInList'
     else: strF.validateCell(final,self.uCfg)  # final обновляется внутри
     return final
+  def nextSugg(self):
+    def _getSuggList(errObj):
+      type,val = errObj.type,errObj.initVal
+      if AST[type]['getLibSugg']: return lib .sugg   .get(type,val)
+      else:                       return strF.getSuggList(type,val)
+
+    queue = self.errors.queue
+    JV    = self.pr['justVerify']
+    AST   = G.dict.AStypes
+    if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
+      self.UI.suggInvalidUD(queue,_getSuggList(queue[0]))
+    else:
+      if not JV      : self.UI.setSuggState(False)
+      if     self.type != 'reCalc': self.finalizeErrors (self.type == 'allChecks')
+  def suggFinalClicked(self,OKclicked:bool,newValue=''):
+    self.errors.suggClicked(OKclicked,newValue)
+    self.nextSugg()
 
   # чтение данных из таблицы
   def searchTitleRow(self,table:Table):
@@ -155,13 +159,14 @@ class Log():      # журнал
     self.UI.log (newStr,unit)
     return newStr # пока что нужно только для _initLE()
 class Errors():   # хранилище ошибок
-  def __init__ (self,log:Log,UI:appUI.Window,initLogStr:str):
-    self.errorsLeft = []  # что не исправлено (нужно для подсвечивания в файле)
-    self.log        = log # основной журнал Root().log
-    self.UI         = UI
-    self.file       = G.files['errors']
+  def __init__   (self,log:Log,UI:appUI.Window,initLogStr:str):
+    self.log,self.UI = log,UI
+    self.queue       = [] # текущая очередь
+    self.qStage      = [] # q=queue: ошибки после очереди, ждут записи
+    self.qFinal      = [] # q=queue: храним ошибки для подсчёта в самом конце
+    self.file        = G.files['errors']
     self.write(initLogStr,False)
-  def addCur(self,errors:dict): # errors={initLow:ErrorObj,...}
+  def  addCur    (self,errors:dict):  # errors={initLow:ErrorObj,...}
     def _addUI():
       vars   = {'count':str(len(err.pos)),
                 'value':        err.initVal}
@@ -172,7 +177,15 @@ class Errors():   # хранилище ошибок
     if errors: self.log.add('errorsFound',
                            {'type' :        self.queue[0].type,
                             'count':str(len(self.queue))})
-  # def add_noFix(self) потом доработать, это запись ошибок без исправления
+  def suggClicked(self,OKclicked:bool,newValue:str):
+    def _log():
+      key =  'sugg'+('-','+')[err.fixed]
+      log = {'type':err.type,'from':err.initVal,'to':err.newVal}
+      self.log.add(key,log)
+    err = self.queue.pop(0)
+    err  .suggFinished(OKclicked,newValue)
+    self.qStage.append(err)
+    _log()
   def write(self,str:str,justAdd=True):
     write_toFile   ([str],self.file,justAdd)
     self.UI.buildUI('log',self.UI.wx['rl:errors'],{'text':str})
@@ -186,6 +199,10 @@ class ErrorObj(): # объект одной ошибки, используетс
     self.pos     = [pos]  # список всех позиций в диапазоне проверки [{'r':,'c':},...]
     self.UI      =  None  # при создании очереди queue тут появится ссылка на label
   def addPos  (self,pos :dict): self.pos.append(pos)
+  def suggFinished(self,fixed:bool,newVal:str):
+    self.fixed,self.newVal = fixed,newVal
+    self.UI.destroy()
+    self.UI = None
 
 # защита от запуска модуля
 if __name__ == '__main__':
