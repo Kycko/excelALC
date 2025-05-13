@@ -92,7 +92,8 @@ class Window     (TBS.Window):  # окно программы
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
         if 'rbeEntry'       in rules:
           for key in G.enterKeys:
-            self.wx['rbeEntry'].bind(key,lambda:_suggFinalClicked('ok'))
+            self.wx['rbeEntry'].bind(key,
+                                     lambda _:_suggFinalClicked('ok'))  # без _ ошибка
         if 'returnWidget'   in rules: return widget
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
@@ -142,6 +143,7 @@ class Window     (TBS.Window):  # окно программы
                 )
               case 'irFile:upd'  : widget.config(command=_updFile)
               case 'ir:launchBtn': widget.config(command=_launchClicked)
+              case 'rbeEntry'    : widget.config(command=lambda:_suggFinalClicked(cmd['lmb']))
           except: pass
     def _switchBoolSetting(param:str):
       newVal = not G.config.get(param)
@@ -197,7 +199,7 @@ class Window     (TBS.Window):  # окно программы
           VAL = self.app.validate_andCapitalize(self.curError.type,
                                                 self.wx['rbeEntry'].get())
           if VAL['valid']: self.app.suggFinalClicked(True,VAL['value'])
-          else:            self         .setErrorMsg(True,VAL)
+          else:            self         .setErrorMsg(VAL)
         case 'cancel': self.app.suggFinalClicked(False)
 
     pr = G.UI.build[key]  # pr = properties
@@ -231,18 +233,19 @@ class Window     (TBS.Window):  # окно программы
     _config()
     # self.setSuggState(True)
     # self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
-    # self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
+    self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
   def   setSuggState(self,enabled:bool):
     if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
     # for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
     # if not enabled: self.lblSuggType.configure(text='')
   def   setErrorMsg (self,vObj=None): # показывает проблему введённого значения
     # vObj={type:,value:,valid:,errKey:}
-    self.lblInvalidUD.configure(text = S.errInput[vObj['type']][vObj['errKey']] if error else '')
+    txt = '' if vObj is None else 'ЗАГЛУШКА'
+    self.wx['rbe:errMsg'].config(text=txt)
   def suggVarClicked(self,value:str):
-    self.suggWidgets['entry'].delete(0,TBS.END)
-    self.suggWidgets['entry'].insert(0,value)
-    self.setSuggErrorState(False)
+    self.wx['rbeEntry'].delete(0,TBS.END)
+    self.wx['rbeEntry'].insert(0,value)
+    self.setErrorMsg()
 
   # прочие, вспомогательные
   def log(self,string:str,unit:str):
