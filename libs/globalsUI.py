@@ -269,9 +269,9 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'wxKey': 're',
                          'pack' :{'fill' :'both','expand':True,'pady':7},
                          'stash':['reInner']},
-      'reInner'        :{'type' : 'fr',
+      'reInner'        :{'type' : 'sfr',
                          'wxKey': 'errQueue',
-                         'pack' :{'fill':'both','expand':True,'padx':8,'pady':3}},
+                         'pack' :{'fill':'both','expand':True,'padx':8,'pady':6}},
       're:entry'       : _getShared('log',{'root' :{'rules':{'final':('paramsConfig',
                                                                       'returnWidget')}}}),
 
