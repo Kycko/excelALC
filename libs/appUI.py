@@ -240,7 +240,7 @@ class Window     (TBS.Window):  # окно программы
     # if not enabled: self.lblSuggType.configure(text='')
   def   setErrorMsg (self,vObj=None): # показывает проблему введённого значения
     # vObj={type:,value:,valid:,errKey:}
-    txt = '' if vObj is None else 'ЗАГЛУШКА'
+    txt = '' if vObj is None else S.errInput[vObj['type']][vObj['errKey']]
     self.wx['rbe:errMsg'].config(text=txt)
   def suggVarClicked(self,value:str):
     self.wx['rbeEntry'].delete(0,TBS.END)

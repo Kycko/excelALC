@@ -10,8 +10,8 @@ def readFile    (file:str):
   with open(file,'r',encoding='utf-8') as f: return [line.strip() for line in f]
 def write_toFile(list:list,file:str,justAdd=False):
   # если justAdd=True, предыдущие данные останутся в файле
-  if justAdd: mode,list = 'a',[list]
-  else:       mode      = 'w'
+  if type(list) != list: list = [list]
+  mode = ('w','a')[justAdd]
 
   with open(file,mode,encoding='utf-8') as f:
     for line in list: f.write(f"{line}\n")

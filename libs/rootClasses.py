@@ -179,15 +179,16 @@ class Errors():   # хранилище ошибок
                             'count':str(len(self.queue))})
   def suggClicked(self,OKclicked:bool,newValue:str):
     def _log():
-      key =  'sugg'+('-','+')[err.fixed]
-      log = {'type':err.type,'from':err.initVal,'to':err.newVal}
-      self.log.add(key,log)
-    err = self.queue.pop(0)
-    err  .suggFinished(OKclicked,newValue)
-    self.qStage.append(err)
+      key =   'sugg'+('-','+')[err.fixed]
+      self.log.add(key,{'type':err.type,'from':err.initVal,'to':err.newVal})
+      if not err.fixed:
+        self.write(S.log['errorLeft'].replace('$type$',err.type) + lblText)
+    err     = self.queue.pop(0)
+    lblText = err  .suggFinished(OKclicked,newValue)
     _log()
+    self.qStage.append(err)
   def write(self,str:str,justAdd=True):
-    write_toFile   ([str],self.file,justAdd)
+    write_toFile(str,self.file,justAdd)
     self.UI.buildUI('log',self.UI.wx['rl:errors'],{'text':str})
 class ErrorObj(): # объект одной ошибки, используется в хранилище Errors()
   def __init__(self,type:str,initValue:str,pos:dict,initFixed=False,newVal=None):
@@ -201,8 +202,10 @@ class ErrorObj(): # объект одной ошибки, используетс
   def addPos  (self,pos :dict): self.pos.append(pos)
   def suggFinished(self,fixed:bool,newVal:str):
     self.fixed,self.newVal = fixed,newVal
+    txt = self.UI['text']
     self.UI.destroy()
     self.UI = None
+    return txt
 
 # защита от запуска модуля
 if __name__ == '__main__':
