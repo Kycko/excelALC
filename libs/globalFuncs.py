@@ -6,15 +6,15 @@ def sysExit(self=None): SYSEXIT() # self для привязки к нажати
 def curDateTime(): return datetime.now().strftime('%d.%m.%Y %H:%M:%S')
 
 # глобальные
-def readFile    (file:str):
+def readFile    (file :str):
   with open(file,'r',encoding='utf-8') as f: return [line.strip() for line in f]
-def write_toFile(list:list,file:str,justAdd=False):
+def write_toFile(lines:list,file:str,justAdd=False):
   # если justAdd=True, предыдущие данные останутся в файле
-  if type(list) != list: list = [list]
+  if type(lines) != list: lines = [lines]
   mode = ('w','a')[justAdd]
 
   with open(file,mode,encoding='utf-8') as f:
-    for line in list: f.write(f"{line}\n")
+    for line in lines: f.write(f"{line}\n")
 def get_initSettings(): return {'main':{'darkTheme':checkWinTheme(),
                                         'zoom'     :0}}
 def getIB(type:str,index:int):  # IB = index/boolean

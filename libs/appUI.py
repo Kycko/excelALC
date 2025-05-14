@@ -97,7 +97,7 @@ class Window     (TBS.Window):  # окно программы
         if 'addSuggItem'    in rules:
           p   = params
           num = p['num'] if p['num'] < 10 else 0
-          self.wx['rbev:num'].config(text    = num) # ДАЛЕЕ ДОБАВИТЬ ХОТКЕИ
+          self.wx['rbev:num'].config(text    = num)
           self.wx['rbev:btn'].config(text    = p['item']['btn'],
                                      command = lambda:self.suggVarClicked(p['item']['val']))
         if 'rbeEntry'       in rules:

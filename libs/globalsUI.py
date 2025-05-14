@@ -44,10 +44,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
     # стили оформления (темы, шрифты и т. п.)
     self.themes = ( 'flatly','superhero')  # светлая/тёмная
-    self.sizes  = ({'lbl':'100%','size':(1000,600)},
-                   {'lbl':'125%','size':(1050,650)},
-                   {'lbl':'150%','size':(1100,700)},
-                   {'lbl':'175%','size':(1150,750)})
+    self.sizes  = ({'lbl':'100%','size':(1000,700)},
+                   {'lbl':'125%','size':(1050,750)},
+                   {'lbl':'150%','size':(1100,800)},
+                   {'lbl':'175%','size':(1150,850)})
     self.fonts  =  {'iconBig':('Calibri',17)} # только для label'ов (для кнопок всё сложнее)
     self.icons  =  {'moon':'🌙','sun'   :'🔆',
                     'done':'✔' ,'cancel':'❌'}
@@ -194,7 +194,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'pack' :{'fill':'both','expand':True,'side':'left'},
                          'stash':['rlLbl','rlTabs']},
       'rr'             :{'type' : 'fr',
-                         'pack' :{'fill':'both','expand':True,'side':'right','padx':5},
+                         'pack' :{'fill':'both','side':'right','padx':5},
                          'stash':['rb','re']},
       'rlLbl'          :{'type' : 'lbl',
                          'build':{'text':S.UI['rl:lbl']},
