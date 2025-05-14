@@ -128,7 +128,7 @@ class Root():
     JV    = self.pr['justVerify']
     AST   = G.dict.AStypes
     if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
-      self.UI.suggInvalidUD(queue,_getSuggList(queue[0]))
+      self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:10])
     elif self.type != 'reCalc': self.finalizeErrors(self.type == 'allChecks')
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
     self.errors.suggClicked(OKclicked,newValue)
@@ -169,7 +169,7 @@ class Errors():   # хранилище ошибок
       vars   = {'count':str(len(err.pos)),
                 'value':        err.initVal}
       txt    = strF.replaceVars(S.log['errQueue'],vars)
-      err.UI = self.UI.buildUI('re:entry',self.UI.wx['errQueue'],{'text':txt})
+      err.UI = self.UI.buildUI('re:item',self.UI.wx['errQueue'],{'text':txt})
     self.queue = list(errors.values())
     for  err  in self.queue: _addUI()
     if errors: self.log.add('errorsFound',

@@ -90,6 +90,16 @@ class Window     (TBS.Window):  # окно программы
         if 'build:irBottom' in rules: _updFile()
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
+        if 'addSuggList'    in rules:
+          for i in range(len(params)): self.buildUI('rbeVars:item',
+                                                    widget,
+                                                    {'num':i+1,'item':params[i]})
+        if 'addSuggItem'    in rules:
+          p   = params
+          num = p['num'] if p['num'] < 10 else 0
+          self.wx['rbev:num'].config(text    = num) # ДАЛЕЕ ДОБАВИТЬ ХОТКЕИ
+          self.wx['rbev:btn'].config(text    = p['item']['btn'],
+                                     command = lambda:self.suggVarClicked(p['item']['val']))
         if 'rbeEntry'       in rules:
           for key in G.enterKeys:
             self.wx['rbeEntry'].bind(key,
@@ -193,14 +203,20 @@ class Window     (TBS.Window):  # окно программы
         self   .buildUI('run',self)
         self.app.launch( book,task)
     def _suggFinalClicked (btn:str):  # btn = ok/cancel/rejectAll(отменить всю очередь)
+      def _finish():
+        self.wx.pop('rbeVars').destroy()
+        if btn == 'ok': OKcl,newVal = True ,VAL['value']
+        else          : OKcl,newVal = False,''
+        self.app.suggFinalClicked(OKcl,newVal)
+        # case 'rejectAll':
+
       self.setErrorMsg()
-      match btn:
-        case 'ok':
-          VAL = self.app.validate_andCapitalize(self.curError.type,
-                                                self.wx['rbeEntry'].get())
-          if VAL['valid']: self.app.suggFinalClicked(True,VAL['value'])
-          else:            self         .setErrorMsg(VAL)
-        case 'cancel': self.app.suggFinalClicked(False)
+      finish  = True
+      if btn == 'ok':
+        VAL = self.app.validate_andCapitalize(self.curError.type,
+                                              self.wx['rbeEntry'].get())
+        if not VAL['valid']: self.setErrorMsg(VAL); finish = False
+      if finish: _finish()
 
     pr = G.UI.build[key]  # pr = properties
     _startRules()         # запуск особых правил (проверки внутри)
@@ -214,7 +230,7 @@ class Window     (TBS.Window):  # окно программы
     if 'stash' in pr.keys():
       wdg = widget.frame if pr['type'] == 'sfr' else widget
       for  item in pr['stash']:
-        if item != key: self.buildUI(item,wdg)  # защита от зацикливания
+        if item != key: self.buildUI(item,wdg,params) # защита от зацикливания
     return    _finalRules() # запуск особых правил (проверки внутри)
   def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
@@ -222,7 +238,7 @@ class Window     (TBS.Window):  # окно программы
 
   # работа с ошибками
   def  suggInvalidUD(self,queue,suggList:list):
-    def _config():
+    def _configWidgets():
       self.wx['rbe:curType'].config(text    = S.UI['rbe:curType'] + S.AStypes[errObj.type])
       self.wx['rbe:curBtn'] .config(text    = errObj.initVal,
                                     command = lambda:self.suggVarClicked(errObj.initVal))
@@ -230,8 +246,8 @@ class Window     (TBS.Window):  # окно программы
                                                          {'count':str(len(queue))}))
 
     self.curError,errObj = queue[0],queue[0]  # надо запомнить, но чтобы здесь было проще
-    _config()
-    self.buildUI('rbe:vars',self.wx['rbRoot'],suggList)
+    _configWidgets()
+    if suggList: self.buildUI('rbeVars',self.wx['rbRoot'],suggList)
     self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
   def   setErrorMsg (self,vObj=None): # показывает проблему введённого значения
     # vObj={type:,value:,valid:,errKey:}
