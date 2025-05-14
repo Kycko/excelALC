@@ -231,13 +231,8 @@ class Window     (TBS.Window):  # окно программы
 
     self.curError,errObj = queue[0],queue[0]  # надо запомнить, но чтобы здесь было проще
     _config()
-    # self.setSuggState(True)
-    # self.buildFrame  ('runSuggVars',self.frSuggMain,suggList)
+    self.buildUI('rbe:vars',self.wx['rbRoot'],suggList)
     self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
-  def   setSuggState(self,enabled:bool):
-    if  hasattr  (self,'frSuggVars'): self.frSuggVars.destroy()
-    # for widget in self.suggWidgets.values(): widget.configure(state=('disabled','normal')[enabled])
-    # if not enabled: self.lblSuggType.configure(text='')
   def   setErrorMsg (self,vObj=None): # показывает проблему введённого значения
     # vObj={type:,value:,valid:,errKey:}
     txt = '' if vObj is None else S.errInput[vObj['type']][vObj['errKey']]

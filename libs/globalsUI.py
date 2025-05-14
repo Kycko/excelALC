@@ -219,7 +219,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'pack' :{'fill':'both','padx':10,'pady':2},
                          'stash':['rbeEntry', # e в rbe = errors (обработка ошибок)
                                   'rbe:sep',
-                                  'rbe:cur']},
+                                  'rbe:cur',
+                                  'rbe:vars']}, # ДАЛЬШЕ ДОБАВЛЯЕМ ЕГО
       'rbeEntry'       :{'type' : 'fr',
                          'pack' :{'fill':'x','anchor':'n'},
                          'stash':['rbeEntry:lbl','rbe:curType','rbeEntry:bottom','rbeEntry:errMsg']},
