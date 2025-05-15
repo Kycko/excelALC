@@ -128,7 +128,7 @@ class Root():
     JV    = self.pr['justVerify']
     AST   = G.dict.AStypes
     if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
-      self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:10])
+      self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:9])
     elif self.type != 'reCalc': self.finalizeErrors(self.type == 'allChecks')
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
     self.errors.suggClicked(OKclicked,newValue)

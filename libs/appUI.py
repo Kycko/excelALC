@@ -40,7 +40,7 @@ class ScrollFrame(TBS.Frame):
     _bind()
 class Window     (TBS.Window):  # окно программы
   # конструкторы интерфейса
-  def __init__  (self,app):
+  def __init__    (self,app):
     def _bindSpace():
       def _call(event):
         try:
@@ -55,7 +55,17 @@ class Window     (TBS.Window):  # окно программы
     _bindSpace   ()
     self.buildUI ('init',self)
     self.place_window_center()  # расположить в центре экрана
-  def buildUI   (self,key:str,parent,params=None):
+  def getAllChilds(self,widget):  # возвращает все вложенные виджеты, КРОМЕ Entry
+    def _append(widget):
+      if not isinstance(widget,TBS.Entry): final.append(widget)
+    final = []
+    for child in widget.winfo_children():
+      if      len(child.winfo_children()) == 0: _append(child)
+      else:
+        _append     (widget)
+        final.extend(self.getAllChilds(child))
+    return final
+  def buildUI     (self,key:str,parent,params=None):
     # key = build key (из G.UI.build{})
     # в params передаём любые доп. данные (напр., тип задачи для фрейма 'ir')
     # создание интерфейса
@@ -77,6 +87,7 @@ class Window     (TBS.Window):  # окно программы
           G.UI.build [newKey]  = {'type':'tt','build':{'text':strings['tt']}}
       except: pass  # так проще, чем с доп. условиями
     def _finalRules  ():
+      def _suggClicked(item:str): self.suggVarClicked(item)
       try:
         rules = pr['rules']['final']
         if 'packTab'        in rules: parent.add(widget,**pr['packTab'])
@@ -97,13 +108,16 @@ class Window     (TBS.Window):  # окно программы
         if 'addSuggItem'    in rules:
           p   = params
           num = p['num'] if p['num'] < 10 else 0
-          self.wx['rbev:num'].config(text    = num)
-          self.wx['rbev:btn'].config(text    = p['item']['btn'],
-                                     command = lambda:self.suggVarClicked(p['item']['val']))
+          self.wx['rbev:num'].config(text        = num)
+          self.wx['rbev:btn'].config(text        = p['item']['btn'],
+                                     command     = lambda  :_suggClicked(p['item']['val']))
+          for w in self.getAllChilds(self.wx['fRoot']):
+            w.bind(num,lambda s:_suggClicked(p['item']['val']))
         if 'rbeEntry'       in rules:
           for key in G.enterKeys:
             self.wx['rbeEntry'].bind(key,
                                      lambda _:_suggFinalClicked('ok'))  # без _ ошибка
+        if 'setFocus'       in rules: widget.focus_set()
         if 'returnWidget'   in rules: return widget
       except: pass  # так проще, чем с доп. условиями
     def _createWidget():
@@ -205,6 +219,8 @@ class Window     (TBS.Window):  # окно программы
     def _suggFinalClicked (btn:str):  # btn = ok/cancel/rejectAll(отменить всю очередь)
       def _finish():
         self.wx.pop('rbeVars').destroy()
+        for w in self.getAllChilds(self.wx['fRoot']):
+            for i in range(10): w.unbind(str(i))
         if btn == 'ok': OKcl,newVal = True ,VAL['value']
         else          : OKcl,newVal = False,''
         self.app.suggFinalClicked(OKcl,newVal)
@@ -232,7 +248,7 @@ class Window     (TBS.Window):  # окно программы
       for  item in pr['stash']:
         if item != key: self.buildUI(item,wdg,params) # защита от зацикливания
     return    _finalRules() # запуск особых правил (проверки внутри)
-  def setUItheme(self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
+  def setUItheme  (self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
 
@@ -242,6 +258,8 @@ class Window     (TBS.Window):  # окно программы
       self.wx['rbe:curType'].config(text    = S.UI['rbe:curType'] + S.AStypes[errObj.type])
       self.wx['rbe:curBtn'] .config(text    = errObj.initVal,
                                     command = lambda:self.suggVarClicked(errObj.initVal))
+      for w in self.getAllChilds(self.wx['fRoot']):
+        w.bind('0',lambda s:self.suggVarClicked(errObj.initVal))
       self.wx['re']         .config(text    = replaceVars(S.UI['re:lfr'],
                                                          {'count':str(len(queue))}))
 
@@ -256,6 +274,7 @@ class Window     (TBS.Window):  # окно программы
   def suggVarClicked(self,value:str):
     self.wx['rbeEntry'].delete(0,TBS.END)
     self.wx['rbeEntry'].insert(0,value)
+    self.wx['rbeEntry:ok'].focus_set()
     self.setErrorMsg()
 
   # прочие, вспомогательные
