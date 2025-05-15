@@ -116,7 +116,7 @@ class Root():
       if final['valid']:
         if not self.pr['justVerify']: final['value'] = found[0]
       else: final['errKey'] = 'notInList'
-    else: strF.validateCell(final,self.uCfg)  # final обновляется внутри
+    else: strF.validateCell(final,self.cfg) # final обновляется внутри
     return final
   def nextSugg(self):
     def _getSuggList(errObj):

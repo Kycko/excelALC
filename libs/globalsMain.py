@@ -16,8 +16,9 @@ files = {'lib'   :'справочник excelALC.xlsx',
 # настройки
 config = userCfg(files['config'])
 
-# прочее
-enterKeys = ('<Key-Return>','<KP_Enter>')
+# горячие клавиши
+keys = {'enter':('<Key-Return>','<KP_Enter>'),
+        'pages':('<Prior>'     ,'<Next>')}  # PgUp,PgDown
 
 # защита от запуска модуля
 if __name__ == '__main__':

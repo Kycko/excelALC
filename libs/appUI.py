@@ -101,6 +101,11 @@ class Window     (TBS.Window):  # окно программы
         if 'build:irBottom' in rules: _updFile()
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
+        if 'bindLogs'       in rules:
+          tabs = self.wx['rlTabs']
+          for w in self.getAllChilds(self.wx['fRoot']):
+            for kk in G.keys['pages']:
+              w.bind(kk,lambda s:tabs.select(abs(tabs.index(tabs.select())-1)))
         if 'addSuggList'    in rules:
           for i in range(len(params)): self.buildUI('rbeVars:item',
                                                     widget,
@@ -114,7 +119,7 @@ class Window     (TBS.Window):  # окно программы
           for w in self.getAllChilds(self.wx['fRoot']):
             w.bind(num,lambda s:_suggClicked(p['item']['val']))
         if 'rbeEntry'       in rules:
-          for key in G.enterKeys:
+          for key in G.keys['enter']:
             self.wx['rbeEntry'].bind(key,
                                      lambda _:_suggFinalClicked('ok'))  # без _ ошибка
         if 'setFocus'       in rules: widget.focus_set()
@@ -218,7 +223,7 @@ class Window     (TBS.Window):  # окно программы
         self.app.launch( book,task)
     def _suggFinalClicked (btn:str):  # btn = ok/cancel/rejectAll(отменить всю очередь)
       def _finish():
-        self.wx.pop('rbeVars').destroy()
+        if 'rbeVars' in self.wx.keys(): self.wx.pop('rbeVars').destroy()
         for w in self.getAllChilds(self.wx['fRoot']):
             for i in range(10): w.unbind(str(i))
         if btn == 'ok': OKcl,newVal = True ,VAL['value']

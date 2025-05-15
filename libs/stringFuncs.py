@@ -13,7 +13,7 @@ def ending_byCount(count:int):
 
 # проверка и исправление разных пользовательских данных (общие)
 def autocorrCell(type:str,value:str,params=None):
-  def _autocorrPMW(): # phone,mail,website
+  def _autocorrPMW(value):  # phone,mail,website
     RPL = {'from':('​','\n','﻿','–','—','|',';',',,'),  # RPL=replace
            'to'  :('',',' ,''  ,'-','-',',',',',',')}
     for i in range(len(RPL['from'])): value = value.replace(RPL['from'][i],RPL['to'][i])
@@ -53,7 +53,7 @@ def autocorrCell(type:str,value:str,params=None):
   value = value.strip()
   if   type ==  'cat':
     return ' '.join(strips(value,G.dict.strips[type]).split())
-  elif type in ('phone','mail','website'): return _autocorrPMW()
+  elif type in ('phone','mail','website'): return _autocorrPMW(value)
   else:                                    return  value
 def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'errKey':}
   def _checkPMW(type:str,value:str):  # PMW = phone,mail,website
@@ -163,7 +163,7 @@ def validateDate(date:str):
   return False
 
 # исправление регионов/городов; RC = region/city
-# НАДО БУДЕТ ПЕРЕПИСАТЬ
+# НАДО БУДЕТ ПЕРЕПИСАТЬ + ДОБАВИТЬ ПРОВЕРКУ РЕЗУЛЬТАТА ПОСЛЕ КАЖДОЙ ФУНКЦИИ
 def ACcity(city:str,regions:list,ACregions:list):
   # ошибка при импорте lib сюда, поэтому передаём аргументами regions и ACregions
   def _fixOblast():
