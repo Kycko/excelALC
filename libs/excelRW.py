@@ -41,6 +41,22 @@ class Excel():  # общий класс, можно копировать без 
   def getValues(self,range:xw.Range):
     return range.options(ndim=2,empty='',numbers=int).value # ndim=2 всегда даёт двумерный массив
 
+  # запись; type может быть 'selection' или 'shActive'(fullRange)
+  def write(self,shName:str,type:str,newSheet=False):
+    shObj = self.data[shName]
+    if   newSheet:
+      shObj['sheet'] = shObj['sheet'].copy()  # возвращает новый лист
+      if   type == 'selection': shObj['range'] = shObj['sheet'].range(shObj['addr'])
+      elif type == 'shActive' :
+        rows  = len(shObj['table'].data)
+        cols  = len(shObj['table'].data[0])
+        shObj['range'] = shObj['sheet'].range((1,1),(rows,cols))
+        shObj['addr']  = shObj['range'].address
+    elif type == 'shActive': shObj['sheet'].clear_contents()
+    shObj['range'].number_format = '@'
+    shObj['range'].value         = shObj['table'].data
+  def save (self): self.file.save()
+
 # защита от запуска модуля
 if __name__ == '__main__':
   print  ("This is module, please don't execute.")

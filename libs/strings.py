@@ -71,6 +71,10 @@ log = {# основные
        'readSheet'      :'Выбран лист: $sheet$',
        'readRange:full' :'Прочитана вся таблица ($addr$): $cols$, 1 заголовок + $rows$',
        'readRange:range':'Прочитан диапазон $addr$: $cols$, $rows$',
+       'finalWrite-'    :'Изменений нет, запись в файл не требуется',
+       'finalWrite+'    :'Результат записан на $sheet$ лист', # заменяется на след. ключ sheet
+       'FWvars'         :('тот же','новый'),
+       'fileSaved'      :'Выполнено сохранение файла',
 
        # работа с ошибками
        'errQueue'       :'[$count$ шт.] $value$',

@@ -18,7 +18,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'resetBg'    :'selection',
                        'hlTitles'   : False}}
         return dictF.update(dict[type],**upd)
-    self.tasks = {'chkCat'  :_taskShared('chk',{'root':{'AStype':'cat'}}),
+    self.tasks = {# 'chkAll'  :,
+                  'chkCat'  :_taskShared('chk',{'root':{'AStype':'cat'}}),
                   'chkSrc'  :_taskShared('chk',{'root':{'AStype':'source'}}),
                   'chkMails':_taskShared('chk',{'root':{'AStype':'mail'}})}
 
@@ -36,7 +37,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'RCremoved'      :'rmRC',
                 'vertChanged'    :'warning',
                 'blanksFilled'   :'autocorr',
-                'finalWrite'     :'finalWrite',
+                'finalWrite+'    :'finalWrite',
+                'finalWrite-'    :'finalWrite',
                 'colorErrors'    :'finalWrite',
                 'fileSaved'      :'finalWrite'}
 

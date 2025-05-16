@@ -21,16 +21,16 @@ class TableTemplate():
 # основные классы
 class     Table(TableTemplate):
   # общий класс, можно копировать без изменений в другие программы
-  def __init__ (self,values:list,initParams=('toStrings','trimAll')): # values – таблица[[]]
+  def __init__   (self,values:list,initParams=('toStrings','trimAll')): # values – таблица[[]]
     self.data       = values
     if 'toStrings' in initParams: self.stringAll()
     if 'trimAll'   in initParams: self.trimAll  ()
-  def stringAll(self):
+  def stringAll  (self):
     # конвертирует каждую ячейку таблицы в строку
     for   r in range(len(self.data)):
       for c in range(len(self.data[r])):
         self.data[r][c] = str(self.data[r][c])
-  def trimAll  (self):
+  def trimAll    (self):
     # делает .trim() и удаляет плохие символы (напр., мягкие пробелы)
     for   r in range(len(self.data)):
       for c in range(len(self.data[r])):
@@ -59,6 +59,14 @@ class     Table(TableTemplate):
       if 'c' not in type: fCols = []
       return fRows,fCols
     else: return [],[]
+  def equals     (self,tObj):
+    # сравнивает эту Table(self) с другой Table(tObj); вернёт True или False
+    this,sec = self.data,tObj.data  # эта и secondary таблицы
+    if len(this) != len(sec) or len(this[0]) != len(sec[0]): return False
+    for   r in range(len(this)):
+      for c in range(len(this[r])):
+        if this[r][c] != sec[r][c]: return False
+    return True
 class CellTable(TableTemplate):
   # общий класс, ВОЗМОЖНО подойдёт для других программ
   # это таблица, в которой каждая ячейка – это объект Cell [[CellObj,...],...]

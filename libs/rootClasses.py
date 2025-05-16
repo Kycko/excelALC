@@ -129,16 +129,57 @@ class Root():
     AST   = G.dict.AStypes
     if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
       self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:9])
-    elif self.type != 'reCalc': self.finalizeErrors(self.type == 'allChecks')
+    elif self.type not in ('chkAll','reCalc'): self.finalizeErrors()
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
     self.errors.suggClicked(OKclicked,newValue)
     self.nextSugg()
+  def   finalizeErrors(self,forceTitles=False):
+    def _processQueue():
+      for lng in range(len(self.errors.qStage)):
+        errObj = self.errors.qStage.pop(0)
+        for i in range(len(errObj.pos)):
+          # self.rTable – это всегда [[Cell,...],...]
+          errPos = errObj.pos[i]
+          cell   = self.rTable[errPos['r']][errPos['c']]
+          if errObj.type == 'title' and i: cell.error = True
+          else:
+            cell.error = not errObj.fixed
+            if errObj.fixed: cell.value = errObj.newVal
+        self.errors.qFinal.append(errObj)
+
+    _processQueue()
+    if            self.pr['read'] ==   'selection': self.table.data = self.rTable
+    # elif forceTitles or self.type == 'checkTitles': self.TDfinalizeTitles()
+    # if                  self.type ==   'allChecks': self.nextStage()
+    if                self.type !=    'reCalc'  : self.finish()
 
   # чтение данных из таблицы
   def searchTitleRow(self,table:Table):
     for r in range(len(table.data)):
       if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
     return 0
+
+  # финальные шаги (преобразование и запись)
+  def finish(self):
+    def   _write():
+      newSheet  = G.config.get(self.type+':newSheet')
+      self.tObj = self.table.toTable()
+      equal     = self.tObj. equals (self.file.data[self.shName]['table'])
+      if not equal:
+        self.file.data [self.shName]['table'] = self.tObj
+        self.file.write(self.shName,self.pr['read'],newSheet)
+      self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
+
+    # count = self.errors.getCount()
+    # if self.pr['toTD']:
+    #   self.joinTDs()
+    #   self.curTD_toTable()
+    _write()
+    # self.finalColors  (count['errors'])
+    if G.config.get(self.type+':saveAfter'):
+      self.file.save()
+      self.log .add ('fileSaved')
+    # self.UI    .finish(count['errors'])
 
 # журнал и ошибки
 class Log():      # журнал
@@ -149,9 +190,9 @@ class Log():      # журнал
   def add(self,type:str,rpl:dict=None):
     # rpl=replace (словарь строк для замены переменных)
     def _getType():
-      unit  =  G.dict.log[type]
-      final = '['+unit+'] ' + strF.replaceVars(S.log[type],rpl)
-      return final,unit
+      unit,txt = G.dict.log[type],S.log[type]
+      if rpl is not None: txt = strF.replaceVars(txt,rpl)
+      return '['+unit+'] ' + txt,unit
     newStr,unit = _getType()
     write_toFile(newStr,self.file,True)
     self.UI.log (newStr,unit)
@@ -181,8 +222,8 @@ class Errors():   # хранилище ошибок
       self.log.add(key,{'type':err.type,'from':err.initVal,'to':err.newVal})
       if not err.fixed:
         self.write(S.log['errorLeft'].replace('$type$',err.type) + lblText)
-    err     = self.queue.pop(0)
-    lblText = err  .suggFinished(OKclicked,newValue)
+    err     =   self.queue.pop(0)
+    lblText = err.suggFinished(OKclicked,newValue)
     _log()
     self.qStage.append(err)
   def write(self,str:str,justAdd=True):
