@@ -50,7 +50,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                    {'lbl':'175%','size':(1150,850)})
     self.fonts  =  {'iconBig':('Calibri',17)} # только для label'ов (для кнопок всё сложнее)
     self.icons  =  {'moon':'🌙','sun'   :'🔆',
-                    'done':'✔' ,'cancel':'❌'}
+                    'done':'✔' ,'cancel':'❌',
+                    'back':'<<<','rejectAll':'❌'}
 
     # цвета (разные для светлой[0] и тёмной[1] тем
     # !ИСП. G.UI.colors (он перезаписывается при смене темы, в appUI.Window.setUItheme())
@@ -229,10 +230,30 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                   'rbe:cur']},
       'rbeEntry'       :{'type' : 'fr',
                          'pack' :{'fill':'x','anchor':'n'},
-                         'stash':['rbeEntry:lbl','rbe:curType','rbeEntry:bottom','rbeEntry:errMsg']},
-      'rbeEntry:lbl'   :{'type' : 'lbl',
+                         'stash':['rbeEntry:up','rbe:curType','rbeEntry:bottom','rbeEntry:errMsg']},
+      'rbeEntry:up'    :{'type' : 'fr',
+                         'pack' :{'fill':'x','anchor':'n'},
+                         'stash':['rbeEntry:upLbl','rbeEntry:upBtns']},
+      'rbeEntry:upLbl' :{'type' : 'lbl',
                          'build':{'text': S.UI['rbeEntry:lbl']},
-                         'pack' :{'fill':'x','padx':2}},
+                         'pack' :{'fill':'x','side':'left','padx':2}},
+      'rbeEntry:upBtns':{'type' : 'fr',
+                         'pack' :{'side':'right'},
+                         'stash':['rbeEntry:upExit','rbeEntry:upCanc']},
+      'rbeEntry:upExit':{'type' : 'btn',
+                         'cmd'  :{'type':'rbeEntry:upExit'},
+                         'build':{'text':self.icons['back'],'bootstyle':'danger-outline'},
+                         'pack' :{'side':'left','padx':2},
+                         'stash':['rbeExit:tt']},
+      'rbeExit:tt'     :{'type' : 'tt',
+                         'build':{'text' :S.UI['rbeExit:tt']}},
+      'rbeEntry:upCanc':{'type' : 'btn',
+                         'cmd'  :{'type':'rbeEntry:upCanc'},
+                         'build':{'text':self.icons['rejectAll'],'bootstyle':'danger-outline'},
+                         'pack' :{'side':'right'},
+                         'stash':['rbeCanc:tt']},
+      'rbeCanc:tt'     :{'type' : 'tt',
+                         'build':{'text' :S.UI['rbeCanc:tt']}},
       'rbe:curType'    :{'rules':{'final':('color:lightRed')},
                          'type' : 'lbl',
                          'wxKey': 'rbe:curType',

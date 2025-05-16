@@ -165,20 +165,22 @@ class Window     (TBS.Window):  # окно программы
           try:  # у некоторых кнопок нет pr['cmd']: команда присваивается позже
             cmd  = pr['cmd']
             match cmd['type']:
-              case 'UIzoom'      : widget.config(command=lambda:_setUIzoom(True))
-              case 'closeApp'    : widget.config(command=sysExit)
-              case 'il:taskBtn'  : widget.config(
+              case 'UIzoom'         : widget.config(command=lambda:_setUIzoom(True))
+              case 'closeApp'       : widget.config(command=sysExit)
+              case 'il:taskBtn'     : widget.config(
                 command = lambda t=cmd['lmb']: _openTask_inRight(t)
                 )
-              case 'irFile:upd'  : widget.config(command=_updFile)
-              case 'ir:launchBtn': widget.config(command=_launchClicked)
-              case 'rbeEntry'    : widget.config(command=lambda:_suggFinalClicked(cmd['lmb']))
+              case 'irFile:upd'     : widget.config(command=_updFile)
+              case 'ir:launchBtn'   : widget.config(command=_launchClicked)
+              case 'rbeEntry'       : widget.config(command=lambda:_suggFinalClicked(cmd['lmb']))
+              case 'rbeEntry:upExit': widget.config(command=lambda:self.buildUI('init',self))
+              case 'rbeEntry:upCanc': widget.config(command=_suggRejectAllType)
           except: pass
-    def _switchBoolSetting(param:str):
+    def _switchBoolSetting   (param:str):
       newVal = not G.config.get(param)
       G.config.set(param,newVal)
       if param == 'main:darkTheme': self.setUItheme(newVal)
-    def _openTask_inRight (type :str):
+    def _openTask_inRight    (type :str):
       # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
       def _build(): self.buildUI('ir',self.wx['fRoot'],{TO:type})
 
@@ -188,7 +190,7 @@ class Window     (TBS.Window):  # окно программы
       if TO in pr.keys():
         if  pr.pop(TO) != type: _build()
       else: _build()
-    def _updFile          ():
+    def _updFile             ():
       def _getProps():  # props = properties
         if book is None:
           FNC = S.UI['ir:fileNotChosen']
@@ -213,7 +215,7 @@ class Window     (TBS.Window):  # окно программы
       for k,it in     keys.items(): self.wx[it]     .config(text       = p[k])
       self.wx[keys['btn']].config(state=p['bState'])
       return book
-    def _launchClicked    ():         # это запуск проверок
+    def _launchClicked       ():        # это запуск проверок
       book = _updFile()
       if book:
         # for param in G.launchTypes[type]['getOnLaunch']:
@@ -221,7 +223,7 @@ class Window     (TBS.Window):  # окно программы
         task = self.props['curTask']  # self.props очищается в self.buildUI()
         self   .buildUI('run',self)
         self.app.launch( book,task)
-    def _suggFinalClicked (btn:str):  # btn = ok/cancel/rejectAll(отменить всю очередь)
+    def _suggFinalClicked    (btn:str): # btn = ok/cancel/rejectAll(отменить всю очередь)
       def _finish():
         if 'rbeVars' in self.wx.keys(): self.wx.pop('rbeVars').destroy()
         for w in self.getAllChilds(self.wx['fRoot']):
@@ -238,6 +240,8 @@ class Window     (TBS.Window):  # окно программы
                                               self.wx['rbeEntry'].get())
         if not VAL['valid']: self.setErrorMsg(VAL); finish = False
       if finish: _finish()
+    def _suggRejectAllType   ():
+      while self.app.errors.queue: _suggFinalClicked('cancel')
 
     pr = G.UI.build[key]  # pr = properties
     _startRules()         # запуск особых правил (проверки внутри)
