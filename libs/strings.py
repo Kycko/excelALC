@@ -66,23 +66,26 @@ UI  = {'init:cantReadLib':'Ошибка чтения файла "$file$". Про
             }
           }}
 log = {# основные
-       'mainLaunch'     :'[$time$] Файл: $file$',
-       'launchType'     :'$str$',
-       'readSheet'      :'Выбран лист: $sheet$',
-       'readRange:full' :'Прочитана вся таблица ($addr$): $cols$, 1 заголовок + $rows$',
-       'readRange:range':'Прочитан диапазон $addr$: $cols$, $rows$',
-       'finalWrite-'    :'Изменений нет, запись в файл не требуется',
-       'finalWrite+'    :'Результат записан на $sheet$ лист', # заменяется на след. ключ sheet
-       'FWvars'         :('тот же','новый'),
-       'fileSaved'      :'Выполнено сохранение файла',
+       'mainLaunch'      :'[$time$] Файл: $file$',
+       'launchType'      :'$str$',
+       'readSheet'       :'Выбран лист: $sheet$',
+       'readRange:full'  :'Прочитана вся таблица ($addr$): $cols$, 1 заголовок + $rows$',
+       'readRange:range' :'Прочитан диапазон $addr$: $cols$, $rows$',
+       'finalWrite-'     :'Изменений нет, запись в файл не требуется',
+       'finalWrite+'     :'Результат записан на $sheet$ лист',  # заменяется на след. ключ sheet
+       'FWvars'          :('тот же','новый'),
+       'fileSaved'       :'Выполнено сохранение файла',
+       'finalColors_0'   :'Фоновые цвета ячеек сброшены',
+       'finalColors_done':'Фоновые цвета ячеек сброшены, ошибки выделены красным: $count$ шт.',
+       'finalColors_skip':'Фоновые цвета ячеек сброшены, ошибки НЕ будут выделены красным (их > 500 шт.)',
 
        # работа с ошибками
-       'errQueue'       :'[$count$ шт.] $value$',
-       'errorLeft'      :'[$type$] ', # в коде +добавляется 'errQueue'
-       'errorsFound'    :'[$type$] Осталось ошибок: $count$ шт.',
-       'ACsuccess'      :'[$type$] "$from$" -> "$to$"',
-       'sugg+'          :'[$type$] Исправлено вручную: "$from$" -> "$to$"',
-       'sugg-'          :'[$type$] Отменено пользователем: "$from$"'}
+       'errQueue'        :'[$count$ шт.] $value$',
+       'errorLeft'       :'[$type$] ',  # в коде +добавляется 'errQueue'
+       'errorsFound'     :'[$type$] Осталось ошибок: $count$ шт.',
+       'ACsuccess'       :'[$type$] "$from$" -> "$to$"',
+       'sugg+'           :'[$type$] Исправлено вручную: "$from$" -> "$to$"',
+       'sugg-'           :'[$type$] Отменено пользователем: "$from$"'}
 
 # обработка ошибок
 AStypes  = {'cat'    : 'категория',

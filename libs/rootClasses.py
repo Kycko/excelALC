@@ -169,13 +169,41 @@ class Root():
         self.file.data [self.shName]['table'] = self.tObj
         self.file.write(self.shName,self.pr['read'],newSheet)
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
+    def  _colors():
+      # шапку подсвечиваем в любом случае
+      def _hlRow(r:int,type:str):
+        def _set(colorKey:str):
+            self.file.setCellColor(self.shName,
+                                   self.pr['read'],
+                                   r,c,
+                                   G.dict.exColors[colorKey])
+        for c in range(len(tbl[r])):
+          err,chg = tbl[r][c].error,tbl[r][c].changed
+          if   type == 'errors'     and     err: _set('hlError')
+          elif type == 'chVerts'    and     chg: _set('hlChanged')
+          elif type == 'goodTitles' and not err: _set('goodTitle')
+      def _log  ():
+        if not totalErrors      : key = '0'
+        elif   totalErrors < 501: key = 'done'
+        else                    : key = 'skip'
+        self.log.add('finalColors_'+key,{'count':str(totalErrors)})
 
-    # count = self.errors.getCount()
+      self.file.resetBgColors(self.shName,self.pr['resetBg'])
+      tbl = self.table.data
+      if totalErrors in range(1,501): last =  len (tbl)
+      else:                           last = (0,2)[self.pr['addHeader']]
+      for row in range(last): _hlRow(row,'errors')
+
+      if self.pr['hlTitles']:_hlRow(self.searchTitleRow(self.tObj.data),'goodTitles')
+      if self.pr['hlVerts']:
+        for row in range(len(tbl)): _hlRow(row,'chVerts') # changed verticals
+      _log()
+
+    totalErrors = self.errors.getCount()
     # if self.pr['toTD']:
     #   self.joinTDs()
     #   self.curTD_toTable()
-    _write()
-    # self.finalColors  (count['errors'])
+    _write(); _colors()
     if G.config.get(self.type+':saveAfter'):
       self.file.save()
       self.log .add ('fileSaved')
@@ -226,9 +254,14 @@ class Errors():   # хранилище ошибок
     lblText = err.suggFinished(OKclicked,newValue)
     _log()
     self.qStage.append(err)
-  def write(self,str:str,justAdd=True):
-    write_toFile(str,self.file,justAdd)
+  def write      (self,str:str,justAdd=True):
+    write_toFile (str ,self.file,justAdd)
     self.UI.buildUI('log',self.UI.wx['rl:errors'],{'text':str})
+  def getCount   (self):
+    final = 0
+    for item in self.qFinal:
+      if not item.fixed: final += len(item.pos)
+    return final
 class ErrorObj(): # объект одной ошибки, используется в хранилище Errors()
   def __init__(self,type:str,initValue:str,pos:dict,initFixed=False,newVal=None):
     # pos={'r':row,'c':col}

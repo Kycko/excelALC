@@ -16,31 +16,34 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'launch'     :'rangeChecker',
                        'justVerify' : False,
                        'resetBg'    :'selection',
-                       'hlTitles'   : False}}
+                       'hlTitles'   : False,
+                       'hlVerts'    : False}}
         return dictF.update(dict[type],**upd)
     self.tasks = {# 'chkAll'  :,
                   'chkCat'  :_taskShared('chk',{'root':{'AStype':'cat'}}),
                   'chkSrc'  :_taskShared('chk',{'root':{'AStype':'source'}}),
                   'chkMails':_taskShared('chk',{'root':{'AStype':'mail'}})}
 
-    self.log = {'mainLaunch'     :'core',
-                'launchType'     :'core',
-                'readSheet'      :'core',
-                'readRange:full' :'core',
-                'readRange:range':'core',
-                'ACsuccess'      :'autocorr',
-                'errorsFound'    :'errors',
-                'sugg+'          :'sugg',
-                'sugg-'          :'sugg',
-                'columnAdded'    :'titles',
-                'titlesReordered':'titles',
-                'RCremoved'      :'rmRC',
-                'vertChanged'    :'warning',
-                'blanksFilled'   :'autocorr',
-                'finalWrite+'    :'finalWrite',
-                'finalWrite-'    :'finalWrite',
-                'colorErrors'    :'finalWrite',
-                'fileSaved'      :'finalWrite'}
+    self.log = {'mainLaunch'      :'core',
+                'launchType'      :'core',
+                'readSheet'       :'core',
+                'readRange:full'  :'core',
+                'readRange:range' :'core',
+                'ACsuccess'       :'autocorr',
+                'errorsFound'     :'errors',
+                'sugg+'           :'sugg',
+                'sugg-'           :'sugg',
+                'columnAdded'     :'titles',
+                'titlesReordered' :'titles',
+                'RCremoved'       :'rmRC',
+                'vertChanged'     :'warning',
+                'blanksFilled'    :'autocorr',
+                'finalWrite+'     :'finalWrite',
+                'finalWrite-'     :'finalWrite',
+                'finalColors_0'   :'finalWrite',
+                'finalColors_done':'finalWrite',
+                'finalColors_skip':'finalWrite',
+                'fileSaved'       :'finalWrite'}
 
     #   readLib : прочитать подходящие варианты для валидации из библиотеки
     #  checkList: валидация путём проверки, есть ли value в списке допустимых (extra)
@@ -61,6 +64,11 @@ class globDicts():  # импортируется в G.dict (в глобальн�
       }
 
     # разные мелочи
+    self.colLetters =  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    self.exColors   = {'goodTitle':'#56E0AB', # ex = Excel
+                       'hlChanged':'#E8E782', # hl = highlight (cell)
+                       'hlError'  :'#F69A98'}
+
     # ↓ неподходящие для почты и сайта
     self.badSymbols   = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),
                          'website':(' ','@','|')}
