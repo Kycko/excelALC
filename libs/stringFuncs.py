@@ -128,7 +128,7 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
 def  getSuggList(type:str ,value:str):
   final = []
   if type in ('mail','website'):
-    new = value.replace(' ','').replace('|',',')
+    new = value.replace(' ','').replace('|',',').lower()
     if new != value:
       vObj = {'type':type,'value':new,'valid':None,'errKey':''}
       validateCell(vObj)

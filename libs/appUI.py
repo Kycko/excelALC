@@ -40,7 +40,7 @@ class ScrollFrame(TBS.Frame):
     _bind()
 class Window     (TBS.Window):  # окно программы
   # конструкторы интерфейса
-  def __init__    (self,app):
+  def __init__     (self,app):
     def _bindSpace():
       def _call(event):
         try:
@@ -55,7 +55,7 @@ class Window     (TBS.Window):  # окно программы
     _bindSpace   ()
     self.buildUI ('init',self)
     self.place_window_center()  # расположить в центре экрана
-  def getAllChilds(self,widget):  # возвращает все вложенные виджеты, КРОМЕ Entry
+  def getAllChilds (self,widget): # возвращает все вложенные виджеты, КРОМЕ Entry
     def _append(widget):
       if not isinstance(widget,TBS.Entry): final.append(widget)
     final = []
@@ -65,7 +65,7 @@ class Window     (TBS.Window):  # окно программы
         _append     (widget)
         final.extend(self.getAllChilds(child))
     return final
-  def buildUI     (self,key:str,parent,params=None):
+  def buildUI      (self,key:str,parent,params=None):
     # key = build key (из G.UI.build{})
     # в params передаём любые доп. данные (напр., тип задачи для фрейма 'ir')
     # создание интерфейса
@@ -73,8 +73,7 @@ class Window     (TBS.Window):  # окно программы
       try:
         rules = pr['rules']['start']
         if 'clean'     in rules:
-          try   : self.wx.pop('fRoot').destroy()
-          except: pass  # так проще, чем с доп. инициализацией self.wx и условиями
+          self.destroyWidget('fRoot')
           self.props = {} # properties, что нужно запоминать для обработки UI
           self.wx    = {} # здесь все ссылки на виджеты, которые надо хранить в памяти
         if 'saveProps' in rules: self.props.update(params)
@@ -184,8 +183,7 @@ class Window     (TBS.Window):  # окно программы
       # надо лишь закрывать при повторном нажатии, поэтому в отдельной функции
       def _build(): self.buildUI('ir',self.wx['fRoot'],{TO:type})
 
-      try   : self.wx.pop('ir').destroy()
-      except: pass
+      self.destroyWidget('ir')
       TO,pr = 'curTask',self.props  # curTask = выбранная задача
       if TO in pr.keys():
         if  pr.pop(TO) != type: _build()
@@ -225,7 +223,8 @@ class Window     (TBS.Window):  # окно программы
         self.app.launch( book,task)
     def _suggFinalClicked    (btn:str): # btn = ok/cancel/rejectAll(отменить всю очередь)
       def _finish():
-        if 'rbeVars' in self.wx.keys(): self.wx.pop('rbeVars').destroy()
+        self.destroyWidget('rbeVars')
+        self.set_reLfr    (True)
         for w in self.getAllChilds(self.wx['fRoot']):
             for i in range(10): w.unbind(str(i))
         if btn == 'ok': OKcl,newVal = True ,VAL['value']
@@ -257,9 +256,20 @@ class Window     (TBS.Window):  # окно программы
       for  item in pr['stash']:
         if item != key: self.buildUI(item,wdg,params) # защита от зацикливания
     return    _finalRules() # запуск особых правил (проверки внутри)
-  def setUItheme  (self,theme:bool):  # theme=true/false для выбора из G.UI.themes()
+  def destroyWidget(self,keys):  # в keys можно передать одну str либо tuple/list
+    if  type(keys) == str: keys = [keys]
+    for key in keys:
+      try   : self.wx.pop(key).destroy()  # при первом запуске self.wx отсутствует
+      except: pass
+  def setUItheme   (self,theme:bool): # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
     G.UI.colors        = G.UI.themeColors[theme]
+  def finish       (self,totalErrors:int):
+    self.destroyWidget(('rbRoot'))
+    self.wx['rbLfr'].config(text=S.UI['rbFinished'],bootstyle='success')
+    self.buildUI('rbf' ,self.wx['rbLfr'],
+                {'text':replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)})})
+    self.wx['rlTabs'].focus_set() # чтобы сразу работали PgUp/PgDown
 
   # работа с ошибками
   def  suggInvalidUD(self,queue,suggList:list):
@@ -269,17 +279,19 @@ class Window     (TBS.Window):  # окно программы
                                     command = lambda:self.suggVarClicked(errObj.initVal))
       for w in self.getAllChilds(self.wx['fRoot']):
         w.bind('0',lambda s:self.suggVarClicked(errObj.initVal))
-      self.wx['re']         .config(text    = replaceVars(S.UI['re:lfr'],
-                                                         {'count':str(len(queue))}))
+      self.set_reLfr()
 
     self.curError,errObj = queue[0],queue[0]  # надо запомнить, но чтобы здесь было проще
     _configWidgets()
     if suggList: self.buildUI('rbeVars',self.wx['rbRoot'],suggList)
     self.suggVarClicked(errObj.initVal) # добавляем в entry текущее значение
-  def   setErrorMsg (self,vObj=None): # показывает проблему введённого значения
+  def   setErrorMsg (self,vObj=None):   # показывает проблему введённого значения
     # vObj={type:,value:,valid:,errKey:}
     txt = '' if vObj is None else S.errInput[vObj['type']][vObj['errKey']]
     self.wx['rbe:errMsg'].config(text=txt)
+  def      set_reLfr(self,disable=False):
+    count = 0 if disable else len(self.app.errors.queue)
+    self.wx['re'].config(text=replaceVars(S.UI['re:lfr'],{'count':str(count)}))
   def suggVarClicked(self,value:str):
     self.wx['rbeEntry'].delete(0,TBS.END)
     self.wx['rbeEntry'].insert(0,value)

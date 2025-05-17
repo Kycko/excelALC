@@ -207,7 +207,7 @@ class Root():
     if G.config.get(self.type+':saveAfter'):
       self.file.save()
       self.log .add ('fileSaved')
-    # self.UI    .finish(count['errors'])
+    self.UI .finish(totalErrors)
 
 # журнал и ошибки
 class Log():      # журнал

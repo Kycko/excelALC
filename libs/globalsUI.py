@@ -316,6 +316,12 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'wxKey': 'rbev:btn', # нужен только для правила 'addSuggItem'
                          'build':{'bootstyle':'info-outline'},
                          'pack' :{'side':'right','fill':'x','expand':True,'padx':4}},
+      'rbf'            :{'type' : 'fr', # f в rbf = finish
+                         'pack' :{'fill':'both','padx':10,'pady':2},
+                         'stash':['rbfLbl']},
+      'rbfLbl'         :{'rules':{'final':('paramsConfig')},
+                         'type' : 'lbl',
+                         'pack' :{'fill':'x','anchor':'w','padx':1}},
 
       're'             :{'type' : 'lfr',
                          'wxKey': 're',
