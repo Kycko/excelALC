@@ -30,7 +30,8 @@ def autocorrCell(type:str,value:str,params=None):
           parts = item.split('@')
           if 'gmail' in parts[-1]: parts[-1] = 'gmail.com'
           parts = '@'.join(parts).split('.')
-          if parts[-1] == 'u': parts[-1] = 'ru'
+          if   parts[-1] in ('r','u') : parts[-1] = 'ru'
+          elif parts[-1] in ('c','co'): parts[-1] = 'com'
           item = '.'.join(parts)
         case 'website':
           item = rmStartList(item,G.dict.badWebStarts,0,False).rstrip('/')
@@ -73,10 +74,12 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
         if '$'      in value                  : return False,'$'
 
         name,dom = value.split('@')
-        if not '.' in dom: return False, 'dotDomain'
-        if    '..' in dom: return False,'dotsDomain'
-        if len(dom) > 1 and dom[-2:] in ('.c','.r'): return False,'endDomain'
-        if name        in    G.dict.allHyphens: return False,'hyphen'
+        end      = dom  .split('.')[-1]
+        if  not '.' in dom: return False, 'dotDomain'
+        if     '..' in dom: return False,'dotsDomain'
+        if len(end) ==  1 : return False, 'endDomain'
+        if     end == 'co': return False, 'endCo'
+        if    name  in       G.dict.allHyphens: return False,'hyphen'
         if inclSubList(value,G.dict.badSymbols[type],False,False):
           return False,'badSymbols'
       case 'website':
