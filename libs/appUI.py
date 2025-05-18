@@ -1,4 +1,5 @@
 from   sys                          import exit as SYSEXIT
+from   os                           import startfile
 from   tkinter                      import BooleanVar
 import ttkbootstrap                     as TBS
 from   ttkbootstrap.tooltip         import ToolTip
@@ -172,7 +173,9 @@ class Window     (TBS.Window):  # окно программы
               case 'irFile:upd'     : widget.config(command=_updFile)
               case 'ir:launchBtn'   : widget.config(command=_launchClicked)
               case 'rbeEntry'       : widget.config(command=lambda:_suggFinalClicked(cmd['lmb']))
-              case 'rbeEntry:upExit': widget.config(command=lambda:self.buildUI('init',self))
+              case 'rbExit'         : widget.config(command=lambda:    self.buildUI('init',self))
+              case 'rbfShowLog'     : widget.config(command=lambda:startfile(G.files['log']))
+              case 'rbfShowErrors'  : widget.config(command=lambda:startfile(G.files['errors']))
               case 'rbeEntry:upCanc': widget.config(command=_suggRejectAllType)
           except: pass
     def _switchBoolSetting   (param:str):
@@ -269,7 +272,6 @@ class Window     (TBS.Window):  # окно программы
     self.wx['rbLfr'].config(text=S.UI['rbFinished'],bootstyle='success')
     self.buildUI('rbf' ,self.wx['rbLfr'],
                 {'text':replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)})})
-    self.wx['rlTabs'].focus_set() # чтобы сразу работали PgUp/PgDown
 
   # работа с ошибками
   def  suggInvalidUD(self,queue,suggList:list):
