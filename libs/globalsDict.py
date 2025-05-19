@@ -22,7 +22,17 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     self.tasks = {# 'chkAll'  :,
                   'chkCat'  :_taskShared('chk',{'root':{'AStype':'cat'}}),
                   'chkSrc'  :_taskShared('chk',{'root':{'AStype':'source'}}),
-                  'chkMails':_taskShared('chk',{'root':{'AStype':'mail'}})}
+                  'chkMails':_taskShared('chk',{'root':{'AStype':'mail'}}),
+                  'rmRC'    :{'cfg'        :['newSheet','saveAfter'],
+                              'read'       : 'shActive',
+                              'rmRC_onRead':  False,  # это для toTD?
+                              'toTD'       :  False,
+                              'addHeader'  :  False,
+                              'launch'     : 'rmRC',
+                              'justVerify' :  False,
+                              'resetBg'    : 'sheet',
+                              'hlTitles'   :  False,
+                              'hlVerts'    :  False}}
 
     self.log = {'mainLaunch'      :'core',
                 'launchType'      :'core',

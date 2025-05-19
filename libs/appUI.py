@@ -101,11 +101,6 @@ class Window     (TBS.Window):  # окно программы
         if 'build:irBottom' in rules: _updFile()
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
-        if 'bindLogs'       in rules:
-          tabs = self.wx[key[:1]+'lTabs']
-          for w in self.getAllChilds(self.wx['fRoot']):
-            for kk in G.keys['pages']:
-              w.bind(kk,lambda s:tabs.select(abs(tabs.index(tabs.select())-1)))
         if 'addSuggList'    in rules:
           for i in range(len(params)): self.buildUI('rbeVars:item',
                                                     widget,
@@ -122,6 +117,11 @@ class Window     (TBS.Window):  # окно программы
           for entKey in G.keys['enter']:
             self.wx['rbeEntry'].bind(entKey,
                                      lambda _:_suggFinalClicked('ok'))  # без _ ошибка
+        if 'bindLogs'       in rules:
+          tabs = self.wx[key[:1]+'lTabs']
+          for w in self.getAllChilds(self.wx['fRoot']):
+            for kk in G.keys['pages']:
+              w.bind(kk,lambda s:tabs.select(abs(tabs.index(tabs.select())-1)))
         if 'setFocus'       in rules: widget.focus_set()
         if 'returnWidget'   in rules: return widget
       except: pass  # так проще, чем с доп. условиями
