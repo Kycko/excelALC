@@ -6,7 +6,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     # эти свойства записываются в rootClasses.pr{} (properties)
     def _taskShared(type:str,upd={}):
       # функция, передающая в self.tasks одинаковые свойства для однотипных элементов
-      if type == 'cfg': return ['newSheet','suggErrors','confirmWrite','saveAfter']
+      if type == 'cfg': return ['newSheet','suggErrors','saveAfter']
       else:
         dict = {'chk':{'cfg'        :_taskShared('cfg'),
                        'read'       :'selection',

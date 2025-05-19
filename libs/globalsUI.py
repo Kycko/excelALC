@@ -192,7 +192,6 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
       'tc:newSheet'    : _getShared('ir:tc:cb',{'root':{'tVar':'newSheet'}}), # tVar = task var
       'tc:suggErrors'  : _getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
-      'tc:confirmWrite': _getShared('ir:tc:cb',{'root':{'tVar':'confirmWrite'}}),
       'tc:saveAfter'   : _getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
 
       'run'            : _getShared('fRoot',{'root' :{'stash':['rl','rr']},
