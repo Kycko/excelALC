@@ -23,7 +23,10 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                   'chkCat'  :_taskShared('chk',{'root':{'AStype':'cat'}}),
                   'chkSrc'  :_taskShared('chk',{'root':{'AStype':'source'}}),
                   'chkMails':_taskShared('chk',{'root':{'AStype':'mail'}}),
-                  'rmRC'    :{'cfg'        :['newSheet','saveAfter'],
+                  'rmRC'    :{'cfg'        :['newSheet',
+                                             'saveAfter',
+                                             '---',   # будет просто separator
+                                             'rmTitled'],
                               'read'       : 'shActive',
                               'rmRC_onRead':  False,  # это для toTD?
                               'toTD'       :  False,

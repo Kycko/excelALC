@@ -73,18 +73,22 @@ class Window     (TBS.Window):  # окно программы
     def _startRules  ():
       try:
         rules = pr['rules']['start']
-        if 'clean'     in rules:
+        if 'clean'      in rules:
           self.destroyWidget('fRoot')
           self.props = {} # properties, что нужно запоминать для обработки UI
           self.wx    = {} # здесь все ссылки на виджеты, которые надо хранить в памяти
-        if 'saveProps' in rules: self.props.update(params)
-        if 'mergeTC'   in rules:
+        if 'saveProps'  in rules: self.props.update(params)
+        if 'mergeTC'    in rules:
           pr['var'] = self.props['curTask']+':'+pr['tVar']
           strings   = S.UI['tc'][pr['tVar']]
           newKey    = 'tc:tt:' + pr['tVar']
           pr['build']['text']  = strings['lbl']
           pr['stash']          = [newKey]
           G.UI.build [newKey]  = {'type':'tt','build':{'text':strings['tt']}}
+        if 'il:taskBtn' in rules:
+          tKey = key.split(':')[-1]
+          pr['cmd']  ['lmb']  = tKey
+          pr['build']['text'] = S.UI['tasks'][tKey]['ilBtn']
       except: pass  # так проще, чем с доп. условиями
     def _finalRules  ():
       def _suggClicked(item:str): self.suggVarClicked(item)
@@ -97,7 +101,8 @@ class Window     (TBS.Window):  # окно программы
           for widg in ('ir','irDesc'): self.wx[widg].config(text=tOp[widg])
         if 'build:irCfg'    in rules:
           for cKey in G.dict.tasks[self.props['curTask']]['cfg']:
-            self.buildUI('tc:'+cKey,widget)
+            finKey = 'irSep' if cKey == '---' else 'tc:'+cKey
+            self.buildUI(finKey,widget)
         if 'build:irBottom' in rules: _updFile()
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
