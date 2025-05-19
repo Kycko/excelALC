@@ -271,7 +271,8 @@ class Window     (TBS.Window):  # окно программы
     self.destroyWidget(('rbRoot'))
     self.wx['rbLfr'].config(text=S.UI['rbFinished'],bootstyle='success')
     self.buildUI('rbf' ,self.wx['rbLfr'],
-                {'text':replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)})})
+                {'text':replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)}),
+                 'foreground':G.UI.colors['red' if totalErrors else 'green']})
 
   # работа с ошибками
   def  suggInvalidUD(self,queue,suggList:list):
