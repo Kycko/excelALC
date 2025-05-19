@@ -127,7 +127,10 @@ class Root():
     queue = self.errors.queue
     JV    = self.pr['justVerify']
     AST   = G.dict.AStypes
-    if queue and not JV and AST[queue[0].type]['showSugg'] and self.cfg['suggErrors']:
+    if JV or not self.cfg['suggErrors']:
+      # после этого выполняется elif ниже
+      for i in range(len(queue)): self.errors.suggClicked(False,'',True)
+    if queue and AST[queue[0].type]['showSugg']:
       self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:9])
     elif self.type not in ('chkAll','reCalc'): self.finalizeErrors()
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
@@ -244,10 +247,11 @@ class Errors():   # хранилище ошибок
     if errors: self.log.add('errorsFound',
                            {'type' :        self.queue[0].type,
                             'count':str(len(self.queue))})
-  def suggClicked(self,OKclicked:bool,newValue:str):
+  def suggClicked(self,OKclicked:bool,newValue:str,autoSkipped=False):
     def _log():
-      key =   'sugg'+('-','+')[err.fixed]
-      self.log.add(key,{'type':err.type,'from':err.initVal,'to':err.newVal})
+      if not autoSkipped:
+        key =   'sugg'+('-','+')[err.fixed]
+        self.log.add(key,{'type':err.type,'from':err.initVal,'to':err.newVal})
       if not err.fixed:
         self.write(S.log['errorLeft'].replace('$type$',err.type) + lblText)
     err     =   self.queue.pop(0)
