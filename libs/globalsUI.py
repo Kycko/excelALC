@@ -6,7 +6,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
   def __init__(self):
     def _getShared(type:str,upd={}):
       # функция, передающая в self.build одинаковые свойства для однотипных элементов
-      dict = {'fRoot'      :{'rules'  :{'start':('clean')},
+      dict = {'fRoot'      :{'rules'  :{'start':('clean'),'final':('bindLogs')},
                              'type'   : 'fr',
                              'wxKey'  : 'fRoot',
                              'pack'   :{'fill':'both','expand':True,'padx':10,'pady':10}},
@@ -90,7 +90,9 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il'             :{'type' : 'fr',
                          'pack' :{'fill':'both','side':'left','padx': 7},
                          'stash':['ilTabs','ilBottom']},
-      'ilTabs'         :{'type' : 'tbs',
+      'ilTabs'         :{'rules':{'final':('setFocus')},
+                         'type' : 'tbs',
+                         'wxKey': 'ilTabs', # нужен для биндов PgUp/PgDown
                          'pack' :{'fill':'both','expand':True,'pady':7},
                          'stash':['ilTabMain','ilTabSec']},
       'ilTabMain'      : _getShared('ilTab',
@@ -194,8 +196,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:suggErrors'  : _getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
       'tc:saveAfter'   : _getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
 
-      'run'            : _getShared('fRoot',{'root' :{'stash':['rl','rr']},
-                                             'inner':{'rules':{'final':('bindLogs')}}}),
+      'run'            : _getShared('fRoot',{'root' :{'stash':['rl','rr']}}),
       'rl'             :{'type' : 'fr',
                          'pack' :{'fill':'both','expand':True,'side':'left'},
                          'stash':['rlLbl','rlTabs']},

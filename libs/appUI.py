@@ -102,7 +102,7 @@ class Window     (TBS.Window):  # окно программы
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
         if 'bindLogs'       in rules:
-          tabs = self.wx['rlTabs']
+          tabs = self.wx[key[:1]+'lTabs']
           for w in self.getAllChilds(self.wx['fRoot']):
             for kk in G.keys['pages']:
               w.bind(kk,lambda s:tabs.select(abs(tabs.index(tabs.select())-1)))
@@ -119,8 +119,8 @@ class Window     (TBS.Window):  # окно программы
           for w in self.getAllChilds(self.wx['fRoot']):
             w.bind(num,lambda s:_suggClicked(p['item']['val']))
         if 'rbeEntry'       in rules:
-          for key in G.keys['enter']:
-            self.wx['rbeEntry'].bind(key,
+          for entKey in G.keys['enter']:
+            self.wx['rbeEntry'].bind(entKey,
                                      lambda _:_suggFinalClicked('ok'))  # без _ ошибка
         if 'setFocus'       in rules: widget.focus_set()
         if 'returnWidget'   in rules: return widget
@@ -261,8 +261,8 @@ class Window     (TBS.Window):  # окно программы
     return    _finalRules() # запуск особых правил (проверки внутри)
   def destroyWidget(self,keys):  # в keys можно передать одну str либо tuple/list
     if  type(keys) == str: keys = [keys]
-    for key in keys:
-      try   : self.wx.pop(key).destroy()  # при первом запуске self.wx отсутствует
+    for wKey in keys:
+      try   : self.wx.pop(wKey).destroy() # при первом запуске self.wx отсутствует
       except: pass
   def setUItheme   (self,theme:bool): # theme=true/false для выбора из G.UI.themes()
     self.style.theme_use(G.UI.themes     [theme])
