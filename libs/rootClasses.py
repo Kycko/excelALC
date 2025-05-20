@@ -47,12 +47,13 @@ class Root():
         if self.pr['toTD']:
           pass
           # self.unkTD = TableDict(tObj['table'])
-          # if rmRC: self.rmEmptyRC(self.unkTD)
+          # if rmRC: self.rmRC_initial(self.unkTD)
           # self.init_curTD()
         else: self.table = CellTable(tObj['table'])
     def _runType():
       match self.pr['launch']:
-        case _: self.rangeChecker(self.table.data,self.pr['AStype'])
+        case 'rangeChecker': self.rangeChecker(self.table.data,self.pr['AStype'])
+        case 'rmRC'        : self.rmRC_initial(self.table);    self.finish()
 
     self.type =  type
     self.pr   =  G.dict.tasks[type]
@@ -94,6 +95,14 @@ class Root():
 
     self.errors.addCur(errors)
     self.nextSugg()
+  def rmRC_initial(self,tObj):  # удаляет только в ОЗУ; потом ещё надо удалить в файле
+    # tObj = CellTable либо TableDict
+    def _log():
+      RC  = self.RCremoved
+      key = 'RAM' if RC['rows'] or RC['cols'] else 'NO'
+      self.log.add('RCremoved_'+key,RC)
+    self.RCremoved = tObj.rmEmptyRC('rc',self.cfg['rmTitled'])
+    _log()
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
@@ -165,12 +174,25 @@ class Root():
   # финальные шаги (преобразование и запись)
   def finish(self):
     def   _write():
+      def _copySheet():
+        self.file.copySheet(self.shName)
+        match self.pr['read']:
+          case 'selection': shObj['range'] = shObj['sheet'].range(shObj['addr'])
+          case 'shActive' :
+            rows  = len(shObj['table'].data)
+            cols  = len(shObj['table'].data[0])
+            shObj['range'] = shObj['sheet'].range((1,1),(rows,cols))
+            shObj['addr']  = shObj['range'].address
+            shObj['sheet'].clear_contents()
+
       newSheet  = G.config.get(self.type+':newSheet')
+      shObj     = self.file.data[self.shName]
       self.tObj = self.table.toTable()
-      equal     = self.tObj. equals (self.file.data[self.shName]['table'])
+      equal     = self.tObj. equals (shObj['table'])
       if not equal:
-        self.file.data [self.shName]['table'] = self.tObj
-        self.file.write(self.shName,self.pr['read'],newSheet)
+        shObj['table'] = self.tObj
+        if newSheet: _copySheet()
+        self.file.write(self.shName)
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _colors():
       # шапку подсвечиваем в любом случае

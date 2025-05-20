@@ -329,8 +329,7 @@ def replaceIndex   (string:str,index:int,newChar:str):
     return string[:index] + newChar + string[index+1:]
 def replaceVars(string:str,vars:dict):  # заменяет в string'е все $var$ на значения из vars{}
   for key,val in vars.items():
-    if type(val) == str:  # защита от TypeError
-      string = string.replace('$'+key+'$',val)
+    string = string.replace('$'+key+'$',str(val)) # str() – защита от TypeError
   return string
 
 # защита от запуска модуля

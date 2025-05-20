@@ -28,7 +28,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                                              '---',   # будет просто separator
                                              'rmTitled'],
                               'read'       : 'shActive',
-                              'rmRC_onRead':  False,  # это для toTD?
+                              'rmRC_onRead':  False,  # это только для toTD
                               'toTD'       :  False,
                               'addHeader'  :  False,
                               'launch'     : 'rmRC',

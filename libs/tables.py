@@ -7,16 +7,28 @@ def getCells_fromList(values:list,errors=False):
 
 # надкласс с общими функциями для Table() и CellTable()
 class TableTemplate():
-  def getSize(self): return len(self.data),len(self.data[0])
-  def cutUp  (self,row:int):
+  def getSize  (self): return len(self.data),len(self.data[0])
+  def cutUp    (self,row:int):
     # обрезать сверху, row останется в итоговой таблице (т. е. row=0 вернёт то же самое)
     self.data = self.data[row:]
-  def rotate (self):
+  def rotate   (self):
     rotated = [[] for cell in self.data[0]]
     for   r  in range(len(self.data)):
       for c  in range(len(self.data[r])):
         rotated[c].append(self.data[r][c])
     self.data = rotated
+  def rmEmptyRC(self,type='rc',ignoreTitles=True):
+    # type=r/c/rc; ignoreTitles работает только для столбцов
+    def _rmList(type:str,list:list):  # type='r'/'c'
+      def   _rm(type:str,num :int,count=1): # type = 'r'/'c'
+        for counter in range(count):
+          if type == 'r': self.data.pop(num)
+          else:
+            for row in self.data: row.pop(num)
+      for i in sorted(list,reverse=True): _rm(type,i)
+    rows,cols = self.findEmptyRC(type,ignoreTitles)
+    _rmList('r',rows); _rmList('c',cols)
+    return {'rows':rows,'cols':cols}
 
 # основные классы
 class     Table(TableTemplate):
