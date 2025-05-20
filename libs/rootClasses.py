@@ -184,6 +184,10 @@ class Root():
             shObj['range'] = shObj['sheet'].range((1,1),(rows,cols))
             shObj['addr']  = shObj['range'].address
             shObj['sheet'].clear_contents()
+      def _rmRC():
+        RC = self.RCremoved
+        for RCkey in RC.keys(): RC[RCkey] = listF.ints_toRanges(RC[RCkey],True)
+        # ДАЛЕЕ УДАЛЕНИЕ
 
       newSheet  = G.config.get(self.type+':newSheet')
       shObj     = self.file.data[self.shName]
@@ -192,6 +196,7 @@ class Root():
       if not equal:
         shObj['table'] = self.tObj
         if newSheet: _copySheet()
+        _rmRC()
         self.file.write(self.shName)
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _colors():

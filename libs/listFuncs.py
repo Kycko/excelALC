@@ -35,9 +35,24 @@ def rmDoublesStr(oldList:list,lower=False):
   for item in oldList:
     if not inclStr(newList,item,True,lower): newList.append(item)
   return newList
-def rmBlankStr(list:list):  # оставлю такую функцию для простоты
+def rmBlankStr     (list:list): # оставлю такую функцию для простоты
   while '' in list: list.remove('')
   return list
+def ints_toRanges  (list:list,reverse=False):
+  # принимает список[] ЦЕЛЫХ чисел, возвращает список[{from:,to:},...] диапазонов
+  # исп., например, для удаления строк/столбцов в Excel
+  def _group():
+    def _init(): return {'from':num,'to':num}
+    def _save(): ranges [cur['from']] = cur
+    cur,ranges = None,{}  # ranges = minNum:{from:,to:}
+    for num in sorted(list):
+      if    cur   is None       : cur       = _init()
+      elif  num-1 == cur['to']  : cur['to'] =  num
+      else: _save(); cur = _init()
+    _save()
+    return ranges
+  ranges = _group()
+  return [ranges[key] for key in sorted(ranges.keys(),reverse=reverse)]
 
 # защита от запуска модуля
 if __name__ == '__main__':
