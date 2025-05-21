@@ -51,17 +51,28 @@ class Root():
           # self.init_curTD()
         else: self.table = CellTable(tObj['table'])
     def _runType():
+      def _runVerts():
+        def _vertUpdData():
+          # возвращает Table из тех же строк столбца с заголовком 'Категория'
+          # + обновляет self.file по selection'у
+          catIndex = self.searchTitleCol(lib.columns.data['cat']['title'])
+          if len(catIndex) == 1:
+            range           =  self.file.data[self.shName]['range']
+            cats            =  self.file.getValues(range.offset(0,catIndex[0]+1-range.column))
+            self.pr['read'] = 'selection'
+            _getData(False)
+            return CellTable(Table(cats,('toStrings')))
+        if self.file.data[self.shName]['range'].columns.count != 1: self.UI.launchErr('oneCol')
+        else:
+          cats = _vertUpdData()
+          if cats is None: self.UI.launchErr('noCats')
+          else:
+            self.vertChecker(self.table.data,cats.data)
+            self.finish()
       match self.pr['launch']:
         case 'rangeChecker': self.rangeChecker(self.table.data,self.pr['AStype'])
         case 'rmRC'        : self.rmRC_initial(self.table);    self.finish()
-        case 'chkVerts'    :
-          if self.file.data[self.shName]['range'].columns.count != 1: self.UI.launchErr('oneCol')
-          else:
-            cats = self.updData_forVertChecker()
-            if cats is None: self.UI.launchErr('noCatsColumn')
-            else:
-              self.vertChecker(self.table.data,cats.data)
-              self.finish()
+        case 'chkVerts'    :         _runVerts()
 
     self.type =  type
     self.pr   =  G.dict.tasks[type]
@@ -71,7 +82,7 @@ class Root():
     _runType()
 
   # основные алгоритмы проверки
-  def rangeChecker(self,table:list,type:str):
+  def rangeChecker(self,table :list,type :str):
     # в table передаём либо CellTable().data, либо [cells[]] из TableColumn
     # т. е. table – это всегда [[Cell,...],...]
     def _addError(): errors[low] = ErrorObj(type,cell.value,errPos)
@@ -103,6 +114,57 @@ class Root():
 
     self.errors.addCur(errors)
     self.nextSugg()
+  def  vertChecker(self,tVerts:list,tCats:list):
+    # в tVerts/tCats передаём либо CellTable().data, либо [cells[]] из TableColumn: это всегда [[Cell,...],...]
+    def _double():
+      def _copy():
+        fRow,fCol  = err.pos[0]['r'],err.pos[0]['c']
+        VC.value   = tVerts[fRow][fCol].value
+        VC.error   = tVerts[fRow][fCol].error
+        VC.changed = tVerts[fRow][fCol].changed
+      err = errors[CVlow]
+      err .addPos(errPos)
+      _copy()
+    def _log():
+      if CVstr not in AClogger:
+        AClogger.append( CVstr)
+        self.log.add   ('ACsuccess',{'type':'vert','from':CVstr,'to':new})
+
+    AClogger     = []     # запоминаем autocorr'ы для журнала (например, Services -> Услуги)
+    errors       = {}     # {initLow:ErrorObj,...}
+    vertsChanged = False  # чтобы показать сообщение про changed только один раз
+
+    for   r in range(len(tVerts)):
+      for c in range(len(tVerts[r])):
+        VC     = tVerts[r][c]                       #  это vert cell (CellObj)
+        lowCat = tCats [r][c].value.lower()         #  это string
+        CVstr  = tCats [r][c].value+' | '+VC.value  # 'cat | vert'
+        CVlib  = lib.cat.catVertList                #  cat & vert
+        errPos = {'r':r,'c':c}
+        new    = CVlib[lowCat] if lowCat in CVlib.keys() else ''
+
+        CVlow     = CVstr.lower()
+        if CVlow in errors.keys(): _double()
+        else:
+          if self.pr['justVerify'] or not self.cfg['ACverts']:
+            if new != VC.value:
+              errors[CVlow] = ErrorObj('vert',CVstr,errPos)
+              VC.error      = True
+          else:
+            ACval = self.autocorr('vert',VC.value)
+            if new:
+              if VC.value  !=   new: _log()
+              if VC.value and ACval.lower() != new.lower():
+                errors[CVlow] = ErrorObj('vert',CVstr,errPos,True,new)
+                vertsChanged,VC.changed = True ,True
+            else:
+              errors[CVlow] = ErrorObj('vert',CVstr,errPos)
+              VC.error = True
+            VC.value = new
+
+    if vertsChanged: self.log.add('vertChanged')
+    self.errors.addCur(errors)
+    # if self.type == 'chkAll': self.nextStage()
   def rmRC_initial(self,tObj):  # удаляет только в ОЗУ; потом ещё надо удалить в файле
     # tObj = CellTable либо TableDict
     def _log():
@@ -179,6 +241,11 @@ class Root():
     for  r   in range(len(table.data)):
       if strF.findSubList(table.data[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
     return 0
+  def searchTitleCol(self,title:str):
+    # возвращает индексЫ (список[]) столбцов с заголовком title, отсекая шапку (errors/unique)
+    rawTable = self.file.data[self.shName]['table']
+    titleRow = rawTable .data[self.searchTitleRow(rawTable)]
+    return listF.searchStr(titleRow,title,'index',True,False)
 
   # финальные шаги (преобразование и запись)
   def finish(self):
@@ -194,10 +261,12 @@ class Root():
             shObj['addr']  = shObj['range'].address
             shObj['sheet'].clear_contents()
       def _rmRC():
-        RC = self.RCremoved
-        for RCkey  in RC.keys (): RC[RCkey] = listF.ints_toRanges(RC[RCkey],True)
-        for rc,lst in RC.items():
-          for rng in lst: self.file.rmRCrange(self.shName,rc,rng)
+        try:
+          RC = self.RCremoved
+          for RCkey  in RC.keys (): RC[RCkey] = listF.ints_toRanges(RC[RCkey],True)
+          for rc,lst in RC.items():
+            for rng in lst: self.file.rmRCrange(self.shName,rc,rng)
+        except: pass
 
       newSheet  = G.config.get(self.type+':newSheet')
       shObj     = self.file.data[self.shName]

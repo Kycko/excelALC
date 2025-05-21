@@ -53,6 +53,14 @@ class RegCatTemplate():
     return final
 
 # классы библиотек
+class Columns():
+  def __init__(self,table): # table = объект tables.Table()
+    self. data =  libR.parseDoubleDict(table.data)
+    self.vList = [params['title'] for params in self.data.values()]
+  def getKey_byTitle(self,title:str,fullText=True,lower=False,strip=''):
+    # возвращает, например, ключ 'region' по заголовку 'Регион и город'
+    for key,params in self.data.items():
+      if strF.findSub(params['title'],title,'bool',fullText,lower,strip): return key
 class Autocorr(AStemplate):
   def get    (self,type:str,value:str):
     res   = super().get(type,value,True)
@@ -80,7 +88,14 @@ class Sugg    (AStemplate):
     return final
 class Cat     (RegCatTemplate):
   def __init__(self,table): # table = объект tables.Table()
+    def _createCatVertList():
+      final = {}
+      for list in self.data.values():
+        for  item in list: final[item   ['id']]          = item   ['vert']
+        if len(list) == 1: final[list[0]['cat'].lower()] = list[0]['vert']
+      self.catVertList = final
     self.cat_vList,self.vert_vList = super().parseMain(table,(0,3,4),'cat','vert')
+    _createCatVertList()
 class Regions (RegCatTemplate):
   def __init__(self,cities,regVars,AClib:dict): # cities и regVars = объекты tables.Table()
     def _parseVars():
@@ -103,6 +118,7 @@ try:
     raw       = Excel  (book,'shAll',('toStrings'))
     book.close()  # иначе останется пустое окно, если других Excel'ей не открыто
   # columns     = Columns      (raw.data['columns']   ['table'])
+  columns     = Columns      (raw.data['columns']   ['table'])
   autocorr    = Autocorr     (raw.data['autocorr']  ['table'],False)
   sugg        = Sugg         (raw.data['sugg']      ['table'],True)
   regions     = Regions      (raw.data['regions']   ['table'],

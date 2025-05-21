@@ -53,6 +53,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'errorsFound'     :'errors',
                 'sugg+'           :'sugg',
                 'sugg-'           :'sugg',
+                'vertChanged'     :'warning',
                 'columnAdded'     :'titles',
                 'titlesReordered' :'titles',
                 'vertChanged'     :'warning',
