@@ -49,7 +49,7 @@ def ints_toRanges  (list:list,reverse=False):
       if    cur   is None       : cur       = _init()
       elif  num-1 == cur['to']  : cur['to'] =  num
       else: _save(); cur = _init()
-    _save()
+    if cur is not None:    _save()
     return ranges
   ranges = _group()
   return [ranges[key] for key in sorted(ranges.keys(),reverse=reverse)]

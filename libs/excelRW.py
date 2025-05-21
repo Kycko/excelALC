@@ -68,6 +68,13 @@ class Excel():  # общий класс, можно копировать без 
         cell      = shObj['sheet'][fRow+row,fCol+col]
       case 'shActive' : cell = shObj['sheet'][row,col]
     cell.color = color
+  def rmRCrange    (self,shName:str,type:str,rng:dict): # rng={from:int,to:int}
+    match type:
+      case 'rows': s,f = str(rng['from']+1),str(rng['to']+1)
+      case 'cols':
+        s = self.colInt_toLetter(rng['from'])
+        f = self.colInt_toLetter(rng['to'])
+    self.data[shName]['sheet'].range(s+':'+f).delete()
   def save(self):   self.file.save()
 
   # вспомогательные
@@ -77,6 +84,14 @@ class Excel():  # общий класс, можно копировать без 
   def colLetters_toInt (self,letters:str):  # преобразует, например, 'AC' в 29
     lib,final = Gdict.colLetters,0
     for symb in letters: final += lib.find(symb)
+    return final
+  def colInt_toLetter  (self,num    :int):  # преобразует, например,  3 в  'C'
+    startIndex,final = 1,'' # it can start either at 0 or at 1
+    while num > 25+startIndex:
+      temp   = int((num-startIndex)/26)
+      final += chr (64 +temp)
+      num   -= temp*26
+    final += chr(65-startIndex+(num))
     return final
   def cellNums_fromAddr(self,cell:str):
     col,row = self.splitCellAddr  (cell)

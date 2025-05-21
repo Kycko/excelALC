@@ -98,7 +98,8 @@ class Root():
   def rmRC_initial(self,tObj):  # удаляет только в ОЗУ; потом ещё надо удалить в файле
     # tObj = CellTable либо TableDict
     def _log():
-      RC  = self.RCremoved
+      RC  = {'rows':len(self.RCremoved['rows']),
+             'cols':len(self.RCremoved['cols'])}
       key = 'RAM' if RC['rows'] or RC['cols'] else 'NO'
       self.log.add('RCremoved_'+key,RC)
     self.RCremoved = tObj.rmEmptyRC('rc',self.cfg['rmTitled'])
@@ -167,8 +168,8 @@ class Root():
 
   # чтение данных из таблицы
   def searchTitleRow(self,table:Table):
-    for r in range(len(table.data)):
-      if strF.findSubList(table[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
+    for  r   in range(len(table.data)):
+      if strF.findSubList(table.data[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
     return 0
 
   # финальные шаги (преобразование и запись)
@@ -186,8 +187,9 @@ class Root():
             shObj['sheet'].clear_contents()
       def _rmRC():
         RC = self.RCremoved
-        for RCkey in RC.keys(): RC[RCkey] = listF.ints_toRanges(RC[RCkey],True)
-        # ДАЛЕЕ УДАЛЕНИЕ
+        for RCkey  in RC.keys (): RC[RCkey] = listF.ints_toRanges(RC[RCkey],True)
+        for rc,lst in RC.items():
+          for rng in lst: self.file.rmRCrange(self.shName,rc,rng)
 
       newSheet  = G.config.get(self.type+':newSheet')
       shObj     = self.file.data[self.shName]
