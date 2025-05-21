@@ -278,6 +278,11 @@ class Window     (TBS.Window):  # окно программы
     self.buildUI('rbf' ,self.wx['rbLfr'],
                 {'text':replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)}),
                  'foreground':G.UI.colors['red' if totalErrors else 'green']})
+  def launchErr    (self,type:str):
+    self.finish(1)
+    self.wx['rbLfr'  ].config(text=S.UI['rbf:lfrError'],bootstyle='danger')
+    self.wx['rbfLbl' ].config(text=S.UI['launchErrors'][type])
+    self.wx['rbfExit'].config(bootstyle='danger')
 
   # работа с ошибками
   def  suggInvalidUD(self,queue,suggList:list):

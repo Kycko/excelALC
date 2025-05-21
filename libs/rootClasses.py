@@ -54,6 +54,14 @@ class Root():
       match self.pr['launch']:
         case 'rangeChecker': self.rangeChecker(self.table.data,self.pr['AStype'])
         case 'rmRC'        : self.rmRC_initial(self.table);    self.finish()
+        case 'chkVerts'    :
+          if self.file.data[self.shName]['range'].columns.count != 1: self.UI.launchErr('oneCol')
+          else:
+            cats = self.updData_forVertChecker()
+            if cats is None: self.UI.launchErr('noCatsColumn')
+            else:
+              self.vertChecker(self.table.data,cats.data)
+              self.finish()
 
     self.type =  type
     self.pr   =  G.dict.tasks[type]
