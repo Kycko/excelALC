@@ -53,9 +53,9 @@ class Excel():  # общий класс, можно копировать без 
     if type != 'none':
       shObj  =  self.data[shName]
       match type:
-        case 'sheet'    : rng = shObj['sheet'].used_range
-        case 'selection': rng = shObj['range']
-        case 'firstRow' :
+        case 'sh'      : rng = shObj['sheet'].used_range
+        case 'sel'     : rng = shObj['range']
+        case 'firstRow':
           lastCol = shObj['range'].columns.count
           rng     = shObj['sheet'].range((1,1),(1,lastCol))
       rng.color = None

@@ -99,12 +99,14 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'ilTabMain'      : _getShared('ilTab',
                                    {'inner':{'packTab':{'text':S.UI['ilTabMain']}},
                                     'root' :{'stash'  :['il:chkCat',  # chk = check
+                                                        'il:chkVert',
                                                         'il:chkSrc',
                                                         'il:chkMails']}}),
       'ilTabSec'       : _getShared('ilTab',
                                    {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
                                     'root' :{'stash'  :['il:rmRC']}}),
       'il:chkCat'      : _getShared('il:taskBtn'),
+      'il:chkVert'     : _getShared('il:taskBtn'),
       'il:chkSrc'      : _getShared('il:taskBtn'),
       'il:chkMails'    : _getShared('il:taskBtn'),
       'il:rmRC'        : _getShared('il:taskBtn'),
@@ -190,6 +192,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:suggErrors'  : _getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
       'tc:saveAfter'   : _getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
       'tc:rmTitled'    : _getShared('ir:tc:cb',{'root':{'tVar':'rmTitled'}}),
+      'tc:ACverts'     : _getShared('ir:tc:cb',{'root':{'tVar':'ACverts'}}),
+      'tc:vertBlanks'  : _getShared('ir:tc:cb',{'root':{'tVar':'vertBlanks'}}),
 
       'run'            : _getShared('fRoot',{'root' :{'stash':['rl','rr']}}),
       'rl'             :{'type' : 'fr',

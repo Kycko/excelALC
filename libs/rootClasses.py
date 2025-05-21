@@ -220,14 +220,14 @@ class Root():
         else                    : key = 'skip'
         self.log.add('finalColors_'+key,{'count':str(totalErrors)})
 
-      self.file.resetBgColors(self.shName,self.pr['resetBg'])
+      self.file.resetBgColors(self.shName,self.pr['colors'].split(':')[0])
       tbl = self.table.data
       if totalErrors in range(1,501): last =  len (tbl)
       else:                           last = (0,2)[self.pr['addHeader']]
       for row in range(last): _hlRow(row,'errors')
 
-      if self.pr['hlTitles']:_hlRow(self.searchTitleRow(self.tObj.data),'goodTitles')
-      if self.pr['hlVerts']:
+      if 'tit'  in self.pr['colors']:_hlRow(self.searchTitleRow(self.tObj.data),'goodTitles')
+      if 'vert' in self.pr['colors']:
         for row in range(len(tbl)): _hlRow(row,'chVerts') # changed verticals
       _log()
 

@@ -15,27 +15,32 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'addHeader'  : False,
                        'launch'     :'rangeChecker',
                        'justVerify' : False,
-                       'resetBg'    :'selection',
-                       'hlTitles'   : False,
-                       'hlVerts'    : False}}
+                       'colors'     :'sel'}}
         return dictF.update(dict[type],**upd)
-    self.tasks = {# 'chkAll'  :,
-                  'chkCat'  :_taskShared('chk',{'root':{'AStype':'cat'}}),
-                  'chkSrc'  :_taskShared('chk',{'root':{'AStype':'source'}}),
-                  'chkMails':_taskShared('chk',{'root':{'AStype':'mail'}}),
-                  'rmRC'    :{'cfg'        :['newSheet',
-                                             'saveAfter',
-                                             '---',   # будет просто separator
-                                             'rmTitled'],
-                              'read'       : 'shActive',
-                              'rmRC_onRead':  False,  # это только для toTD
-                              'toTD'       :  False,
-                              'addHeader'  :  False,
-                              'launch'     : 'rmRC',
-                              'justVerify' :  False,
-                              'resetBg'    : 'sheet',
-                              'hlTitles'   :  False,
-                              'hlVerts'    :  False}}
+    self.tasks = {
+      # --- – это будет separator; rmRC_onRead работает только с toTD=True
+      # colors = sel(selection) либо sh(sheet); туда же добавляем :tit(hlTitles) и :vert(hlVerts)
+      # 'chkAll'  :,
+      'chkCat'  : _taskShared('chk',{'root':{'AStype':'cat'}}),
+      'chkVert' :{'cfg'        :['newSheet','saveAfter','---','ACverts','vertBlanks'],
+                  'read'       : 'shSelection',
+                  'rmRC_onRead':  False,
+                  'toTD'       :  False,
+                  'addHeader'  :  False,
+                  'launch'     : 'chkVerts',
+                  'justVerify' :  False,
+                  'colors'     : 'sel:vert'},
+      'chkSrc'  : _taskShared('chk',{'root':{'AStype':'source'}}),
+      'chkMails': _taskShared('chk',{'root':{'AStype':'mail'}}),
+      'rmRC'    :{'cfg'        :['newSheet','saveAfter','---','rmTitled'],
+                  'read'       : 'shActive',
+                  'rmRC_onRead':  False,
+                  'toTD'       :  False,
+                  'addHeader'  :  False,
+                  'launch'     : 'rmRC',
+                  'justVerify' :  False,
+                  'colors'     : 'sel'}
+      }
 
     self.log = {'mainLaunch'      :'core',
                 'launchType'      :'core',
