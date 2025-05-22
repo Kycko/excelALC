@@ -51,7 +51,7 @@ def autocorrCell(type:str,value:str,params=None):
     if type == 'phone' and not list and params['noBlanks']: return G.dict.badPhone
     return ','.join(list)
 
-  value = value.strip()
+  value = value.replace(' ',' ').strip()
   if   type ==  'cat':
     return ' '.join(strips(value,G.dict.strips[type]).split())
   elif type in ('phone','mail','website'): return _autocorrPMW(value)

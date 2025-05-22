@@ -29,7 +29,9 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                   'addHeader'  :  False,
                   'launch'     : 'chkVerts',
                   'justVerify' :  False,
-                  'colors'     : 'sel:vert'},
+                  'colors'     : 'sel:vert',
+                  # ↓ добавляет в Root().cfg, но не в основные настройки и не в файл настроек
+                  'forceCfg'   :{'suggErrors':False}},
       'chkSrc'  : _taskShared('chk',{'root':{'AStype':'source'}}),
       'chkMails': _taskShared('chk',{'root':{'AStype':'mail'}}),
       'rmRC'    :{'cfg'        :['newSheet','saveAfter','---','rmTitled'],

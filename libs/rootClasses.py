@@ -18,6 +18,11 @@ class Root():
     else: appUI.cantReadLib()
   def launch  (self,book,type:str):
     # book = {obj:,file:,sheet:}; type = например, 'chkCat'
+    def _getCfg ():
+      self.cfg = {param:G.config.get(type+':'+param) for param in self.pr['cfg']}
+      try:
+        for key,val in self.pr['forceCfg'].items(): self.cfg[key] = val
+      except: pass
     def _initLE (): # LE = log & errors
       self.log = Log(self.UI)
       initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
@@ -66,18 +71,14 @@ class Root():
         else:
           cats = _vertUpdData()
           if cats is None: self.UI.launchErr('noCats')
-          else:
-            self.vertChecker(self.table.data,cats.data)
-            self.finish()
+          else           :  self.vertChecker(self.table.data,cats.data)
       match self.pr['launch']:
         case 'rangeChecker': self.rangeChecker(self.table.data,self.pr['AStype'])
         case 'rmRC'        : self.rmRC_initial(self.table);    self.finish()
         case 'chkVerts'    :         _runVerts()
 
-    self.type =  type
-    self.pr   =  G.dict.tasks[type]
-    self.cfg  = {param:G.config.get(type+':'+param) for param in self.pr['cfg']}
-    _initLE ()
+    self.type,self.pr = type,G.dict.tasks[type]
+    _getCfg (); _initLE ()
     _getData(rmRC=self.pr['rmRC_onRead'])
     _runType()
 
@@ -116,7 +117,7 @@ class Root():
     self.nextSugg()
   def  vertChecker(self,tVerts:list,tCats:list):
     # в tVerts/tCats передаём либо CellTable().data, либо [cells[]] из TableColumn: это всегда [[Cell,...],...]
-    def _double():
+    def _double  ():
       def _copy():
         fRow,fCol  = err.pos[0]['r'],err.pos[0]['c']
         VC.value   = tVerts[fRow][fCol].value
@@ -125,7 +126,10 @@ class Root():
       err = errors[CVlow]
       err .addPos(errPos)
       _copy()
-    def _log():
+    def _addError():
+      errors[CVlow] = ErrorObj('vert',CVstr,errPos)
+      VC.error      = True
+    def _log     ():
       if CVstr not in AClogger:
         AClogger.append( CVstr)
         self.log.add   ('ACsuccess',{'type':'vert','from':CVstr,'to':new})
@@ -133,38 +137,37 @@ class Root():
     AClogger     = []     # запоминаем autocorr'ы для журнала (например, Services -> Услуги)
     errors       = {}     # {initLow:ErrorObj,...}
     vertsChanged = False  # чтобы показать сообщение про changed только один раз
+    self.rTable = tVerts  # range table, понадобится в self.finalizeErrors()
 
     for   r in range(len(tVerts)):
       for c in range(len(tVerts[r])):
-        VC     = tVerts[r][c]                       #  это vert cell (CellObj)
-        lowCat = tCats [r][c].value.lower()         #  это string
-        CVstr  = tCats [r][c].value+' | '+VC.value  # 'cat | vert'
-        CVlib  = lib.cat.catVertList                #  cat & vert
-        errPos = {'r':r,'c':c}
-        new    = CVlib[lowCat] if lowCat in CVlib.keys() else ''
+        VC       = tVerts[r][c] # это vert cell (CellObj)
+        stripped = VC.value.replace(' ',' ').strip()
+        if not self.cfg['vertBlanks'] or not stripped:
+          lowCat = tCats [r][c].value.lower()         #  это string
+          CVstr  = tCats [r][c].value+' | '+VC.value  # 'cat | vert'
+          CVlib  = lib.cat.catVertList                #  cat & vert
+          errPos = {'r':r,'c':c}
+          new    = CVlib[lowCat] if lowCat in CVlib.keys() else ''
 
-        CVlow     = CVstr.lower()
-        if CVlow in errors.keys(): _double()
-        else:
-          if self.pr['justVerify'] or not self.cfg['ACverts']:
-            if new != VC.value:
-              errors[CVlow] = ErrorObj('vert',CVstr,errPos)
-              VC.error      = True
+          CVlow     = CVstr.lower()
+          if CVlow in errors.keys(): _double()
           else:
-            ACval = self.autocorr('vert',VC.value)
-            if new:
-              if VC.value  !=   new: _log()
-              if VC.value and ACval.lower() != new.lower():
-                errors[CVlow] = ErrorObj('vert',CVstr,errPos,True,new)
-                vertsChanged,VC.changed = True ,True
+            if self.pr['justVerify'] or not self.cfg['ACverts']:
+              if new != VC.value: _addError()
             else:
-              errors[CVlow] = ErrorObj('vert',CVstr,errPos)
-              VC.error = True
-            VC.value = new
+              ACval = self.autocorr('vert',VC.value)
+              if new:
+                if VC.value  !=   new: _log()
+                if stripped and ACval.lower() != new.lower():
+                  vertsChanged,VC.changed = True,True
+              else  : _addError()
+              VC.value = new
 
     if vertsChanged: self.log.add('vertChanged')
     self.errors.addCur(errors)
     # if self.type == 'chkAll': self.nextStage()
+    self.nextSugg()
   def rmRC_initial(self,tObj):  # удаляет только в ОЗУ; потом ещё надо удалить в файле
     # tObj = CellTable либо TableDict
     def _log():
@@ -319,7 +322,7 @@ class Root():
     self.UI .finish(totalErrors)
 
 # журнал и ошибки
-class Log():      # журнал
+class Log     (): # журнал
   def __init__(self,UI:appUI.Window):
     self.UI   = UI
     self.file = G.files['log']
@@ -334,7 +337,7 @@ class Log():      # журнал
     write_toFile(newStr,self.file,True)
     self.UI.log (newStr,unit)
     return newStr # пока что нужно только для _initLE()
-class Errors():   # хранилище ошибок
+class Errors  (): # хранилище ошибок
   def __init__   (self,log:Log,UI:appUI.Window,initLogStr:str):
     self.log,self.UI = log,UI
     self.queue       = [] # текущая очередь
