@@ -1,4 +1,5 @@
 from   sys         import exit as SYSEXIT
+from   copy        import deepcopy
 from   globalFuncs import curDateTime,write_toFile
 import globalsMain     as G
 import appUI
@@ -77,7 +78,8 @@ class Root():
         case 'rmRC'        : self.rmRC_initial(self.table);    self.finish()
         case 'chkVerts'    :         _runVerts()
 
-    self.type,self.pr = type,G.dict.tasks[type]
+    self.type = type
+    self.pr   = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
     _getCfg (); _initLE ()
     _getData(rmRC=self.pr['rmRC_onRead'])
     _runType()
