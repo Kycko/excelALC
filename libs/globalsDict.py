@@ -42,7 +42,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                    'forceCfg'   :{'suggErrors':False}},
       'chkSrc'   : _taskShared('chk',{'root':{'AStype':'source'}}),
       'chkMails' : _taskShared('chk',{'root':{'AStype':'mail'}}),
-      'rmRC'     :{'cfg'        :['newSheet','saveAfter','---','rmTitled'],
+      'rmRC'     :{'cfg'        :['newSheet','saveAfter','---','rmTitledCols'],
                    'read'       : 'shActive',
                    'rmRC_onRead':  False,
                    'toTD'       :  False,

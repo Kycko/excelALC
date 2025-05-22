@@ -1,4 +1,6 @@
-from sys import exit as SYSEXIT
+from   sys     import exit as SYSEXIT
+from   copy    import deepcopy
+import stringFuncs as strF
 
 # функции инициализации
 def getCells_fromList(values:list,errors=False):
@@ -100,6 +102,64 @@ class Cell():
     self.value   = value
     self.error   = error
     self.changed = False  # изменялось ли значение ячейки; важно, например, для вертикалей
+
+# это таблица, представленная в виде словаря {'столбец': TableColumn() obj,...}
+class TableDict  ():
+  def __init__(self,tObj:Table=None,errors=False):
+    # если tObj=None, создаём пустой объект без колонок
+    # errors = значение по умолчанию для всех ячеек
+    self.columns = {} # основное хранилище столбцов (объектов TableColumn)
+    if tObj is not None:
+      tObj = deepcopy(tObj)
+      tObj    .rotate()
+      for r in range(len(tObj.data)):
+        self.columns[str(r)] = TableColumn(tObj.data[r],errors,initPos=r)
+
+  # удаление строк и столбцов
+  def rmEmptyRC(self,type='rc',ignoreTitles=True):
+    # type=r/c/rc; ignoreTitles работает только для столбцов
+    rows,cols = self.findEmptyRC(type,ignoreTitles)
+    for key in        cols              : self.rmRC('c',key)
+    for row in sorted(rows,reverse=True): self.rmRC('r',row)
+    return {'rows':rows,'cols':cols}
+  def rmRC(self,type:str,item): # type = r/c; item = column key / row index
+    match type:
+      case 'c': self.columns.pop(item)
+      case 'r':
+        for col in self.columns.values(): col.cells.pop(item)
+  def findEmptyRC  (self,type='rc',ignoreTitles=True):
+    try:
+      fRows,fCols = [],[] # f = final
+      count = len(self.columns[tuple(self.columns.keys())[0]].cells)  # кол-во ячеек в столбцах
+      if 'r' in type: fRows = [row for row     in range(count)         if self.checkEmptyRow  (row)]
+      if 'c' in type: fCols = [key for key,col in self.columns.items() if col.isEmpty(ignoreTitles)]
+      return  fRows,fCols
+    except: return [],[]
+  def checkEmptyRow(self,row:int):
+    for  col in self.columns.values():
+      if col.cells[row].value: return False
+    return True
+
+  # прочее
+  def searchTitle(self,title:str,fullText=True,lower=True,strip=''):
+    for key,column in self.columns.items():
+      if strF.findSub(column.title.value,title,'bool',fullText,lower,strip): return key
+
+class TableColumn():  # title=CellObj, cells=[CellObj,...]
+  def __init__(self,values:list,errors=False,title=None,initPos:int=None,type:str=None):
+    if title is None:         title = values.pop(0)
+    self.title   = Cell             (title, errors)
+    self.cells   = getCells_fromList(values,errors)
+    self.type    = type     # тип данных в столбце
+    self.initPos = initPos  # номер по порядку в изначальной таблице
+
+    # для вывода в шапке таблицы (оба свойства – количество)
+    self.unique  = None
+    self.errors  = len(values) if errors else 0
+  def isEmpty (self,ignoreTitle=True):
+    for  cell in self.cells:
+      if cell.value: return False
+    return ignoreTitle or not bool(self.title.value)
 
 # защита от запуска модуля
 if __name__ == '__main__':

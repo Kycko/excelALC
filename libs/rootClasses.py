@@ -4,7 +4,7 @@ from   globalFuncs import curDateTime,write_toFile
 import globalsMain     as G
 import appUI
 from   excelRW     import Excel
-from   tables      import Table,CellTable
+from   tables      import Table,CellTable,TableDict
 import strings         as  S
 import stringFuncs     as  strF
 import listFuncs       as listF
@@ -40,6 +40,14 @@ class Root():
         rpl['cols'] = str(c)+' '+S.wordEndings['столбцы'][strF.ending_byCount(c)]
         rpl['rows'] = str(r)+' '+S.wordEndings['строки' ][strF.ending_byCount(r)]
         return type,rpl
+      def _curTD ():
+        uTD,self.curTD = self.unkTD,TableDict()
+        for lKey,par in lib.columns.data.items():
+          uKey = uTD.searchTitle(par['title'])
+          if uKey is not None:
+            uTD.columns[uKey].title.value = par['title']  # для правильной капитализации
+            self.moveUnkTD_toCurTD(uKey,lKey)
+
       self.file = Excel(book['obj'],self.pr['read'],('toStrings'))
       for shName,tObj in self.file.data.items():
         # for выполнится один раз; обращение через .keys()[0] и .values()[0] не работает
@@ -51,10 +59,9 @@ class Root():
           self.log.add(*_getLog())                    # диапазон
 
         if self.pr['toTD']:
-          pass
-          # self.unkTD = TableDict(tObj['table'])
-          # if rmRC: self.rmRC_initial(self.unkTD)
-          # self.init_curTD()
+          self.unkTD = TableDict(tObj['table'])
+          if rmRC: self.rmRC_initial(self.unkTD)
+          _curTD()
         else: self.table = CellTable(tObj['table'])
     def _runType():
       def _runVerts():
@@ -73,7 +80,7 @@ class Root():
           cats = _vertUpdData()
           if cats is None: self.UI.launchErr('noCats')
           else           :  self.vertChecker(self.table.data,cats.data)
-      match self.pr['launch']:
+      match self.pr['launch']:  # ДАЛЕЕ ДОБАВИТЬ СЮДА TITLES
         case 'rangeChecker': self.rangeChecker(self.table.data,self.pr['AStype'])
         case 'rmRC'        : self.rmRC_initial(self.table);    self.finish()
         case 'chkVerts'    :         _runVerts()
@@ -177,7 +184,7 @@ class Root():
              'cols':len(self.RCremoved['cols'])}
       key = 'RAM' if RC['rows'] or RC['cols'] else 'NO'
       self.log.add('RCremoved_'+key,RC)
-    self.RCremoved = tObj.rmEmptyRC('rc',self.cfg['rmTitled'])
+    self.RCremoved = tObj.rmEmptyRC('rc',self.cfg['rmTitledCols'])
     _log()
 
   # работа с ошибками
@@ -242,15 +249,19 @@ class Root():
     if                self.type !=    'reCalc'  : self.finish()
 
   # чтение данных из таблицы
-  def searchTitleRow(self,table:Table):
+  def searchTitleRow   (self,table :Table):
     for  r   in range(len(table.data)):
       if strF.findSubList(table.data[r][0],('Уникальных: ','Ошибок: '),'index') != 0: return r
     return 0
-  def searchTitleCol(self,title:str):
+  def searchTitleCol   (self,title :str):
     # возвращает индексЫ (список[]) столбцов с заголовком title, отсекая шапку (errors/unique)
     rawTable = self.file.data[self.shName]['table']
     titleRow = rawTable .data[self.searchTitleRow(rawTable)]
     return listF.searchStr(titleRow,title,'index',True,False)
+  def moveUnkTD_toCurTD(self,unkKey:str,curKey:str):
+    curCols,cLib    = self.curTD.columns,lib.columns.data
+    curCols[curKey] = self.unkTD.columns.pop(unkKey)
+    curCols[curKey].type = cLib[curKey]['type'] if curKey in cLib.keys() else None
 
   # финальные шаги (преобразование и запись)
   def finish(self):

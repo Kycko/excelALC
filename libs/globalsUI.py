@@ -194,7 +194,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:newSheet'    : _getShared('ir:tc:cb',{'root':{'tVar':'newSheet'}}), # tVar = task var
       'tc:suggErrors'  : _getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
       'tc:saveAfter'   : _getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
-      'tc:rmTitled'    : _getShared('ir:tc:cb',{'root':{'tVar':'rmTitled'}}),
+      'tc:rmTitledCols': _getShared('ir:tc:cb',{'root':{'tVar':'rmTitledCols'}}),
       'tc:ACverts'     : _getShared('ir:tc:cb',{'root':{'tVar':'ACverts'}}),
       'tc:vertBlanks'  : _getShared('ir:tc:cb',{'root':{'tVar':'vertBlanks'}}),
       'tc:reorder'     : _getShared('ir:tc:cb',{'root':{'tVar':'reorder'}}),
