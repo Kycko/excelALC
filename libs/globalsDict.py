@@ -13,7 +13,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'rmRC_onRead': False,
                        'toTD'       : False,
                        'addHeader'  : False,
-                       'launch'     :'rangeChecker',
+                       'launch'     :'chkRange',
                        'justVerify' : False,
                        'colors'     :'sel'}}
         return dictF.update(dict[type],**upd)
@@ -26,7 +26,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                    'rmRC_onRead':  False,
                    'toTD'       :  True,
                    'addHeader'  :  False,
-                   'launch'     : 'chkTitles',
+                   'launch'     : 'chkRange',
+                   'AStype'     : 'title',
                    'justVerify' :  False,
                    'colors'     : 'sh:tit'},
       'chkCat'   : _taskShared('chk',{'root':{'AStype':'cat'}}),

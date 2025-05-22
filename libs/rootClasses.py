@@ -80,10 +80,15 @@ class Root():
           cats = _vertUpdData()
           if cats is None: self.UI.launchErr('noCats')
           else           :  self.vertChecker(self.table.data,cats.data)
-      match self.pr['launch']:  # ДАЛЕЕ ДОБАВИТЬ СЮДА TITLES
-        case 'rangeChecker': self.rangeChecker(self.table.data,self.pr['AStype'])
-        case 'rmRC'        : self.rmRC_initial(self.table);    self.finish()
-        case 'chkVerts'    :         _runVerts()
+      def _runRange():
+        if self.pr['AStype'] == 'title':
+          data  = [[col.title for col in self.unkTD.columns.values()]]
+        else: data = self.table.data
+        self.rangeChecker(data,self.pr['AStype'])
+      match self.pr['launch']:
+        case 'chkRange' :         _runRange()
+        case 'chkVerts' :         _runVerts()
+        case 'rmRC'     : self.rmRC_initial(self.table);    self.finish()
 
     self.type = type
     self.pr   = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
@@ -228,8 +233,8 @@ class Root():
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
     self.errors.suggClicked(OKclicked,newValue)
     self.nextSugg()
-  def   finalizeErrors(self,forceTitles=False):
-    def _processQueue():
+  def   finalizeErrors(self):
+    def _processQueue ():
       for lng in range(len(self.errors.qStage)):
         errObj = self.errors.qStage.pop(0)
         for i in range(len(errObj.pos)):
@@ -241,12 +246,28 @@ class Root():
             cell.error = not errObj.fixed
             if errObj.fixed: cell.value = errObj.newVal
         self.errors.qFinal.append(errObj)
+    def _titles       ():
+      def _fixed(): # сперва переносим исправленные
+        keys = [] # ключи[(unkKey,curKey),...] для перемещения из unkTD в curTD
+        for uKey,col in self.unkTD.columns.items():
+          if not col.title.error:
+            keys.append((uKey,cLib.getKey_byTitle(col.title.value)))
+        for item in keys:  self.moveUnkTD_toCurTD(*item)
+      def _add  (): # затем  добавляем обязательные
+        cTD  = self.curTD
+        rows = len(tuple(cTD.columns.values())[0].cells)
+        for key,params in cLib.data.items():
+          if params['mandatory'] and key not in cTD.columns.keys():
+            cTD .addEmptyColumn(key,params['title'],rows,cLib.data[key]['type'])
+            self.log       .add('+column',{'title':params['title']})
+      cLib = lib.columns
+      _fixed(); _add()
 
     _processQueue()
-    if            self.pr['read'] ==   'selection': self.table.data = self.rTable
-    # elif forceTitles or self.type == 'checkTitles': self.TDfinalizeTitles()
+    if   self.pr['read'] == 'selection': self.table.data = self.rTable
+    elif self.type       == 'chkTitles': _titles()
     # if                  self.type ==   'allChecks': self.nextStage()
-    if                self.type !=    'reCalc'  : self.finish()
+    if   self.type       != 'reCalc'   : self.finish()
 
   # чтение данных из таблицы
   def searchTitleRow   (self,table :Table):
@@ -265,6 +286,26 @@ class Root():
 
   # финальные шаги (преобразование и запись)
   def finish(self):
+    def _TDjoin():  # объединяем curTD и unkTD перед финальной записью
+      for key in tuple(self.unkTD.columns.keys()): self.moveUnkTD_toCurTD(key,key)
+    def _curTD_toTable():
+      def _reorder(): # изменяет в столбцах initPos: по нему будет расстановка при записи
+        def _byLib(): # сперва из библиотеки
+          for  key in libData.keys():
+            if key in keys:
+              keys.remove(key)
+              cTD.columns[key].initPos = counter
+              counter += 1
+        def _unk  (): # затем с неправильными названиями
+          for i in sorted([int(key) for key in keys]):
+            cTD.columns[str(i)].initPos = counter
+            counter += 1
+        counter,keys = 0,list(cTD.columns.keys())
+        _byLib(); _unk()
+        self.log.add('titlesReordered')
+      cTD,libData = self.curTD,lib.columns.data
+      if self.cfg['reorder']: _reorder()
+      self.table = cTD.toCellTable(self.pr['addHeader'],libData,S.tblHeader)
     def   _write():
       def _copySheet():
         self.file.copySheet(self.shName)
@@ -325,9 +366,7 @@ class Root():
       _log()
 
     totalErrors = self.errors.getCount()
-    # if self.pr['toTD']:
-    #   self.joinTDs()
-    #   self.curTD_toTable()
+    if self.pr['toTD']: _TDjoin(); _curTD_toTable() # ← ЗДЕСЬ ДОДЕЛАЛ, МОЖНО ЗАПУСКАТЬ?
     _write(); _colors()
     if G.config.get(self.type+':saveAfter'):
       self.file.save()

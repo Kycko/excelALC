@@ -114,6 +114,10 @@ class TableDict  ():
       tObj    .rotate()
       for r in range(len(tObj.data)):
         self.columns[str(r)] = TableColumn(tObj.data[r],errors,initPos=r)
+  def addEmptyColumn(self,key:str,title:str,cellCount:int,type:str=None):
+    self.columns[key] = TableColumn(['' for i in range(cellCount)],
+                                    title = title,
+                                    type  = type)
 
   # удаление строк и столбцов
   def rmEmptyRC(self,type='rc',ignoreTitles=True):
@@ -144,6 +148,29 @@ class TableDict  ():
   def searchTitle(self,title:str,fullText=True,lower=True,strip=''):
     for key,column in self.columns.items():
       if strF.findSub(column.title.value,title,'bool',fullText,lower,strip): return key
+  def toCellTable(self,addHeader:bool,cLib,strings:dict):
+    # header = кол-во ошибок и уникальных
+    # cLib(lib.columns.data) и strings нельзя импортировать здесь
+    def _addHeader():
+      col.reCalc()
+      txtUnq = strings['unq']+str(col.unique)
+      txtErr = strings['err']+str(col.errors)
+
+      try   : colorize = col.unique > cLib[keys[str(i)]]['maxUnique']
+      except: colorize = False
+      header.append(Cell(txtUnq,colorize))
+      header.append(Cell(txtErr,bool(col.errors)))
+
+    # ↓ получаем "список" позиций и ключей столбцов
+    keys  = {str(col.initPos):key for key,col in self.columns.items()}
+    table = []  # создаём ротированную CellTable, затем переворачиваем её
+    for i in sorted([int(key) for key in keys.keys()]):
+      header,col = [],self.columns[keys[str(i)]]
+      if addHeader: _addHeader()
+      table.append(header + [col.title] + col.cells)
+    CT = CellTable(table,False)
+    CT.rotate()
+    return CT
 
 class TableColumn():  # title=CellObj, cells=[CellObj,...]
   def __init__(self,values:list,errors=False,title=None,initPos:int=None,type:str=None):
@@ -156,6 +183,12 @@ class TableColumn():  # title=CellObj, cells=[CellObj,...]
     # для вывода в шапке таблицы (оба свойства – количество)
     self.unique  = None
     self.errors  = len(values) if errors else 0
+  def reCalc  (self):
+    unique,self.errors = [],0
+    for  cell in self.cells:
+      if cell.value not in unique: unique.append(cell.value)
+      if cell.error              : self.errors += 1
+    self.unique = len(unique)
   def isEmpty (self,ignoreTitle=True):
     for  cell in self.cells:
       if cell.value: return False
