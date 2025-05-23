@@ -21,6 +21,17 @@ class globDicts():  # импортируется в G.dict (в глобальн�
       # --- – это будет separator; rmRC_onRead работает только с toTD=True
       # colors = sel(selection) либо sh(sheet); туда же добавляем :tit(hlTitles) и :vert(hlVerts)
       # 'chkAll'  :,
+      'reCalc'   :{'cfg'        :['newSheet','saveAfter'],
+                   'read'       : 'shActive',
+                   'rmRC_onRead':  False,
+                   'toTD'       :  True,
+                   'addHeader'  :  True,
+                   'launch'     : 'reCalc',
+                   'justVerify' :  True,
+                   'colors'     : 'sh:tit',
+                   'forceCfg'   :{'vertBlanks'   :False,
+                                  'noPhoneBlanks':False,
+                                  'reorder'      :False}},
       'chkTitles':{'cfg'        :['newSheet','suggErrors','saveAfter','---','reorder'],
                    'read'       : 'shActive',
                    'rmRC_onRead':  False,

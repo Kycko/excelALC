@@ -278,7 +278,8 @@ class Window     (TBS.Window):  # окно программы
   def finish       (self,totalErrors:int):
     self.destroyWidget(('rbRoot'))
     self.wx['rbLfr'].config(text=S.UI['rbFinished'],bootstyle='success')
-    self.buildUI('rbf' ,self.wx['rbLfr'],
+    self.set_reLfr(True)
+    self.buildUI  ('rbf' ,self.wx['rbLfr'],
                 {'text':replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)}),
                  'foreground':G.UI.colors['red' if totalErrors else 'green']})
   def launchErr    (self,type:str):

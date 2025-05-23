@@ -64,6 +64,11 @@ class Root():
           _curTD()
         else: self.table = CellTable(tObj['table'])
     def _runType():
+      def _runRange():
+        if self.pr['AStype'] == 'title':
+          data  = [[col.title for col in self.unkTD.columns.values()]]
+        else: data = self.table.data
+        self.rangeChecker(data,self.pr['AStype'])
       def _runVerts():
         def _vertUpdData():
           # возвращает Table из тех же строк столбца с заголовком 'Категория'
@@ -80,14 +85,21 @@ class Root():
           cats = _vertUpdData()
           if cats is None: self.UI.launchErr('noCats')
           else           :  self.vertChecker(self.table.data,cats.data)
-      def _runRange():
-        if self.pr['AStype'] == 'title':
-          data  = [[col.title for col in self.unkTD.columns.values()]]
-        else: data = self.table.data
-        self.rangeChecker(data,self.pr['AStype'])
+      def   _reCalc():
+        cols  = self.curTD.columns
+        GASTk = G.dict.AStypes.keys()
+        for col in cols.values():
+          temp = col.type.split(':')
+          type = temp      .pop(0)
+          if len(temp)     : self.subtype = temp[0]
+          if type == 'vert':
+            if 'cat' in cols.keys(): self. vertChecker([col.cells],[cols['cat'].cells])
+          elif  type in GASTk      : self.rangeChecker([col.cells], type)
+        self.finish()
       match self.pr['launch']:
         case 'chkRange' :         _runRange()
         case 'chkVerts' :         _runVerts()
+        case 'reCalc'   :           _reCalc()
         case 'rmRC'     : self.rmRC_initial(self.table);    self.finish()
 
     self.type = type
@@ -229,7 +241,7 @@ class Root():
       for i in range(len(queue)): self.errors.suggClicked(False,'',True)
     if queue and AST[queue[0].type]['showSugg']:
       self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:9])
-    elif self.type not in ('chkAll','reCalc'): self.finalizeErrors()
+    elif self.type != 'chkAll': self.finalizeErrors()
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
     self.errors.suggClicked(OKclicked,newValue)
     self.nextSugg()

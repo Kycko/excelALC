@@ -98,7 +98,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'stash':['ilTabMain','ilTabSec']},
       'ilTabMain'      : _getShared('ilTab',
                                    {'inner':{'packTab':{'text':S.UI['ilTabMain']}},
-                                    'root' :{'stash'  :['il:chkTitles', # chk = check
+                                    'root' :{'stash'  :['il:reCalc',
+                                                        'il:chkTitles', # chk = check
                                                         'il:chkCat',
                                                         'il:chkVert',
                                                         'il:chkSrc',
@@ -106,6 +107,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'ilTabSec'       : _getShared('ilTab',
                                    {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
                                     'root' :{'stash'  :['il:rmRC']}}),
+      'il:reCalc'      : _getShared('il:taskBtn',
+                                   {'inner':{'build':{'bootstyle':'warning'}}}),
       'il:chkTitles'   : _getShared('il:taskBtn'),
       'il:chkCat'      : _getShared('il:taskBtn'),
       'il:chkVert'     : _getShared('il:taskBtn'),
