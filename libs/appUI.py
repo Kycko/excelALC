@@ -127,6 +127,9 @@ class Window     (TBS.Window):  # окно программы
           for w in self.getAllChilds(self.wx['fRoot']):
             for kk in G.keys['pages']:
               w.bind(kk,lambda s:tabs.select(abs(tabs.index(tabs.select())-1)))
+        if 'bind_rbCancel'  in rules:
+          for wdg in self.getAllChilds(self.wx['fRoot']):
+            for kk in ('-','<Escape>'): wdg.bind(kk,lambda s:_suggFinalClicked('cancel'))
         if 'setFocus'       in rules: widget.focus_set()
         if 'returnWidget'   in rules: return widget
       except: pass  # так проще, чем с доп. условиями

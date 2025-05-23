@@ -10,6 +10,7 @@ import stringFuncs     as strF
 def get_vList(type:str):
   match type:
     # case 'title'    : return columns.vList
+    case 'title'    : return columns.vList
     case 'region'   : return regions.vList
     case 'ACregions': return regions.vListAC
     case 'cat'      : return cat    . cat_vList

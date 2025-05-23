@@ -220,7 +220,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                    {'inner':{'packTab':{'text':S.UI['rl:errors']}},
                                     'root' :{'wxKey'  : 'rl:errors'}}),
 
-      'rb'             :{'type' : 'lfr',
+      'rb'             :{'rules':{'final':('bind_rbCancel')},
+                         'type' : 'lfr',
                          'wxKey': 'rbLfr',
                          'build':{'text':S.UI['rb:init']},
                          'pack' :{'fill':'both','expand':True},

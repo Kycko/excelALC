@@ -254,12 +254,13 @@ class Root():
             keys.append((uKey,cLib.getKey_byTitle(col.title.value)))
         for item in keys:  self.moveUnkTD_toCurTD(*item)
       def _add  (): # затем  добавляем обязательные
-        cTD  = self.curTD
-        rows = len(tuple(cTD.columns.values())[0].cells)
+        cnt,cTD = 10000,self.curTD
+        rows    = len(tuple(cTD.columns.values())[0].cells)
         for key,params in cLib.data.items():
           if params['mandatory'] and key not in cTD.columns.keys():
             cTD .addEmptyColumn(key,params['title'],rows,cLib.data[key]['type'])
-            self.log       .add('+column',{'title':params['title']})
+            cTD .columns[key].initPos = cnt; cnt += 1
+            self.log.add('+column',{'title':params['title']})
       cLib = lib.columns
       _fixed(); _add()
 
@@ -291,17 +292,19 @@ class Root():
     def _curTD_toTable():
       def _reorder(): # изменяет в столбцах initPos: по нему будет расстановка при записи
         def _byLib(): # сперва из библиотеки
+          counter   = 0
           for  key in libData.keys():
             if key in keys:
               keys.remove(key)
               cTD.columns[key].initPos = counter
               counter += 1
-        def _unk  (): # затем с неправильными названиями
+          return counter
+        def _unk  (counter:int):  # затем с неправильными названиями
           for i in sorted([int(key) for key in keys]):
             cTD.columns[str(i)].initPos = counter
             counter += 1
-        counter,keys = 0,list(cTD.columns.keys())
-        _byLib(); _unk()
+        keys = list(cTD.columns.keys())
+        _unk(_byLib())
         self.log.add('titlesReordered')
       cTD,libData = self.curTD,lib.columns.data
       if self.cfg['reorder']: _reorder()
@@ -319,10 +322,12 @@ class Root():
             shObj['sheet'].clear_contents()
       def _rmRC():
         try:
-          RC = self.RCremoved
+          RC  = self.RCremoved
+          r,c = len(RC['rows']),len(RC['cols'])
           for RCkey  in RC.keys (): RC[RCkey] = listF.ints_toRanges(RC[RCkey],True)
           for rc,lst in RC.items():
             for rng in lst: self.file.rmRCrange(self.shName,rc,rng)
+          if r or c: self.log.add('RCremoved_file',{'rows':r,'cols':c})
         except: pass
 
       newSheet  = G.config.get(self.type+':newSheet')
@@ -360,13 +365,13 @@ class Root():
       else:                           last = (0,2)[self.pr['addHeader']]
       for row in range(last): _hlRow(row,'errors')
 
-      if 'tit'  in self.pr['colors']:_hlRow(self.searchTitleRow(self.tObj.data),'goodTitles')
+      if 'tit'  in self.pr['colors']: _hlRow(self.searchTitleRow(self.tObj),'goodTitles')
       if 'vert' in self.pr['colors']:
-        for row in range(len(tbl)): _hlRow(row,'chVerts') # changed verticals
+        for row in range  (len(tbl)): _hlRow(row,'chVerts') # changed verticals
       _log()
 
     totalErrors = self.errors.getCount()
-    if self.pr['toTD']: _TDjoin(); _curTD_toTable() # ← ЗДЕСЬ ДОДЕЛАЛ, МОЖНО ЗАПУСКАТЬ?
+    if self.pr['toTD']: _TDjoin(); _curTD_toTable()
     _write(); _colors()
     if G.config.get(self.type+':saveAfter'):
       self.file.save()
