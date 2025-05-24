@@ -106,6 +106,10 @@ class Window     (TBS.Window):  # окно программы
         if 'build:irBottom' in rules: _updFile()
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
+        if 'TCent'          in rules:
+          prm = pr['tVar']
+          self.buildUI('tcEnt:lbl',widget,{'text':S.UI['tc'][prm]})
+          self.wx['tcl:'+prm] = self.buildUI('tcEnt:ent',widget)
         if 'addSuggList'    in rules:
           for i in range(len(params)): self.buildUI('rbeVars:item',
                                                     widget,
@@ -227,9 +231,9 @@ class Window     (TBS.Window):  # окно программы
     def _launchClicked       ():        # это запуск проверок
       book = _updFile()
       if book:
-        # for param in G.launchTypes[type]['getOnLaunch']:
-        #   G.config.set(type+':'+param,self.onLaunch[param].get())
         task = self.props['curTask']  # self.props очищается в self.buildUI()
+        for param in G.dict.tasks[task]['getOnLaunch']:
+          G.config.set(task+':'+param,self.wx['tcl:'+param].get())
         self   .buildUI('run',self)
         self.app.launch( book,task)
     def _suggFinalClicked    (btn:str): # btn = ok/cancel/rejectAll(отменить всю очередь)

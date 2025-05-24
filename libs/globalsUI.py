@@ -23,6 +23,13 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'cmd'    :{'type' :'il:taskBtn'},
                              'build'  :{'width': 45,'bootstyle':'primary'},
                              'pack'   :{'pady' :  3}},
+              'irFileLbl'  :{'type'   : 'lbl',
+                             'pack'   :{'anchor':'w','padx':5}},
+              'log'        :{'rules'  :{'final':('paramsConfig')},
+                             'type'   : 'lbl',
+                             'pack'   :{'fill':'x'}},
+              'rbeOkCancel':{'type'   : 'btn',
+                             'pack'   :{'side':'left'}},
               'ir:tc:cb'   :{'rules'  :{'start':('mergeTC')},
                              'type'   : 'cb',
                              'build'  :{'bootstyle':'round-toggle'},
@@ -30,13 +37,9 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                         'expand'   : True,
                                         'padx'     : 5,
                                         'pady'     : 5}},
-              'irFileLbl'  :{'type'   : 'lbl',
-                             'pack'   :{'anchor':'w','padx':5}},
-              'log'        :{'rules'  :{'final':('paramsConfig')},
-                             'type'   : 'lbl',
-                             'pack'   :{'fill':'x'}},
-              'rbeOkCancel':{'type'   : 'btn',
-                             'pack'   :{'side':'left'}}}
+              'ir:tc:ent'  :{'rules'  :{'final':('TCent')},
+                             'type'   : 'fr',
+                             'pack'   :{'fill':'x','padx':5,'pady':5}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -106,7 +109,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                                         'il:chkMails']}}),
       'ilTabSec'       : _getShared('ilTab',
                                    {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
-                                    'root' :{'stash'  :['il:rmRC']}}),
+                                    'root' :{'stash'  :['il:rmRC',
+                                                        'il:fillBlanks']}}),
       'il:reCalc'      : _getShared('il:taskBtn',
                                    {'inner':{'build':{'bootstyle':'warning'}}}),
       'il:chkTitles'   : _getShared('il:taskBtn'),
@@ -115,6 +119,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il:chkSrc'      : _getShared('il:taskBtn'),
       'il:chkMails'    : _getShared('il:taskBtn'),
       'il:rmRC'        : _getShared('il:taskBtn'),
+      'il:fillBlanks'  : _getShared('il:taskBtn'),
 
       'ilBottom'       :{'type' : 'fr',
                          'pack' :{'fill':'x','side':'bottom','pady': 5},
@@ -194,13 +199,22 @@ class globUI(): # импортируется в G.UI (в глобальные п
                          'build':{'bootstyle':'success'},
                          'pack' :{'fill':'x','side':'bottom','pady':12}},
 
-      'tc:newSheet'    : _getShared('ir:tc:cb',{'root':{'tVar':'newSheet'}}), # tVar = task var
-      'tc:suggErrors'  : _getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
-      'tc:saveAfter'   : _getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
-      'tc:rmTitledCols': _getShared('ir:tc:cb',{'root':{'tVar':'rmTitledCols'}}),
-      'tc:ACverts'     : _getShared('ir:tc:cb',{'root':{'tVar':'ACverts'}}),
-      'tc:vertBlanks'  : _getShared('ir:tc:cb',{'root':{'tVar':'vertBlanks'}}),
-      'tc:reorder'     : _getShared('ir:tc:cb',{'root':{'tVar':'reorder'}}),
+      'tcEnt:lbl'      :{'rules':{'final':('paramsConfig')},
+                         'type' : 'lbl',
+                         'pack' :{'side':'left','padx':4}},
+      'tcEnt:ent'      :{'rules':{'final':('returnWidget')},
+                         'type' : 'ent',
+                         'pack' :{'fill':'x'}},
+
+      'tc:newSheet'    : _getShared('ir:tc:cb' ,{'root':{'tVar':'newSheet'}}), # tVar = task var
+      'tc:suggErrors'  : _getShared('ir:tc:cb' ,{'root':{'tVar':'suggErrors'}}),
+      'tc:saveAfter'   : _getShared('ir:tc:cb' ,{'root':{'tVar':'saveAfter'}}),
+      'tc:rmTitledCols': _getShared('ir:tc:cb' ,{'root':{'tVar':'rmTitledCols'}}),
+      'tc:ACverts'     : _getShared('ir:tc:cb' ,{'root':{'tVar':'ACverts'}}),
+      'tc:vertBlanks'  : _getShared('ir:tc:cb' ,{'root':{'tVar':'vertBlanks'}}),
+      'tc:reorder'     : _getShared('ir:tc:cb' ,{'root':{'tVar':'reorder'}}),
+      # ↓ в коде зашито self.wx['tcl:'+tVar]
+      'tc:strFiller'   : _getShared('ir:tc:ent',{'root':{'tVar':'strFiller'}}),
 
       'run'            : _getShared('fRoot',{'root' :{'stash':['rl','rr']}}),
       'rl'             :{'type' : 'fr',
