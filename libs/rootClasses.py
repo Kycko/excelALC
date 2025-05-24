@@ -64,12 +64,12 @@ class Root():
           _curTD()
         else: self.table = CellTable(tObj['table'])
     def _runType():
-      def _runRange():
+      def   _runRange():
         if self.pr['AStype'] == 'title':
           data  = [[col.title for col in self.unkTD.columns.values()]]
         else: data = self.table.data
         self.rangeChecker(data,self.pr['AStype'])
-      def _runVerts():
+      def   _runVerts():
         def _vertUpdData():
           # возвращает Table из тех же строк столбца с заголовком 'Категория'
           # + обновляет self.file по selection'у
@@ -85,7 +85,7 @@ class Root():
           cats = _vertUpdData()
           if cats is None: self.UI.launchErr('noCats')
           else           :  self.vertChecker(self.table.data,cats.data)
-      def   _reCalc():
+      def     _reCalc():
         cols  = self.curTD.columns
         GASTk = G.dict.AStypes.keys()
         for col in cols.values():
@@ -96,11 +96,21 @@ class Root():
             if 'cat' in cols.keys(): self. vertChecker([col.cells],[cols['cat'].cells])
           elif  type in GASTk      : self.rangeChecker([col.cells], type)
         self.finish()
+      def _fillBlanks():
+        count = 0
+        for   row  in self.table.data:
+          for cell in row:
+            if not cell.value.replace(' ',' ').strip():
+              cell.value = self.cfg['strFiller']
+              count     += 1
+        self.log.add('blanksFilled',{'count':count})
+        self. finish()
       match self.pr['launch']:
-        case 'chkRange' :         _runRange()
-        case 'chkVerts' :         _runVerts()
-        case 'reCalc'   :           _reCalc()
-        case 'rmRC'     : self.rmRC_initial(self.table);    self.finish()
+        case 'chkRange'  :         _runRange()
+        case 'chkVerts'  :         _runVerts()
+        case 'fillBlanks':       _fillBlanks()
+        case 'reCalc'    :           _reCalc()
+        case 'rmRC'      : self.rmRC_initial(self.table);    self.finish()
 
     self.type = type
     self.pr   = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
@@ -369,9 +379,10 @@ class Root():
         if not totalErrors      : key = '0'
         elif   totalErrors < 501: key = 'done'
         else                    : key = 'skip'
-        self.log.add('finalColors_'+key,{'count':str(totalErrors)})
+        if resBg != 'none': self.log.add('finalColors_'+key,{'count':str(totalErrors)})
 
-      self.file.resetBgColors(self.shName,self.pr['colors'].split(':')[0])
+      resBg = self.pr['colors'].split(':')[0]
+      self.file.resetBgColors(self.shName,resBg)
       tbl = self.table.data
       if totalErrors in range(1,501): last =  len (tbl)
       else:                           last = (0,2)[self.pr['addHeader']]

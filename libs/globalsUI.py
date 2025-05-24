@@ -202,7 +202,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tcEnt:lbl'      :{'rules':{'final':('paramsConfig')},
                          'type' : 'lbl',
                          'pack' :{'side':'left','padx':4}},
-      'tcEnt:ent'      :{'rules':{'final':('returnWidget')},
+      'tcEnt:ent'      :{'rules':{'final':('fillEnt','returnWidget')},
                          'type' : 'ent',
                          'pack' :{'fill':'x'}},
 

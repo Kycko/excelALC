@@ -107,9 +107,11 @@ class Window     (TBS.Window):  # окно программы
         if 'paramsConfig'   in rules: widget.config(**params)
         if 'color:lightRed' in rules: widget.config(foreground=G.UI.colors['lightRed'])
         if 'TCent'          in rules:
-          prm = pr['tVar']
+          prm  = pr['tVar']
+          conf = G.config.get(self.props['curTask']+':'+prm)
           self.buildUI('tcEnt:lbl',widget,{'text':S.UI['tc'][prm]})
-          self.wx['tcl:'+prm] = self.buildUI('tcEnt:ent',widget)
+          self.wx['tcl:'+prm] = self.buildUI('tcEnt:ent',widget,conf)
+        if 'fillEnt'        in rules: widget.insert(0,str(params))
         if 'addSuggList'    in rules:
           for i in range(len(params)): self.buildUI('rbeVars:item',
                                                     widget,
