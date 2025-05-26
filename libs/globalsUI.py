@@ -39,7 +39,10 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                         'pady'     : 5}},
               'ir:tc:ent'  :{'rules'  :{'final':('TCent')},
                              'type'   : 'fr',
-                             'pack'   :{'fill':'x','padx':5,'pady':5}}}
+                             'pack'   :{'fill' : 'x','padx':5,'pady':5}},
+              'ir:tc:rad'  :{'rules'  :{'final':('TCrad')},
+                             'type'   : 'fr',
+                             'pack'   :{'fill' : 'x','padx':5,'pady':5}}}
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
@@ -110,6 +113,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'ilTabSec'       : _getShared('ilTab',
                                    {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
                                     'root' :{'stash'  :['il:rmRC',
+                                                        'il:capitalize',
                                                         'il:fillBlanks']}}),
       'il:reCalc'      : _getShared('il:taskBtn',
                                    {'inner':{'build':{'bootstyle':'warning'}}}),
@@ -119,6 +123,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il:chkSrc'      : _getShared('il:taskBtn'),
       'il:chkMails'    : _getShared('il:taskBtn'),
       'il:rmRC'        : _getShared('il:taskBtn'),
+      'il:capitalize'  : _getShared('il:taskBtn'),
       'il:fillBlanks'  : _getShared('il:taskBtn'),
 
       'ilBottom'       :{'type' : 'fr',
@@ -201,10 +206,13 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
       'tcEnt:lbl'      :{'rules':{'final':('paramsConfig')},
                          'type' : 'lbl',
-                         'pack' :{'side':'left','padx':4}},
+                         'pack' :{'side' : 'left','padx':4}},
       'tcEnt:ent'      :{'rules':{'final':('fillEnt','returnWidget')},
                          'type' : 'ent',
-                         'pack' :{'fill':'x'}},
+                         'pack' :{'fill' : 'x'}},
+      'tc:radEntry'    :{'rules':{'final':('tc:radio')},
+                         'type' : 'radEntry',
+                         'pack' :{'fill' :'x','padx':4,'pady':3}},
 
       'tc:newSheet'    : _getShared('ir:tc:cb' ,{'root':{'tVar':'newSheet'}}), # tVar = task var
       'tc:suggErrors'  : _getShared('ir:tc:cb' ,{'root':{'tVar':'suggErrors'}}),
@@ -215,6 +223,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:reorder'     : _getShared('ir:tc:cb' ,{'root':{'tVar':'reorder'}}),
       # ↓ в коде зашито self.wx['tcl:'+tVar]
       'tc:strFiller'   : _getShared('ir:tc:ent',{'root':{'tVar':'strFiller'}}),
+      'tc:captMask'    : _getShared('ir:tc:rad',
+                                   {'root':{'tVar':['Aa_Aa','Aa_aa','Aa_aA','AA_AA','aa_aa']}}),
 
       'run'            : _getShared('fRoot',{'root' :{'stash':['rl','rr']}}),
       'rl'             :{'type' : 'fr',

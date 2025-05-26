@@ -1,6 +1,6 @@
 from   sys                          import exit as SYSEXIT
 from   os                           import startfile
-from   tkinter                      import BooleanVar
+from   tkinter                      import BooleanVar,StringVar
 import ttkbootstrap                     as TBS
 from   ttkbootstrap.tooltip         import ToolTip
 from   ttkbootstrap.dialogs.dialogs import Messagebox
@@ -111,6 +111,13 @@ class Window     (TBS.Window):  # окно программы
           conf = G.config.get(self.props['curTask']+':'+prm)
           self.buildUI('tcEnt:lbl',widget,{'text':S.UI['tc'][prm]})
           self.wx['tcl:'+prm] = self.buildUI('tcEnt:ent',widget,conf)
+        if 'TCrad'          in rules:
+          sType = self.props['curTask']+':'+key[3:]
+          rVar  = StringVar(value=G.config.get(sType))
+          for mask in pr['tVar']:
+            self.buildUI('tc:radEntry',
+                         widget,
+                         {'prp':key[3:],'key':mask,'rVar':rVar,'sType':sType})
         if 'fillEnt'        in rules: widget.insert(0,str(params))
         if 'addSuggList'    in rules:
           for i in range(len(params)): self.buildUI('rbeVars:item',
@@ -142,20 +149,27 @@ class Window     (TBS.Window):  # окно программы
     def _createWidget():
       bld = pr['build'] if 'build' in pr.keys() else {}
       match pr['type']:
-        case 'btn': return TBS.     Button(parent,**bld)
-        case 'cb' : return TBS.Checkbutton(
+        case 'btn'     : return TBS.     Button(parent,**bld)
+        case 'cb'      : return TBS.Checkbutton(
           parent,
           variable = BooleanVar(value=G.config.get(pr['var'])),
           **bld
           )
-        case 'ent': return TBS.Entry      (parent)
-        case  'fr': return TBS.Frame      (parent)
-        case 'lbl': return TBS.Label      (parent,**bld)
-        case 'lfr': return TBS.Labelframe (parent,**bld)
-        case 'sep': return TBS.Separator  (parent)
-        case 'sfr': return     ScrollFrame(parent)
-        case 'tbs': return TBS.Notebook   (parent)
-        case 'tt' : return     ToolTip    (parent,**bld)
+        case 'ent'     : return TBS.Entry      (parent)
+        case  'fr'     : return TBS.Frame      (parent)
+        case 'lbl'     : return TBS.Label      (parent,**bld)
+        case 'lfr'     : return TBS.Labelframe (parent,**bld)
+        case 'radEntry': return TBS.Radiobutton(
+          parent,
+          text     = S.UI['tc'][params['prp']][params['key']],
+          value    = params['key'],
+          variable = params['rVar'],
+          command  = lambda:G.config.set(params['sType'],params['key'])
+          )
+        case 'sep'     : return TBS.Separator  (parent)
+        case 'sfr'     : return     ScrollFrame(parent)
+        case 'tbs'     : return TBS.Notebook   (parent)
+        case 'tt'      : return     ToolTip    (parent,**bld)
     # изменение оформления
     def _setUIzoom(change=False):
       cfgName = 'main:zoom'
