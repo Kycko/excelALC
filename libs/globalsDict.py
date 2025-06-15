@@ -98,9 +98,10 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'rmRC_onRead':  False,
         'toTD'       :  False,
         'addHeader'  :  False,
-        'launch'     : 'fillBlanks',
+        'launch'     : 'formatSheet',
         'justVerify' :  False,
-        'colors'     : 'none'
+        'colors'     : 'none',
+        'forceCfg'   :{'formatSheet':True}
         }
       }
 
@@ -151,6 +152,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     self.exColors   = {'goodTitle':'#56E0AB', # ex = Excel
                        'hlChanged':'#E8E782', # hl = highlight (cell)
                        'hlError'  :'#F69A98'}
+    self.frmExcel   = {'font'     :{'name':'Calibri','size':11}}
 
     # ↓ неподходящие для почты и сайта
     self.badSymbols   = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),

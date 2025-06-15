@@ -116,12 +116,13 @@ class Root():
         self.finish()
 
       match self.pr['launch']:
-        case 'capitalize':       _capitalize()
-        case 'chkRange'  :         _runRange()
-        case 'chkVerts'  :         _runVerts()
-        case 'fillBlanks':       _fillBlanks()
-        case 'reCalc'    :           _reCalc()
-        case 'rmRC'      : self.rmRC_initial(self.table);    self.finish()
+        case 'capitalize' :       _capitalize()
+        case 'chkRange'   :         _runRange()
+        case 'chkVerts'   :         _runVerts()
+        case 'fillBlanks' :       _fillBlanks()
+        case 'formatSheet':       self.finish(self.cfg['newSheet'])
+        case 'reCalc'     :           _reCalc()
+        case 'rmRC'       : self.rmRC_initial(self.table); self.finish()
 
     self.type = type
     self.pr   = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
@@ -319,7 +320,7 @@ class Root():
     curCols[curKey].type = cLib[curKey]['type'] if curKey in cLib.keys() else None
 
   # финальные шаги (преобразование и запись)
-  def finish(self):
+  def finish(self,forceNewSheet=False):
     def _TDjoin():  # объединяем curTD и unkTD перед финальной записью
       for key in tuple(self.unkTD.columns.keys()): self.moveUnkTD_toCurTD(key,key)
     def _curTD_toTable():
@@ -367,12 +368,26 @@ class Root():
       shObj     = self.file.data[self.shName]
       self.tObj = self.table.toTable()
       equal     = self.tObj. equals (shObj['table'])
+
       if not equal:
         shObj['table'] = self.tObj
         if newSheet: _copySheet()
         _rmRC()
         self.file.write(self.shName)
+      elif forceNewSheet: _copySheet()
+      if self.type == 'formatSheet': equal = False
+
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
+    def  _format():
+      def _font():
+        fRange.font.name = glob['font']['name']
+        fRange.font.size = glob['font']['size']
+
+      glob     = G.dict.frmExcel
+      frmSheet = self.file.data[self.shName]
+      fRange   = frmSheet['range'] if self.cfg['frmRange'] else frmSheet['sheet'].cells
+
+      if self.cfg['frmFont']: _font()
     def  _colors():
       # шапку подсвечиваем в любом случае
       def _hlRow(r:int,type:str):
@@ -406,7 +421,9 @@ class Root():
 
     totalErrors = self.errors.getCount()
     if self.pr['toTD']: _TDjoin(); _curTD_toTable()
-    _write(); _colors()
+    _write()
+    if self.cfg['formatSheet']: _format()
+    _colors()
     if G.config.get(self.type+':saveAfter'):
       self.file.save()
       self.log .add ('fileSaved')
