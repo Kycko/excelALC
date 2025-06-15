@@ -93,7 +93,12 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'colors'     : 'none'
         },
       'formatSheet':{
-        'cfg'        :['newSheet','saveAfter','---','frmRange','frmFont'],
+        'cfg'        :['newSheet',
+                       'saveAfter',
+                       '---',
+                       'frmRange',
+                       'frmFont',
+                       'frmBIU'], # BIU = bold, italic, underlined
         'read'       : 'selection',
         'rmRC_onRead':  False,
         'toTD'       :  False,

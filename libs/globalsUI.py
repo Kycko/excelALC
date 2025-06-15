@@ -290,6 +290,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
         ),
       'tc:frmRange'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmRange'}}),
       'tc:frmFont'     :_getShared('ir:tc:cb',{'root':{'tVar':'frmFont'}}),
+      'tc:frmBIU'      :_getShared('ir:tc:cb',{'root':{'tVar':'frmBIU'}}),
 
       'run'            :_getShared('fRoot'   ,{'root':{'stash':['rl','rr']}}),
       'rl'             :{

@@ -380,14 +380,20 @@ class Root():
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _format():
       def _font():
-        fRange.font.name = glob['font']['name']
-        fRange.font.size = glob['font']['size']
+        RF.name = glob['font']['name']
+        RF.size = glob['font']['size']
+      def  _BIU():
+        RF.bold   = False
+        RF.italic = False
+        fRange.api.Font.Underline = -4142 # так отключается подчёркивание
 
       glob     = G.dict.frmExcel
       frmSheet = self.file.data[self.shName]
       fRange   = frmSheet['range'] if self.cfg['frmRange'] else frmSheet['sheet'].cells
+      RF       = fRange.font  # RF = range font
 
       if self.cfg['frmFont']: _font()
+      if self.cfg['frmBIU' ]:  _BIU()
     def  _colors():
       # шапку подсвечиваем в любом случае
       def _hlRow(r:int,type:str):
