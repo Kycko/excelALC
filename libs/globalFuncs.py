@@ -15,8 +15,9 @@ def write_toFile(lines:list,file:str,justAdd=False):
 
   with open(file,mode,encoding='utf-8') as f:
     for line in lines: f.write(f"{line}\n")
-def get_initSettings(): return {'main':{'darkTheme':checkWinTheme(),
-                                        'zoom'     :0}}
+def get_initSettings(): return {'main'      :{'darkTheme': checkWinTheme(),
+                                              'zoom'     : 0},
+                                'capitalize':{'captMask' :'Aa_aa'}}
 def getIB(type:str,index:int):  # IB = index/boolean
   # служебная функция; возвращает сам index либо true/false
   return index if type == 'index' else index >= 0

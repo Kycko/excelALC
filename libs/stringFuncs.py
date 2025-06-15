@@ -331,6 +331,12 @@ def replaceVars(string:str,vars:dict):  # заменяет в string'е все $
   for key,val in vars.items():
     string = string.replace('$'+key+'$',str(val)) # str() – защита от TypeError
   return string
+def capitalize (string:str,mask:str):
+  if   mask == 'Aa_Aa': return ' '.join([item.capitalize() for item in string.split()])
+  elif mask == 'Aa_aa': return string.capitalize()
+  elif mask == 'Aa_aA': return string[0]  .upper() + string[1:]
+  elif mask == 'AA_AA': return string     .upper()
+  elif mask == 'aa_aa': return string     .lower()
 
 # защита от запуска модуля
 if __name__ == '__main__':

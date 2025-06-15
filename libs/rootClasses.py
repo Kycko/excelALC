@@ -20,7 +20,7 @@ class Root():
   def launch  (self,book,type:str):
     # book = {obj:,file:,sheet:}; type = например, 'chkCat'
     def _getCfg ():
-      self.cfg = {param:G.config.get(type+':'+param) for param in self.pr['cfg']}
+      self.cfg = {p:G.config.get(type+':'+p) for p in self.pr['cfg'] if p != '---'}
       try:
         for key,val in self.pr['forceCfg'].items(): self.cfg[key] = val
       except: pass
@@ -105,7 +105,18 @@ class Root():
               count     += 1
         self.log.add('blanksFilled',{'count':count})
         self. finish()
+      def _capitalize():
+        mask = self.cfg['captMask']
+        for   row  in self.table.data:
+          for cell in row:
+            new = strF.capitalize(cell.value,mask)
+            if new != cell.value:
+              self.log.add('ACsuccess',{'type':mask,'from':cell.value,'to':new})
+            cell.value = new
+        self.finish()
+
       match self.pr['launch']:
+        case 'capitalize':       _capitalize()
         case 'chkRange'  :         _runRange()
         case 'chkVerts'  :         _runVerts()
         case 'fillBlanks':       _fillBlanks()

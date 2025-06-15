@@ -247,9 +247,11 @@ class Window     (TBS.Window):  # окно программы
     def _launchClicked       ():        # это запуск проверок
       book = _updFile()
       if book:
-        task = self.props['curTask']  # self.props очищается в self.buildUI()
-        for param in G.dict.tasks[task]['getOnLaunch']:
-          G.config.set(task+':'+param,self.wx['tcl:'+param].get())
+        task =   self.props['curTask']  # self.props очищается в self.buildUI()
+        glob = G.dict.tasks[task]
+        if 'getOnLaunch' in glob.keys():
+          for param in glob['getOnLaunch']:
+            G.config.set(task+':'+param,self.wx['tcl:'+param].get())
         self   .buildUI('run',self)
         self.app.launch( book,task)
     def _suggFinalClicked    (btn:str): # btn = ok/cancel/rejectAll(отменить всю очередь)
