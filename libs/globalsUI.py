@@ -114,7 +114,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                                    {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
                                     'root' :{'stash'  :['il:rmRC',
                                                         'il:capitalize',
-                                                        'il:fillBlanks']}}),
+                                                        'il:fillBlanks',
+                                                        'il:formatSheet']}}),
       'il:reCalc'      : _getShared('il:taskBtn',
                                    {'inner':{'build':{'bootstyle':'warning'}}}),
       'il:chkTitles'   : _getShared('il:taskBtn'),
@@ -125,6 +126,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il:rmRC'        : _getShared('il:taskBtn'),
       'il:capitalize'  : _getShared('il:taskBtn'),
       'il:fillBlanks'  : _getShared('il:taskBtn'),
+      'il:formatSheet' : _getShared('il:taskBtn',
+                                   {'inner':{'build':{'bootstyle':'warning'}}}),
 
       'ilBottom'       :{'type' : 'fr',
                          'pack' :{'fill':'x','side':'bottom','pady': 5},
@@ -225,6 +228,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:strFiller'   : _getShared('ir:tc:ent',{'root':{'tVar':'strFiller'}}),
       'tc:captMask'    : _getShared('ir:tc:rad',
                                    {'root':{'tVar':['Aa_Aa','Aa_aa','Aa_aA','AA_AA','aa_aa']}}),
+      'tc:formatRange' : _getShared('ir:tc:cb' ,{'root':{'tVar':'formatRange'}}),
 
       'run'            : _getShared('fRoot',{'root' :{'stash':['rl','rr']}}),
       'rl'             :{'type' : 'fr',
