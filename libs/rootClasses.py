@@ -1,14 +1,15 @@
-from   sys         import exit as SYSEXIT
-from   copy        import deepcopy
-from   globalFuncs import curDateTime,write_toFile
-import globalsMain     as G
+from   sys               import exit as SYSEXIT
+from   xlwings.constants import HAlign
+from   copy              import deepcopy
+from   globalFuncs       import curDateTime,write_toFile
+import globalsMain           as G
 import appUI
-from   excelRW     import Excel
-from   tables      import Table,CellTable,TableDict
-import strings         as  S
-import stringFuncs     as  strF
-import listFuncs       as listF
-import libClasses      as lib
+from   excelRW           import Excel
+from   tables            import Table,CellTable,TableDict
+import strings               as  S
+import stringFuncs           as  strF
+import listFuncs             as listF
+import libClasses            as lib
 
 # корневой класс: из него запускаются UI и код других модулей
 class Root():
@@ -379,18 +380,21 @@ class Root():
 
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _format():
-      def    _font():
-        RF.name = glob['font']['name']
-        RF.size = glob['font']['size']
-      def     _BIU():
-        RF.bold   = False
-        RF.italic = False
-        fRange.api.Font.Underline = -4142 # так отключается подчёркивание
-      def _borders():
-        fRange.api.Borders.Weight = 2
-        fRange.api.Borders.Color  = clrs['borders']
-      def      _bg(): fRange.color = None
-      def      _fg(): RF    .color = clrs['blackFont']
+      def _set(type:str=None,force=False):
+        if force or type == 'frmFont'   :
+          RF.name = glob['font']['name']
+          RF.size = glob['font']['size']
+        if force or type == 'frmBIU'    :
+          RF.bold   = False
+          RF.italic = False
+          fRange.api.Font.Underline = -4142 # так отключается подчёркивание
+        if force or type == 'frmAlign'  :
+          fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
+        if force or type == 'frmBorders':
+          fRange.api.Borders.Weight = 2
+          fRange.api.Borders.Color  = clrs['borders']
+        if force or type == 'frmBg'     : fRange.color = None
+        if force or type == 'frmFg'     : RF    .color = clrs['blackFont']
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors
@@ -398,11 +402,10 @@ class Root():
       fRange   = frmSheet['range'] if self.cfg['frmRange'] else frmSheet['sheet'].cells
       RF       = fRange.font  # RF = range font
 
-      if forceFrm or self.cfg['frmFont']   :    _font()
-      if forceFrm or self.cfg['frmBIU' ]   :     _BIU()
-      if forceFrm or self.cfg['frmBorders']: _borders()
-      if forceFrm or self.cfg['frmBg']     :      _bg()
-      if forceFrm or self.cfg['frmFg']     :      _fg()
+      if forceFrm: _set(force=True)
+      else:
+        for key,val in self.cfg.items():
+          if key[:3] == 'frm' and val: _set(type=key)
     def  _colors():
       # шапку подсвечиваем в любом случае
       def _hlRow(r:int,type:str):
