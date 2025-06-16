@@ -320,7 +320,7 @@ class Root():
     curCols[curKey].type = cLib[curKey]['type'] if curKey in cLib.keys() else None
 
   # финальные шаги (преобразование и запись)
-  def finish(self,forceNewSheet=False):
+  def finish(self,forceNewSheet=False,forceFrm=False):
     def _TDjoin():  # объединяем curTD и unkTD перед финальной записью
       for key in tuple(self.unkTD.columns.keys()): self.moveUnkTD_toCurTD(key,key)
     def _curTD_toTable():
@@ -398,11 +398,11 @@ class Root():
       fRange   = frmSheet['range'] if self.cfg['frmRange'] else frmSheet['sheet'].cells
       RF       = fRange.font  # RF = range font
 
-      if self.cfg['frmFont']   :    _font()
-      if self.cfg['frmBIU' ]   :     _BIU()
-      if self.cfg['frmBorders']: _borders()
-      if self.cfg['frmBg']     :      _bg()
-      if self.cfg['frmFg']     :      _fg()
+      if forceFrm or self.cfg['frmFont']   :    _font()
+      if forceFrm or self.cfg['frmBIU' ]   :     _BIU()
+      if forceFrm or self.cfg['frmBorders']: _borders()
+      if forceFrm or self.cfg['frmBg']     :      _bg()
+      if forceFrm or self.cfg['frmFg']     :      _fg()
     def  _colors():
       # шапку подсвечиваем в любом случае
       def _hlRow(r:int,type:str):
@@ -437,7 +437,7 @@ class Root():
     totalErrors = self.errors.getCount()
     if self.pr['toTD']: _TDjoin(); _curTD_toTable()
     _write()
-    if self.cfg['formatSheet']: _format()
+    if forceFrm or self.cfg['formatSheet']: _format()
     _colors()
     if G.config.get(self.type+':saveAfter'):
       self.file.save()
