@@ -102,6 +102,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'frmFont',
                        'frmBIU',  # BIU = bold, italic, underlined
                        'frmAlign',
+                       'frmNewLines',
                        '---',
                        'frmBorders',
                        'frmBg',   # фон ячеек
