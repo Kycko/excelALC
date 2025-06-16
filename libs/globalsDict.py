@@ -1,5 +1,6 @@
-from   sys import exit as SYSEXIT
-import dictFuncs       as dictF
+from   sys           import exit as SYSEXIT
+from   xlwings.utils import rgb_to_int
+import dictFuncs         as dictF
 
 class globDicts():  # импортируется в G.dict (в глобальные переменные)
   def __init__(self):
@@ -98,7 +99,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        '---',
                        'frmRange',
                        'frmFont',
-                       'frmBIU'], # BIU = bold, italic, underlined
+                       'frmBIU',  # BIU = bold, italic, underlined
+                       'frmBorders'],
         'read'       : 'selection',
         'rmRC_onRead':  False,
         'toTD'       :  False,
@@ -156,7 +158,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     self.colLetters =  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     self.exColors   = {'goodTitle':'#56E0AB', # ex = Excel
                        'hlChanged':'#E8E782', # hl = highlight (cell)
-                       'hlError'  :'#F69A98'}
+                       'hlError'  :'#F69A98',
+                       'borders'  :rgb_to_int((191,191,191))}
     self.frmExcel   = {'font'     :{'name':'Calibri','size':11}}
 
     # ↓ неподходящие для почты и сайта
