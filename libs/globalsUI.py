@@ -292,6 +292,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:frmFont'     :_getShared('ir:tc:cb',{'root':{'tVar':'frmFont'}}),
       'tc:frmBIU'      :_getShared('ir:tc:cb',{'root':{'tVar':'frmBIU'}}),
       'tc:frmBorders'  :_getShared('ir:tc:cb',{'root':{'tVar':'frmBorders'}}),
+      'tc:frmBg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmBg'}}),
+      'tc:frmFg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmFg'}}),
 
       'run'            :_getShared('fRoot'   ,{'root':{'stash':['rl','rr']}}),
       'rl'             :{

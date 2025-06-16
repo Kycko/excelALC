@@ -388,9 +388,12 @@ class Root():
         fRange.api.Font.Underline = -4142 # так отключается подчёркивание
       def _borders():
         fRange.api.Borders.Weight = 2
-        fRange.api.Borders.Color  = G.dict.exColors['borders']
+        fRange.api.Borders.Color  = clrs['borders']
+      def      _bg(): fRange.color = None
+      def      _fg(): RF    .color = clrs['blackFont']
 
       glob     = G.dict.frmExcel
+      clrs     = G.dict.exColors
       frmSheet = self.file.data[self.shName]
       fRange   = frmSheet['range'] if self.cfg['frmRange'] else frmSheet['sheet'].cells
       RF       = fRange.font  # RF = range font
@@ -398,6 +401,8 @@ class Root():
       if self.cfg['frmFont']   :    _font()
       if self.cfg['frmBIU' ]   :     _BIU()
       if self.cfg['frmBorders']: _borders()
+      if self.cfg['frmBg']     :      _bg()
+      if self.cfg['frmFg']     :      _fg()
     def  _colors():
       # шапку подсвечиваем в любом случае
       def _hlRow(r:int,type:str):

@@ -100,7 +100,10 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'frmRange',
                        'frmFont',
                        'frmBIU',  # BIU = bold, italic, underlined
-                       'frmBorders'],
+                       '---',
+                       'frmBorders',
+                       'frmBg',   # фон ячеек
+                       'frmFg'],  # цвет текста
         'read'       : 'selection',
         'rmRC_onRead':  False,
         'toTD'       :  False,
@@ -159,6 +162,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     self.exColors   = {'goodTitle':'#56E0AB', # ex = Excel
                        'hlChanged':'#E8E782', # hl = highlight (cell)
                        'hlError'  :'#F69A98',
+                       'blackFont':'#000000',
                        'borders'  :rgb_to_int((191,191,191))}
     self.frmExcel   = {'font'     :{'name':'Calibri','size':11}}
 
