@@ -77,6 +77,11 @@ class Excel():  # общий класс, можно копировать без 
     self.data[shName]['sheet'].range(s+':'+f).delete()
   def save(self):   self.file.save()
 
+  # оформление
+  def pinTitle(self,shName:str,row:int):
+    self.data[shName]['sheet'][row+1,0].select()
+    self.file.app.api.ActiveWindow.FreezePanes = True
+
   # вспомогательные
   def splitCellAddr    (self,addr:str):
     return (''.join(filter(str.isalpha,addr)) or None,

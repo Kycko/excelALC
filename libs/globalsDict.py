@@ -106,7 +106,9 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'frmBorders',
                        'frmBg',   # фон ячеек
                        'frmFg',   # цвет текста
-                       'frmResetAll'],  # + ДОБАВИТЬ ЗАКРЕП. ВЕРХНИХ СТРОК
+                       'frmResetAll',
+                       '---',
+                       'frmPinTitle'],
         'read'       : 'selection',
         'rmRC_onRead':  False,
         'toTD'       :  False,

@@ -399,6 +399,9 @@ class Root():
             case 'frmAlign'   :
               fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
             case 'frmNewLines': fRange.api.WrapText = False
+        if force or type == 'frmPinTitle':
+          self.file.pinTitle(self.shName,
+                             self.searchTitleRow(self.file.data[self.shName]['table']))
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors
