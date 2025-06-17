@@ -381,21 +381,24 @@ class Root():
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _format():
       def _set(type:str=None,force=False):
-        if force or type == 'frmFont'    :
-          RF.name = glob['font']['name']
-          RF.size = glob['font']['size']
-        if force or type == 'frmBIU'     :
-          RF.bold   = False
-          RF.italic = False
-          fRange.api.Font.Underline = -4142 # так отключается подчёркивание
-        if force or type == 'frmAlign'   :
-          fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
-        if force or type == 'frmNewLines': fRange.api.WrapText = False
-        if force or type == 'frmBorders' :
-          fRange.api.Borders.Weight = 2
-          fRange.api.Borders.Color  = clrs['borders']
-        if force or type == 'frmBg'      : fRange.color = None
-        if force or type == 'frmFg'      : RF    .color = clrs['blackFont']
+        if force or type == 'frmResetAll': fRange.clear_formats()
+        else:
+          match type:
+            case 'frmBorders' :
+              fRange.api.Borders.Weight = 2
+              fRange.api.Borders.Color  = clrs['borders']
+            case 'frmBg'      : fRange.color = None
+            case 'frmFg'      : RF    .color = clrs['blackFont']
+            case 'frmBIU'     :
+              RF.bold   = False
+              RF.italic = False
+              fRange.api.Font.Underline = -4142 # так отключается подчёркивание
+            case 'frmFont'    :
+              RF.name = glob['font']['name']
+              RF.size = glob['font']['size']
+            case 'frmAlign'   :
+              fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
+            case 'frmNewLines': fRange.api.WrapText = False
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors

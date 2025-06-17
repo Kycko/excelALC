@@ -296,6 +296,11 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:frmBorders'  :_getShared('ir:tc:cb',{'root':{'tVar':'frmBorders'}}),
       'tc:frmBg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmBg'}}),
       'tc:frmFg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmFg'}}),
+      'tc:frmResetAll' :_getShared(
+        'ir:tc:cb',
+        {'root' :{'tVar' : 'frmResetAll'},
+         'inner':{'build':{'bootstyle':'danger-round-toggle'}}}
+        ),
 
       'run'            :_getShared('fRoot'   ,{'root':{'stash':['rl','rr']}}),
       'rl'             :{

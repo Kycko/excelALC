@@ -103,10 +103,10 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'frmBIU',  # BIU = bold, italic, underlined
                        'frmAlign',
                        'frmNewLines',
-                       '---',
                        'frmBorders',
                        'frmBg',   # фон ячеек
-                       'frmFg'],  # цвет текста
+                       'frmFg',   # цвет текста
+                       'frmResetAll'],  # + ДОБАВИТЬ ЗАКРЕП. ВЕРХНИХ СТРОК
         'read'       : 'selection',
         'rmRC_onRead':  False,
         'toTD'       :  False,
