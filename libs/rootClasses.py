@@ -392,7 +392,6 @@ class Root():
           fRange.clear_formats()
           self.file.callPin(False)
           self.file. filter(False,frmSheet['sheet'])
-          self.log .    add('frmResetAll')
         elif not self.cfg['frmResetAll']:
           match type:
             case 'frmBorders' :
@@ -410,14 +409,12 @@ class Root():
             case 'frmAlign'   :
               fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
             case 'frmNewLines': fRange.api.WrapText = False
-          self.log.add(type)
 
-        if force or  type == 'frmPinTitle':
-          self.file.pinTitle(self.shName,tRow)
-          self.log.add('frmPinTitle')
+        if force or  type == 'frmPinTitle': self.file.pinTitle(self.shName,tRow)
         if force or (type == 'frmFilter' and not self.cfg['frmRange']):
           self.file.filter(True,frmSheet['sheet'].range((tRow+1,1),self.tObj.getSize()))
-          self.log.add('frmFilter')
+
+        self.log.add(type)
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors
