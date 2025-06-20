@@ -302,6 +302,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
          'inner':{'build':{'bootstyle':'danger-round-toggle'}}}
         ),
       'tc:frmPinTitle' :_getShared('ir:tc:cb',{'root':{'tVar':'frmPinTitle'}}),
+      'tc:frmFilter'   :_getShared('ir:tc:cb',{'root':{'tVar':'frmFilter'}}),
 
       'run'            :_getShared('fRoot'   ,{'root':{'stash':['rl','rr']}}),
       'rl'             :{

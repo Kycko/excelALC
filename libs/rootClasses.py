@@ -399,9 +399,9 @@ class Root():
             case 'frmAlign'   :
               fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
             case 'frmNewLines': fRange.api.WrapText = False
-        if force or type == 'frmPinTitle':
-          self.file.pinTitle(self.shName,
-                             self.searchTitleRow(self.file.data[self.shName]['table']))
+        if force or  type == 'frmPinTitle': self.file.pinTitle(self.shName,tRow)
+        if force or (type == 'frmFilter' and not self.cfg['frmRange']):
+          frmSheet['sheet'].range((tRow+1,1),self.tObj.getSize()).api.AutoFilter(Field:=1)
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors
@@ -439,7 +439,7 @@ class Root():
       else:                           last = (0,2)[self.pr['addHeader']]
       for row in range(last): _hlRow(row,'errors')
 
-      if 'tit'  in self.pr['colors']: _hlRow(self.searchTitleRow(self.tObj),'goodTitles')
+      if 'tit'  in self.pr['colors']: _hlRow(tRow,'goodTitles')
       if 'vert' in self.pr['colors']:
         for row in range  (len(tbl)): _hlRow(row,'chVerts') # changed verticals
       _log()
@@ -447,6 +447,7 @@ class Root():
     totalErrors = self.errors.getCount()
     if self.pr['toTD']: _TDjoin(); _curTD_toTable()
     _write()
+    tRow = self.searchTitleRow(self.tObj)
     if forceFrm or self.cfg['formatSheet']: _format()
     _colors()
     if G.config.get(self.type+':saveAfter'):

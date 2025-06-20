@@ -108,8 +108,9 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'frmFg',   # цвет текста
                        'frmResetAll',
                        '---',
-                       'frmPinTitle'],
-        'read'       : 'selection',
+                       'frmPinTitle',
+                       'frmFilter'],
+        'read'       : 'shSelection',
         'rmRC_onRead':  False,
         'toTD'       :  False,
         'addHeader'  :  False,
