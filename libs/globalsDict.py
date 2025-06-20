@@ -140,6 +140,15 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'blanksFilled'    :'autocorr',
 
                 'frmResetAll'     :'formatting',
+                'frmBorders'      :'formatting',
+                'frmBg'           :'formatting',
+                'frmFg'           :'formatting',
+                'frmBIU'          :'formatting',
+                'frmFont'         :'formatting',
+                'frmAlign'        :'formatting',
+                'frmNewLines'     :'formatting',
+                'frmPinTitle'     :'formatting',
+                'frmFilter'       :'formatting',
 
                 'finalWrite+'     :'finalWrite',
                 'finalWrite-'     :'finalWrite',

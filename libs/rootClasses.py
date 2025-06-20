@@ -65,12 +65,12 @@ class Root():
           _curTD()
         else: self.table = CellTable(tObj['table'])
     def _runType():
-      def   _runRange():
+      def    _runRange():
         if self.pr['AStype'] == 'title':
           data  = [[col.title for col in self.unkTD.columns.values()]]
         else: data = self.table.data
         self.rangeChecker(data,self.pr['AStype'])
-      def   _runVerts():
+      def    _runVerts():
         def _vertUpdData():
           # возвращает Table из тех же строк столбца с заголовком 'Категория'
           # + обновляет self.file по selection'у
@@ -86,7 +86,7 @@ class Root():
           cats = _vertUpdData()
           if cats is None: self.UI.launchErr('noCats')
           else           :  self.vertChecker(self.table.data,cats.data)
-      def     _reCalc():
+      def      _reCalc():
         cols  = self.curTD.columns
         GASTk = G.dict.AStypes.keys()
         for col in cols.values():
@@ -97,7 +97,7 @@ class Root():
             if 'cat' in cols.keys(): self. vertChecker([col.cells],[cols['cat'].cells])
           elif  type in GASTk      : self.rangeChecker([col.cells], type)
         self.finish()
-      def _fillBlanks():
+      def  _fillBlanks():
         count = 0
         for   row  in self.table.data:
           for cell in row:
@@ -106,7 +106,7 @@ class Root():
               count     += 1
         self.log.add('blanksFilled',{'count':count})
         self. finish()
-      def _capitalize():
+      def  _capitalize():
         mask = self.cfg['captMask']
         for   row  in self.table.data:
           for cell in row:
@@ -115,13 +115,20 @@ class Root():
               self.log.add('ACsuccess',{'type':mask,'from':cell.value,'to':new})
             cell.value = new
         self.finish()
+      def _formatSheet():
+        def _check():
+          for  key,val in self.cfg.items():
+            if key != 'frmRange' and key[:3] == 'frm' and val: return True
+          return False
+        if  _check(): self.finish(self.cfg['newSheet'])
+        else        : self.UI.launchErr   ('noOpts')
 
       match self.pr['launch']:
         case 'capitalize' :       _capitalize()
         case 'chkRange'   :         _runRange()
         case 'chkVerts'   :         _runVerts()
         case 'fillBlanks' :       _fillBlanks()
-        case 'formatSheet':       self.finish(self.cfg['newSheet'])
+        case 'formatSheet':      _formatSheet()
         case 'reCalc'     :           _reCalc()
         case 'rmRC'       : self.rmRC_initial(self.table); self.finish()
 
@@ -385,7 +392,7 @@ class Root():
           fRange.clear_formats()
           self.file.callPin(False)
           self.file. filter(False,frmSheet['sheet'])
-          self.log.add(type)
+          self.log .    add('frmResetAll')
         elif not self.cfg['frmResetAll']:
           match type:
             case 'frmBorders' :
@@ -403,9 +410,14 @@ class Root():
             case 'frmAlign'   :
               fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
             case 'frmNewLines': fRange.api.WrapText = False
-        if force or  type == 'frmPinTitle': self.file.pinTitle(self.shName,tRow)
+          self.log.add(type)
+
+        if force or  type == 'frmPinTitle':
+          self.file.pinTitle(self.shName,tRow)
+          self.log.add('frmPinTitle')
         if force or (type == 'frmFilter' and not self.cfg['frmRange']):
           self.file.filter(True,frmSheet['sheet'].range((tRow+1,1),self.tObj.getSize()))
+          self.log.add('frmFilter')
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors
