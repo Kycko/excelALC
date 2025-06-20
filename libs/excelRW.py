@@ -80,7 +80,13 @@ class Excel():  # общий класс, можно копировать без 
   # оформление
   def pinTitle(self,shName:str,row:int):
     self.data[shName]['sheet'][row+1,0].select()
-    self.file.app.api.ActiveWindow.FreezePanes = True
+    self.callPin(True)
+  def callPin (self,state :bool): self.file.app.api.ActiveWindow.FreezePanes = state
+  def filter  (self,state :bool ,obj=None):
+    # obj=xw.Range, чтобы установить фильтр, и =xw.Sheet, чтобы удалить его с листа
+    match state:
+      case  True: obj.api.AutoFilter(Field:=1)
+      case False: obj.api.AutoFilterMode = False
 
   # вспомогательные
   def splitCellAddr    (self,addr:str):

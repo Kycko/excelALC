@@ -381,8 +381,12 @@ class Root():
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _format():
       def _set(type:str=None,force=False):
-        if force or type == 'frmResetAll': fRange.clear_formats()
-        else:
+        if force or type == 'frmResetAll':
+          fRange.clear_formats()
+          self.file.callPin(False)
+          self.file. filter(False,frmSheet['sheet'])
+          self.log.add(type)
+        elif not self.cfg['frmResetAll']:
           match type:
             case 'frmBorders' :
               fRange.api.Borders.Weight = 2
@@ -401,7 +405,7 @@ class Root():
             case 'frmNewLines': fRange.api.WrapText = False
         if force or  type == 'frmPinTitle': self.file.pinTitle(self.shName,tRow)
         if force or (type == 'frmFilter' and not self.cfg['frmRange']):
-          frmSheet['sheet'].range((tRow+1,1),self.tObj.getSize()).api.AutoFilter(Field:=1)
+          self.file.filter(True,frmSheet['sheet'].range((tRow+1,1),self.tObj.getSize()))
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors

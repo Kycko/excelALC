@@ -558,6 +558,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                 'warning'   :'red',
                 'sugg'      :'magenta',
                 'titles'    :'blue',
+                'formatting':'pink',
                 'finalWrite':'green'}
 
 # защита от запуска модуля

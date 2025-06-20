@@ -138,6 +138,9 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'titlesReordered' :'titles',
                 'vertChanged'     :'warning',
                 'blanksFilled'    :'autocorr',
+
+                'frmResetAll'     :'formatting',
+
                 'finalWrite+'     :'finalWrite',
                 'finalWrite-'     :'finalWrite',
                 'finalColors_0'   :'finalWrite',
