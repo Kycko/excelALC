@@ -120,7 +120,9 @@ class Root():
           for  key,val in self.cfg.items():
             if key != 'frmRange' and key[:3] == 'frm' and val: return True
           return False
-        if  _check(): self.finish(self.cfg['newSheet'])
+        if  _check():
+          self.log.add(('frmSelSheet','frmSelRange')[self.cfg['frmRange']])
+          self.finish(self.cfg['newSheet'])
         else        : self.UI.launchErr   ('noOpts')
 
       match self.pr['launch']:
@@ -353,10 +355,12 @@ class Root():
       self.table = cTD.toCellTable(self.pr['addHeader'],libData,S.tblHeader)
     def   _write():
       def _copySheet():
+        def _rng(): shObj['range'] = shObj['sheet'].range(shObj['addr'])
         self.file.copySheet(self.shName)
         match self.pr['read']:
-          case 'selection': shObj['range'] = shObj['sheet'].range(shObj['addr'])
-          case 'shActive' :
+          case 'selection'  : _rng()
+          case 'shSelection': _rng()
+          case 'shActive'   :
             rows  = len(shObj['table'].data)
             cols  = len(shObj['table'].data[0])
             shObj['range'] = shObj['sheet'].range((1,1),(rows,cols))
@@ -388,33 +392,53 @@ class Root():
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _format():
       def _set(type:str=None,force=False):
-        if force or type == 'frmResetAll':
-          fRange.clear_formats()
-          self.file.callPin(False)
-          self.file. filter(False,frmSheet['sheet'])
-        elif not self.cfg['frmResetAll']:
-          match type:
-            case 'frmBorders' :
-              fRange.api.Borders.Weight = 2
-              fRange.api.Borders.Color  = clrs['borders']
-            case 'frmBg'      : fRange.color = None
-            case 'frmFg'      : RF    .color = clrs['blackFont']
-            case 'frmBIU'     :
-              RF.bold   = False
-              RF.italic = False
-              fRange.api.Font.Underline = -4142 # так отключается подчёркивание
-            case 'frmFont'    :
-              RF.name = glob['font']['name']
-              RF.size = glob['font']['size']
-            case 'frmAlign'   :
-              fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
-            case 'frmNewLines': fRange.api.WrapText = False
+        def _unPin   (): self.file.callPin(False)
+        def _unFilter(): self.file. filter(False,frmSheet['sheet'])
 
-        if force or  type == 'frmPinTitle': self.file.pinTitle(self.shName,tRow)
-        if force or (type == 'frmFilter' and not self.cfg['frmRange']):
+        cRng = self.cfg['frmRange']
+
+        if force or type ==  'frmResetAll' :
+          fRange.clear_formats(); _unPin(); _unFilter()
+          self.log.add('frmResetAll')
+        elif    not self.cfg['frmResetAll']:
+          if type == 'frmBorders' :
+            fRange.api.Borders.Weight = 2
+            fRange.api.Borders.Color  = clrs['borders']
+            self.log.add(type)
+          if type == 'frmBg'      :
+            fRange.color = None
+            self.log.add(type)
+          if type == 'frmFg'      :
+            RF.color = clrs['blackFont']
+            self.log.add(type)
+          if type == 'frmBIU'     :
+            RF.bold   = False
+            RF.italic = False
+            fRange.api.Font.Underline = -4142 # так отключается подчёркивание
+            self.log.add(type)
+          if type == 'frmFont'    :
+            RF.name = glob['font']['name']
+            RF.size = glob['font']['size']
+            self.log.add(type)
+          if type == 'frmAlign'   :
+            fRange.api.HorizontalAlignment = HAlign.xlHAlignLeft
+            self.log.add(type)
+          if type == 'frmNewLines':
+            fRange.api.WrapText = False
+            self.log.add(type)
+          if type == 'frmUnPin'    and not cRng:
+            _unPin()
+            self.log.add(type)
+          if type == 'frmUnFilter' and not cRng:
+            _unFilter()
+            self.log.add(type)
+
+        if force or (type == 'frmPinTitle' and not cRng):
+          self.file.pinTitle(self.shName,tRow)
+          self.log.add('frmPinTitle')
+        if force or (type == 'frmFilter'   and not cRng):
           self.file.filter(True,frmSheet['sheet'].range((tRow+1,1),self.tObj.getSize()))
-
-        self.log.add(type)
+          self.log.add('frmFilter')
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors
@@ -425,7 +449,7 @@ class Root():
       if forceFrm: _set(force=True)
       else:
         for key,val in self.cfg.items():
-          if key[:3] == 'frm' and val: _set(type=key)
+          if key != 'frmRange' and key[:3] == 'frm' and val: _set(type=key)
     def  _colors():
       # шапку подсвечиваем в любом случае
       def _hlRow(r:int,type:str):

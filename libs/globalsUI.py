@@ -296,6 +296,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:frmBorders'  :_getShared('ir:tc:cb',{'root':{'tVar':'frmBorders'}}),
       'tc:frmBg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmBg'}}),
       'tc:frmFg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmFg'}}),
+      'tc:frmUnPin'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmUnPin'}}),
+      'tc:frmUnFilter' :_getShared('ir:tc:cb',{'root':{'tVar':'frmUnFilter'}}),
       'tc:frmResetAll' :_getShared(
         'ir:tc:cb',
         {'root' :{'tVar' : 'frmResetAll'},

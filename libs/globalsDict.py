@@ -106,6 +106,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'frmBorders',
                        'frmBg',   # фон ячеек
                        'frmFg',   # цвет текста
+                       'frmUnPin',
+                       'frmUnFilter',
                        'frmResetAll',
                        '---',
                        'frmPinTitle',
@@ -139,6 +141,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'vertChanged'     :'warning',
                 'blanksFilled'    :'autocorr',
 
+                'frmSelRange'     :'formatting',
+                'frmSelSheet'     :'formatting',
                 'frmResetAll'     :'formatting',
                 'frmBorders'      :'formatting',
                 'frmBg'           :'formatting',
@@ -147,6 +151,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'frmFont'         :'formatting',
                 'frmAlign'        :'formatting',
                 'frmNewLines'     :'formatting',
+                'frmUnPin'        :'formatting',
+                'frmUnFilter'     :'formatting',
                 'frmPinTitle'     :'formatting',
                 'frmFilter'       :'formatting',
 
