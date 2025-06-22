@@ -111,6 +111,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
         {'inner':{'packTab':{'text':S.UI['ilTabMain']}},
          'root' :{'stash'  :['il:reCalc',
                              'il:chkTitles',  # chk = check
+                             'il:chkRegions',
                              'il:chkCat',
                              'il:chkVert',
                              'il:chkSrc',
@@ -129,6 +130,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
         {'inner':{'build':{'bootstyle':'warning'}}}
         ),
       'il:chkTitles'   :_getShared('il:taskBtn'),
+      'il:chkRegions'  :_getShared('il:taskBtn'),
       'il:chkCat'      :_getShared('il:taskBtn'),
       'il:chkVert'     :_getShared('il:taskBtn'),
       'il:chkSrc'      :_getShared('il:taskBtn'),

@@ -46,6 +46,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'justVerify' :  False,
         'colors'     : 'sh:tit'
         },
+      'chkRegions' :_taskShared('chk',{'root':{'AStype':'region'}}),
       'chkCat'     :_taskShared('chk',{'root':{'AStype':'cat'}}),
       'chkVert'    :{
         'cfg'        :['newSheet','saveAfter','---','ACverts','vertBlanks'],
