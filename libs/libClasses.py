@@ -105,9 +105,10 @@ class Regions (RegCatTemplate):
         self.regVars.append(fromLow)
         AClib[fromLow] = libR.get_ACto(row[1])
       self.regVars.sort(key=len,reverse=True) # сортирует от длинных к коротким
+
     self.vList,self.regVars = super().parseMain(cities,(0,1,2),'city','region')
-    self.vListAC = self.vList + list(AClib.keys()) # для функции strF.RCtry()
     _parseVars()
+    self.vListAC = self.vList + list(AClib.keys()) # для функции strF.RCtry()
 class oneCol_toList():  # один столбец в список, можно исп. для разных библиотек
   def __init__(self,table): # table = объект tables.Table()
     self.data = libR.oneCol_toList(table)

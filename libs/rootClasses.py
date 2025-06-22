@@ -121,7 +121,7 @@ class Root():
             if key != 'frmRange' and key[:3] == 'frm' and val: return True
           return False
         if  _check():
-          self.log.add(('frmSelSheet','frmSelRange')[self.cfg['frmRange']])
+          self.log.add('frmSelRange' if [self.cfg['frmRange']] else 'frmSelSheet')
           self.finish(self.cfg['newSheet'])
         else        : self.UI.launchErr   ('noOpts')
 
@@ -238,18 +238,25 @@ class Root():
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
-    value = strF.autocorrCell(type,value,self.cfg)  # выполн. не для всех type (кроме strip())
-    AC    = lib .autocorr.get(type,value)           # выполнится не для всех type
-    return   AC['value']
+    initVal  =  value
+    value    =  strF.autocorrCell(type,value,self.cfg)  # выполн. не для всех type (кроме strip())
+    if type == 'region':
+      # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
+      AC = lib.autocorr.get(type,value)
+      if AC['fixed']: return AC['value']
+      else: value = strF.ACcity(value,lib.regions.regVars,lib.get_vList('ACregions'),lib.autocorr)
+
+    AC = lib.autocorr.get(type,value) # выполнится не для всех type
+    return AC['value']
   def validate_andCapitalize(self,type:str,value:str,extra=None):
     # в extra можно передать любые необходимые доп. данные
     params = G.dict.AStypes[type]
     # ↓ передаём в extra suggList из appUI.suggInvalidUD()
     if extra is None and params['readLib']: extra = lib.get_vList(type)
-    final   = {'type'  :type,
-               'value' :value,
-               'valid' :None,
-               'errKey':''} # ключ сообщения для suggUI
+    final = {'type'  :type,
+             'value' :value,
+             'valid' :None,
+             'errKey':''} # ключ сообщения для suggUI
 
     if params['checkList']:
       found          = listF.searchStr(extra,value,'item',True,not self.pr['justVerify'])
