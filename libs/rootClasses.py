@@ -238,15 +238,15 @@ class Root():
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
-    initVal  =  value
-    value    =  strF.autocorrCell(type,value,self.cfg)  # выполн. не для всех type (кроме strip())
-    if type == 'region':
-      # сперва в autocorr без изменений, и, если не будет найдено, ещё раз после изменений
-      AC = lib.autocorr.get(type,value)
-      if AC['fixed']: return AC['value']
-      else: value = strF.ACcity(value,lib.regions.regVars,lib.get_vList('ACregions'),lib.autocorr)
+    def _getAC(): return lib.autocorr.get(type,value)
 
-    AC = lib.autocorr.get(type,value) # выполнится не для всех type
+    value    =  strF.autocorrCell(type,value,self.cfg)
+    if type == 'region':
+      AC     = _getAC() # сперва в autocorr без изменений, потом после них
+      if AC['fixed']: return          AC['value']
+      else          : value = strF.ACcity(value,lib.regions)
+
+    AC = _getAC()
     return AC['value']
   def validate_andCapitalize(self,type:str,value:str,extra=None):
     # в extra можно передать любые необходимые доп. данные

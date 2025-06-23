@@ -9,13 +9,12 @@ import stringFuncs     as strF
 # общие функции
 def get_vList(type:str):
   match type:
-    # case 'title'    : return columns.vList
-    case 'title'    : return columns.vList
-    case 'region'   : return regions.vList
-    case 'ACregions': return regions.vListAC
-    case 'cat'      : return cat    . cat_vList
-    case 'vert'     : return cat    .vert_vList
-    case 'source'   : return sources.data
+    case 'title' : return columns.     vList
+    case 'title' : return columns.     vList
+    case 'region': return regions.     vList
+    case 'cat'   : return cat    . cat_vList
+    case 'vert'  : return cat    .vert_vList
+    case 'source': return sources.data
 
 # шаблоны классов
 class     AStemplate(): # autocorr & sugg

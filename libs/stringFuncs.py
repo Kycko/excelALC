@@ -166,6 +166,21 @@ def validateDate(date:str):
   return False
 
 # исправление регионов/городов; RC = region/city
+def ACcity(city:str,regLib):  # ошибка при импорте lib сюда, поэтому передаём аргументами
+  def _fixOblast():
+    list = city.split()
+    for i in range(len(list)):
+      if mRCtrims(list[i]).lower() in G.dict.oblWords:
+        list[i] = 'область'
+        return ' '.join(list)
+    return city
+  def     _check(): return listF.inclStr(regLib.vListAC,city)
+
+  city = joinSpaces(city)
+  city = _fixOblast()
+  if _check(): return city
+
+
 # НАДО БУДЕТ ПЕРЕПИСАТЬ + ДОБАВИТЬ ПРОВЕРКУ РЕЗУЛЬТАТА ПОСЛЕ КАЖДОЙ ФУНКЦИИ
 def ACcity(city:str,regions:list,ACregions:list):
   # ошибка при импорте lib сюда, поэтому передаём аргументами regions и ACregions
