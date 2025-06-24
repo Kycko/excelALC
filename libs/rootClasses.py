@@ -244,7 +244,7 @@ class Root():
     if type == 'region':
       AC     = _getAC() # сперва в autocorr без изменений, потом после них
       if AC['fixed']: return          AC['value']
-      else          : value = strF.ACcity(value,lib.regions)
+      else          : value = strF.ACcity(value,lib.regions,lib.autocorr)
 
     AC = _getAC()
     return AC['value']

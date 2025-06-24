@@ -166,7 +166,7 @@ def validateDate(date:str):
   return False
 
 # исправление регионов/городов; RC = region/city
-def ACcity(city:str,regLib):  # ошибка при импорте lib сюда, поэтому передаём аргументами
+def ACcity(city:str,regLib,AClib):  # ошибка при импорте lib сюда, поэтому передаём аргументами
   def _fixOblast():
     list = city.split()
     for i in range(len(list)):
@@ -174,12 +174,18 @@ def ACcity(city:str,regLib):  # ошибка при импорте lib сюда,
         list[i] = 'область'
         return ' '.join(list)
     return city
+  def  _rmOblast():
+    new = RCsplitRegion(city,regLib,AClib)
+    new = _trimCity(new)  # только для проверки ACregions, приходится дублировать следующий шаг
+    if new and listF.inclStr(ACregions,new): return new
+    else:                                    return city
   def     _check(): return listF.inclStr(regLib.vListAC,city)
 
   city = joinSpaces(city)
   city = _fixOblast()
   if _check(): return city
 
+  city = _rmOblast()
 
 # НАДО БУДЕТ ПЕРЕПИСАТЬ + ДОБАВИТЬ ПРОВЕРКУ РЕЗУЛЬТАТА ПОСЛЕ КАЖДОЙ ФУНКЦИИ
 def ACcity(city:str,regions:list,ACregions:list):
@@ -242,18 +248,54 @@ def ACcity(city:str,regions:list,ACregions:list):
   city = trimOverHyphens(city)
   city = _try()
   return city
-def RCsplitRegion(string:str,regList:list):
-  # ищет в string каждый регион и, если найдёт его, возвращает отдельно город и регион
-  init   = string
+def RCsplitRegion(string:str,regLib,AClib): # ищет в string регионы и возвращает отдельно город/регион
+  def _find():
+    reg = findSubList(st,regLib.regVars)
+    if  reg is not None:
+      if fr is     None: fr = AClib.get('region',reg)
+      st =   st.replace(reg.lower(),'')
+      st = regTrimmer()
+    return st,reg,fr
+
+  st,reg,fr = string.lower(),'',None  # string, region, final/found region
+  while reg is not None:
+    init = st
+    st,reg,fr = _find()
+    if not st: return fr,fr
+  return st,fr  # посмотреть реальные примеры
+
+
+
+
   region = findSubList(string,regList)
   if region is not None and len(region) != len(string):
     string = mRCtrims(string.lower().replace(region.lower(),''))
     if not string: string = init
   return string,region
-def mRCtrims     (city  :str):  # main region/city trims
+def mRCtrims     (city  :str):        # main region/city trims
   city = rmStartList(city,    G.dict.mrcTrims,0,False)
   while  city and city[-1] in G.dict.mrcTrims: city = city[:-1]
   return city
+def trimCity     (str   :str):
+  # сначала те, что с пробелом
+  list = str.split()
+  for i in (0,-1):
+    list[i] = list[i].replace('(','').replace(')','')
+    if listF.inclStr(G.dict.cTrims['spaced'],list[i]):
+      list.pop(i)
+      return ' '.join(list)
+
+  # потом           те, что могут быть в начале строки без пробела, но в скобках
+  # и сразу за ними те, что могут быть в начале строки без пробела и без скобок
+  temp     = rmStartList(str,G.cTrims['start'],1)
+  if temp != str: return temp
+
+  return str
+def regTrimmer   (str   :str):        # запускает в цикле mRCtrims()+trimCity()
+  while True:
+    init = st
+    st = trimCity(mRCtrims(st))
+    if init == st: return st
 
 # поиск (общие)
 def inclSubList(string:str,list:list,fullText=False,lower=True,strip=''):
