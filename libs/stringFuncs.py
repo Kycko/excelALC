@@ -1,6 +1,7 @@
 from   sys         import exit as SYSEXIT
 from   globalFuncs import getIB
 import globalsMain     as G
+import strings         as S
 import listFuncs       as listF
 
 # получение правильного окончания в зависимости от количества
@@ -170,7 +171,7 @@ def ACcity(city:str,regLib,AClib):  # ошибка при импорте lib с�
   def _fixOblast():
     list = city.split()
     for i in range(len(list)):
-      if mRCtrims(list[i]).lower() in G.dict.oblWords:
+      if mRCtrims(list[i]).lower() in S.oblWords:
         list[i] = 'область'
         return ' '.join(list)
     return city
@@ -252,7 +253,7 @@ def RCsplitRegion(string:str,regLib,AClib): # ищет в string регионы 
   def _find():
     reg = findSubList(st,regLib.regVars)
     if  reg is not None:
-      if fr is     None: fr = AClib.get('region',reg)
+      if fr in (None,S.noRegion): fr = AClib.get('region',reg)
       st =   st.replace(reg.lower(),'')
       st = regTrimmer()
     return st,reg,fr
