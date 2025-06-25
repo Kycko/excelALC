@@ -28,7 +28,7 @@ class     AStemplate(): # autocorr & sugg
       return [self.data[type][key] for key in keys]
     else: return []
 class RegCatTemplate():
-  def parseMain(self,table,cols:tuple,cKey:str,pKey:str):
+  def parseMain     (self,table,cols:tuple,cKey:str,pKey:str):
     # table = объект tables.Table(); cKey,pKey = core key, parent key
     core_vList,pList,self.doubles = [],[],[]  # pList = parents list
     self.core,self.parent         = cKey,pKey
@@ -51,6 +51,14 @@ class RegCatTemplate():
         final.append({'val':u['id'],
                       'btn':u['id']+' ['+u[self.core]+', '+u[self.parent]+']'})
     return final
+  def getID         (self,core :str,parent:str):
+    # принимает основу (город/категорию) + родителя (регион/вертикаль)
+    # возвращает либо основу, либо ID (для дублей по названию)
+    # если не найдёт, возвращает core
+    try:
+      for  var in self.data[core.lower()]:
+        if var   [self.parent]  .lower() == parent.lower(): return var['id']
+    except: return core
 
 # классы библиотек
 class Columns():
@@ -104,7 +112,6 @@ class Regions (RegCatTemplate):
         self.regVars.append(fromLow)
         AClib[fromLow] = libR.get_ACto(row[1])
       self.regVars.sort(key=len,reverse=True) # сортирует от длинных к коротким
-
     self.vList,self.regVars = super().parseMain(cities,(0,1,2),'city','region')
     _parseVars()
     self.vListAC = self.vList + list(AClib.keys()) # для функции strF.RCtry()

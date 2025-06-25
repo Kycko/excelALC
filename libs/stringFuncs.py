@@ -168,87 +168,54 @@ def validateDate(date:str):
 
 # исправление регионов/городов; RC = region/city
 def ACcity(city:str,regLib,AClib):  # ошибка при импорте lib сюда, поэтому передаём аргументами
-  def _fixOblast():
+  def _fixOblast(city:str):
     list = city.split()
     for i in range(len(list)):
       if mRCtrims(list[i]).lower() in S.oblWords:
         list[i] = 'область'
         return ' '.join(list)
     return city
-  def  _rmOblast():
-    new = RCsplitRegion(city,regLib,AClib)
-    new = _trimCity(new)  # только для проверки ACregions, приходится дублировать следующий шаг
-    if new and listF.inclStr(ACregions,new): return new
-    else:                                    return city
-  def     _check(): return listF.inclStr(regLib.vListAC,city)
-
-  city = joinSpaces(city)
-  city = _fixOblast()
-  if _check(): return city
-
-  city = _rmOblast()
-
-# НАДО БУДЕТ ПЕРЕПИСАТЬ + ДОБАВИТЬ ПРОВЕРКУ РЕЗУЛЬТАТА ПОСЛЕ КАЖДОЙ ФУНКЦИИ
-def ACcity(city:str,regions:list,ACregions:list):
-  # ошибка при импорте lib сюда, поэтому передаём аргументами regions и ACregions
-  def _fixOblast():
-    list = city.split()
-    for i in range(len(list)):
-      if mRCtrims(list[i]).lower() in ('обл','оюл','облость'):
-        list[i] = 'область'
-        return ' '.join(list)
-    return city
-  def _rmOblast ():
-    new = RCsplitRegion(city,regions)[0]
-    new = _trimCity(new)  # только для проверки ACregions, приходится дублировать следующий шаг
-    if new and listF.inclStr(ACregions,new): return new
-    else:                                    return city
-  def _trimCity (str:str):
-    # сначала те, что с пробелом
-    list = str.split()
-    for i in (0,-1):
-      list[i] = list[i].replace('(','').replace(')','')
-      if listF.inclStr(G.dict.cTrims['spaced'],list[i]):
-        list.pop(i)
-        return ' '.join(list)
-
-    # потом           те, что могут быть в начале строки без пробела, но в скобках
-    # и сразу за ними те, что могут быть в начале строки без пробела и без скобок
-    temp     = rmStartList(str,G.cTrims['start'],1)
-    if temp != str: return temp
-
-    return str
   def _try      ():
-    # пробует заменять 'е'<->'ё' (в обе стороны), все пробелы на дефисы (напр., для 'Ростов на Дону')
-    # и подчёркивания на пробелы/дефисы (напр., для 'Санкт_Петербург')
-    # возвращает новый вариант, если получится правильный город либо подходящий под автозамену
-    RPL   = {'е':'ё','ё':'е'} # RPL=replacement
-    vars  = [city,
-             city.replace(' ','-'),
-             city.replace('_','-'),
-             city.replace('_',' ')]
-    vars  =  listF.rmDoublesStr                    (vars)
-    found =  listF.searchAny_from_strList(ACregions,vars)
-    if found is not None: return found
+    # пробует заменять 'е'<->'ё' (в обе стороны)
+    # все пробелы на дефисы (напр., для 'Ростов на Дону'), дефисы на пробелы
+    # подчёркивания на пробелы/дефисы (напр., для 'Санкт_Петербург')
+    # и возвращает новый вариант, если получится правильный город либо подходящий под автозамену
+    def _getVars(old:str,new:str):  # с какого на какой символ заменяем
+      def _add    (var   :str):
+        if not listF.inclStr(vars,var,True,False): vars.append(var)
+      def _replace(string:str,start=0):
+        for i in range(start,len(string)):
+          if string[i] == old:
+            newVar = replaceIndex(string,i,new)
+            _add    (newVar)
+            _replace(newVar,i+1)
+      firstVar = vars[0].replace(new,old)
+      _add    (firstVar)
+      _replace(firstVar)
+
+    pairs = (('е','ё'),
+             (' ','-'),
+             ('-',' '),
+             ('_','-'),
+             ('_',' '))
+    vars  = [city.lower()]
+    for pair in pairs: _getVars(*pair)
 
     for var in vars:
-      for i in range(len(var)):
-        if var[i] in RPL.keys():
-          new = replaceIndex(var,i,RPL[var[i]])
-          if   listF.inclStr(ACregions,new): return new
-    return city
+      if _check(var): return var
+      id = regLib.getID(var,region)
+      if id != var: return id
+  def _check    (string:str): return listF.inclStr(regLib.vListAC,string)
 
-  city = joinSpaces(city)
-  city = _fixOblast()
-  city = _rmOblast ()
-  city = _trimCity (city)
-  city =  mRCtrims (city)
-  if listF.inclStr (ACregions,city): return city
+  city =  lat_toCyr(trimOverHyphens(fixDashes(joinSpaces(city))))
+  city = regTrimmer(_fixOblast(city))
+  if _check(city): return city
 
-  city = lat_toCyr      (city)
-  city = trimOverHyphens(city)
-  city = _try()
-  return city
+  city,region = RCsplitRegion(city,regLib,AClib)
+  if _check(city): return city
+
+  res = _try()
+  return city if res is None else res
 def RCsplitRegion(string:str,regLib,AClib): # ищет в string регионы и возвращает отдельно город/регион
   def _find():
     reg = findSubList(st,regLib.regVars)
@@ -257,22 +224,11 @@ def RCsplitRegion(string:str,regLib,AClib): # ищет в string регионы 
       st =   st.replace(reg.lower(),'')
       st = regTrimmer()
     return st,reg,fr
-
   st,reg,fr = string.lower(),'',None  # string, region, final/found region
   while reg is not None:
-    init = st
     st,reg,fr = _find()
     if not st: return fr,fr
   return st,fr  # посмотреть реальные примеры
-
-
-
-
-  region = findSubList(string,regList)
-  if region is not None and len(region) != len(string):
-    string = mRCtrims(string.lower().replace(region.lower(),''))
-    if not string: string = init
-  return string,region
 def mRCtrims     (city  :str):        # main region/city trims
   city = rmStartList(city,    G.dict.mrcTrims,0,False)
   while  city and city[-1] in G.dict.mrcTrims: city = city[:-1]
@@ -371,6 +327,9 @@ def joinSpaces (string:str):  # объединяет все мультипроб
   string = string.replace(' ',' ')  # заменяем неразрывные пробелы
   while '  ' in string: string = string.replace('  ',' ')
   return string
+def  fixDashes (string:str):  # заменяет все – и — на -
+  # while быстрее, чем regex и split+join
+  return string.replace('–','-').replace('—','-')
 def lat_toCyr  (string:str,allowLower=True):
   if  allowLower: string = string.lower()
   for init,to in G.dict.lat_toCyr.items():

@@ -10,7 +10,7 @@ def searchStr(list:list,txt:str,type='item',fullText=True,lower=True,strip=''):
     if strF.findSub(list[i],txt,'bool',fullText,lower,strip):
       final.append (list[i] if type == 'item' else i)
   return final
-def inclStr(list:list,txt:str,fullText=True,lower=True,strip=''):
+def inclStr  (list:list,txt:str,fullText=True,lower=True,strip=''):
   # есть ли строка среди элементов списка
   for item in list:
     if strF.findSub(item,txt,'bool',fullText,lower,strip): return True
@@ -30,15 +30,15 @@ def searchAny_from_strList(root:list,vars:list,type='item',fullText=True,lower=T
   return (-1,None)[type == 'item']
 
 # изменение
-def rmDoublesStr(oldList:list,lower=False):
+def rmDoublesStr (oldList:list,lower=False):
   newList = []
   for item in oldList:
     if not inclStr(newList,item,True,lower): newList.append(item)
   return newList
-def rmBlankStr     (list:list): # оставлю такую функцию для простоты
+def rmBlankStr   (list:list): # оставлю такую функцию для простоты
   while '' in list: list.remove('')
   return list
-def ints_toRanges  (list:list,reverse=False):
+def ints_toRanges(list:list,reverse=False):
   # принимает список[] ЦЕЛЫХ чисел, возвращает список[{from:,to:},...] диапазонов
   # исп., например, для удаления строк/столбцов в Excel
   def _group():
