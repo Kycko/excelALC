@@ -16,7 +16,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'addHeader'  : False,
                        'launch'     :'chkRange',
                        'justVerify' : False,
-                       'colors'     :'sel'}}
+                       'colors'     :'sel',
+                       'formatSheet': False}}
         return dictF.update(dict[type],**upd)
     self.tasks = {
       # --- – это будет separator; rmRC_onRead работает только с toTD=True
@@ -31,6 +32,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'launch'     : 'reCalc',
         'justVerify' :  True,
         'colors'     : 'sh:tit',
+        'formatSheet':  True,
         'forceCfg'   :{'vertBlanks'   :False,
                        'noPhoneBlanks':False,
                        'reorder'      :False}
@@ -44,7 +46,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'launch'     : 'chkRange',
         'AStype'     : 'title',
         'justVerify' :  False,
-        'colors'     : 'sh:tit'
+        'colors'     : 'sh:tit',
+        'formatSheet':  False
         },
       'chkRegions' :_taskShared('chk',{'root':{'AStype':'region'}}),
       'chkCat'     :_taskShared('chk',{'root':{'AStype':'cat'}}),
@@ -57,6 +60,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'launch'     : 'chkVerts',
         'justVerify' :  False,
         'colors'     : 'sel:vert',
+        'formatSheet':  False,
         # ↓ добавляет в Root().cfg, но не в основные настройки и не в файл настроек
         'forceCfg'   :{'suggErrors':False}
         },
@@ -71,7 +75,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'addHeader'  :  False,
         'launch'     : 'rmRC',
         'justVerify' :  False,
-        'colors'     : 'sel'
+        'colors'     : 'sel',
+        'formatSheet':  False
         },
       'capitalize' :{
         'cfg'        :['newSheet','saveAfter','---','captMask'],
@@ -81,7 +86,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'addHeader'  :  False,
         'launch'     : 'capitalize',
         'justVerify' :  False,
-        'colors'     : 'sel'
+        'colors'     : 'sel',
+        'formatSheet':  False
         },
       'fillBlanks' :{
         'cfg'        :['newSheet','saveAfter','---','strFiller'],
@@ -92,7 +98,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'addHeader'  :  False,
         'launch'     : 'fillBlanks',
         'justVerify' :  False,
-        'colors'     : 'none'
+        'colors'     : 'none',
+        'formatSheet':  False
         },
       'formatSheet':{
         'cfg'        :['newSheet',
@@ -120,7 +127,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'launch'     : 'formatSheet',
         'justVerify' :  False,
         'colors'     : 'none',
-        'forceCfg'   :{'formatSheet':True}
+        'formatSheet':  True
         }
       }
 
@@ -212,7 +219,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                           'ст.','пос.','пгт.','гор.','городской пос.'],
                'spaced' :['г','д','п','с','х','рп','дп','ст','посёлок','поселок',
                           'пос','пгт','гор','городской пос','город','станица',
-                          'ст-ца','хутор','село','деревня']}
+                          'ст-ца','хутор','село','деревня','рабочий поселок','рабочий посёлок',
+                          'поселок городского типа','посёлок городского типа']}
     cTrims    ['spaced'] = cTrims['noSpace'] + cTrims['spaced']
     cTrims    ['start']  = ['('+item+')' for item in cTrims['spaced']] + cTrims['noSpace']
     cTrims.pop('noSpace')

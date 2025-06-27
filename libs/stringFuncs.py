@@ -217,16 +217,16 @@ def ACcity(city:str,regLib,AClib):  # ошибка при импорте lib с�
   res = _try()
   return city if res is None else res
 def RCsplitRegion(string:str,regLib,AClib): # ищет в string регионы и возвращает отдельно город/регион
-  def _find():
+  def _find(st:str,reg:str,fr:str):
     reg = findSubList(st,regLib.regVars)
     if  reg is not None:
       if fr in (None,S.noRegion): fr = AClib.get('region',reg)
-      st =   st.replace(reg.lower(),'')
-      st = regTrimmer()
+      st = st.replace(reg.lower(),'')
+      st = regTrimmer(st)
     return st,reg,fr
   st,reg,fr = string.lower(),'',None  # string, region, final/found region
   while reg is not None:
-    st,reg,fr = _find()
+    st,reg,fr = _find(st,reg,fr)
     if not st: return fr,fr
   return st,fr  # посмотреть реальные примеры
 def mRCtrims     (city  :str):        # main region/city trims
@@ -244,15 +244,15 @@ def trimCity     (str   :str):
 
   # потом           те, что могут быть в начале строки без пробела, но в скобках
   # и сразу за ними те, что могут быть в начале строки без пробела и без скобок
-  temp     = rmStartList(str,G.cTrims['start'],1)
+  temp     = rmStartList(str,G.dict.cTrims['start'],1)
   if temp != str: return temp
 
   return str
 def regTrimmer   (str   :str):        # запускает в цикле mRCtrims()+trimCity()
   while True:
-    init = st
-    st = trimCity(mRCtrims(st))
-    if init == st: return st
+    init     = str
+    str      = trimCity(mRCtrims(str))
+    if init == str: return str
 
 # поиск (общие)
 def inclSubList(string:str,list:list,fullText=False,lower=True,strip=''):

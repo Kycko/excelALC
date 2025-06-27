@@ -136,7 +136,8 @@ class Root():
 
     self.type = type
     self.pr   = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
-    _getCfg (); _initLE ()
+    _getCfg ()
+    _initLE ()
     _getData(rmRC=self.pr['rmRC_onRead'])
     _runType()
 
@@ -146,16 +147,16 @@ class Root():
     # т. е. table – это всегда [[Cell,...],...]
     def _addError(): errors[low] = ErrorObj(type,cell.value,errPos)
 
-    self.rTable = table # range table, понадобится в self.finalizeErrors()
-    errors      = {}    # {initLow:ErrorObj,...}
+    self.rTable  = table  # range table, понадобится в self.finalizeErrors()
+    errors,fixed = {},{}  # {initLow:ErrorObj,...}, {fromLow:to,...}
     for   r in range(len(table)):
       for c in range(len(table[r])):
         cell   =   table[r][c]
         errPos = {'r':r,'c':c}
 
-        low = cell.value.lower()
-        if low in errors.keys (): errors[low].addPos(errPos)
-        else:
+        low   = cell.value.lower()
+        try   : cell.value = fixed[low]
+        except:
           JV      = self.pr['justVerify']
           tempVal = cell.value
           VAL     = self.validate_andCapitalize(type,tempVal)
@@ -163,11 +164,12 @@ class Root():
             tempVal = self.autocorr(type,tempVal)
             VAL     = self.validate_andCapitalize(type,tempVal)
 
-          if VAL['valid']:
+          if   VAL['valid']:
             if VAL['value'] != cell.value:  # иначе ничего делать не надо (ошибки нет)
               if JV: _addError()
               else: # это только про autocorr?
                 self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
+                fixed[low] = VAL['value']
                 cell.value = VAL['value']
           else: _addError()
 
@@ -492,7 +494,7 @@ class Root():
     if self.pr['toTD']: _TDjoin(); _curTD_toTable()
     _write()
     tRow = self.searchTitleRow(self.tObj)
-    if forceFrm or self.cfg['formatSheet']: _format()
+    if forceFrm or self.pr['formatSheet']: _format()
     _colors()
     if G.config.get(self.type+':saveAfter'):
       self.file.save()
