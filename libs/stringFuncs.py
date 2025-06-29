@@ -206,29 +206,39 @@ def ACcity(city:str,regLib,AClib):  # ошибка при импорте lib с�
       id = regLib.getID(var,region)
       if id != var: return id
   def _check    (string:str): return listF.inclStr(regLib.vListAC,string)
+  def _return   (string:str):
+    print ('autocorr final             : '+string)  # оставил для debug'а
+    return string
 
+  print('---------------------------------------------------')  # оставил для debug'а
+  print('autocorr init              : '+city)                   # оставил для debug'а
   city =  lat_toCyr(trimOverHyphens(fixDashes(joinSpaces(city))))
   city = regTrimmer(_fixOblast(city))
-  if _check(city): return city
+  if _check(city): return _return(city)
 
   city,region = RCsplitRegion(city,regLib,AClib)
-  if _check(city): return city
+  if _check(city): return _return(city)
 
   res = _try()
-  return city if res is None else res
+  return _return(city if res is None else res)
 def RCsplitRegion(string:str,regLib,AClib): # ищет в string регионы и возвращает отдельно город/регион
-  def _find(st:str,reg:str,fr:str):
+  def   _find(st:str,reg:str,fr:str):
     reg = findSubList(st,regLib.regVars)
     if  reg is not None:
-      if fr in (None,S.noRegion): fr = AClib.get('region',reg)
+      if fr in (None,S.noRegion): fr = AClib.get('region',reg)['value']
       st = st.replace(reg.lower(),'')
       st = regTrimmer(st)
     return st,reg,fr
+  def _return( a:str,  b:str):
+    print('split final (string,region): '+str(a)+' | '+str(b))  # оставил для debug'а
+    return a,b
+
+  print('split init                 : '+string) # оставил для debug'а
   st,reg,fr = string.lower(),'',None  # string, region, final/found region
   while reg is not None:
     st,reg,fr = _find(st,reg,fr)
-    if not st: return fr,fr
-  return st,fr  # посмотреть реальные примеры
+    if not st: return _return(fr,fr)
+  return              _return(st,fr)  # посмотреть реальные примеры
 def mRCtrims     (city  :str):        # main region/city trims
   city = rmStartList(city,    G.dict.mrcTrims,0,False)
   while  city and city[-1] in G.dict.mrcTrims: city = city[:-1]
@@ -250,9 +260,9 @@ def trimCity     (str   :str):
   return str
 def regTrimmer   (str   :str):        # запускает в цикле mRCtrims()+trimCity()
   while True:
-    init     = str
-    str      = trimCity(mRCtrims(str))
-    if init == str: return str
+    init        = str
+    if str: str = trimCity(mRCtrims(str))
+    if init    == str: return str
 
 # поиск (общие)
 def inclSubList(string:str,list:list,fullText=False,lower=True,strip=''):
