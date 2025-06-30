@@ -66,6 +66,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         },
       'chkSrc'     :_taskShared('chk',{'root':{'AStype':'source'}}),
       'chkMails'   :_taskShared('chk',{'root':{'AStype':'mail'}}),
+      'chkWebsites':_taskShared('chk',{'root':{'AStype':'website'}}),
 
       'rmRC'       :{
         'cfg'        :['newSheet','saveAfter','---','rmTitledCols'],

@@ -115,7 +115,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'il:chkCat',
                              'il:chkVert',
                              'il:chkSrc',
-                             'il:chkMails']}}
+                             'il:chkMails',
+                             'il:chkWebsites']}}
         ),
       'ilTabSec'       :_getShared(
         'ilTab',
@@ -135,6 +136,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il:chkVert'     :_getShared('il:taskBtn'),
       'il:chkSrc'      :_getShared('il:taskBtn'),
       'il:chkMails'    :_getShared('il:taskBtn'),
+      'il:chkWebsites' :_getShared('il:taskBtn'),
       'il:rmRC'        :_getShared('il:taskBtn'),
       'il:capitalize'  :_getShared('il:taskBtn'),
       'il:fillBlanks'  :_getShared('il:taskBtn'),

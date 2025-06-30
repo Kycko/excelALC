@@ -38,8 +38,7 @@ def autocorrCell(type:str,value:str,params=None):
           item = rmStartList(item,G.dict.badWebStarts,0,False).rstrip('/')
           if  checkStartList(item,G.dict.rmSites,'bool',False): item = ''
           else:
-            item = cut_ifFound(item,'?ysclid='       ,'end',False)      # трекинг Яндекса
-            item = cut_ifFound(item,'?yclid='        ,'end',False)      # трекинг Яндекса
+            for tr in S.yTracks: item = cut_ifFound(item,tr,'end',False)  # трекинг Яндекса
             item = cut_ifFound(item,'?utm_campaign=' ,'end',False)
             item = cut_ifFound(item,'?utm_medium=  ' ,'end',False)
             item = cut_ifFound(item,'?utm_referrer=' ,'end',False)
@@ -50,7 +49,7 @@ def autocorrCell(type:str,value:str,params=None):
 
     list     =  listF.rmDoublesStr(listF.rmBlankStr(list))
     if type == 'phone' and not list and params['noPhoneBlanks']: return G.dict.badPhone
-    return ','.join(list)
+    return ','.join(list).rstrip('/') # rstrip повторяется, иногда это необходимо
 
   value = value.replace(' ',' ').strip()
   if   type ==  'cat':
@@ -91,7 +90,8 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
         if checkStartList(value,G.dict.rmSites     ,'bool'): return False,'rmSites'
         if    inclSubList(value,G.dict.badSymbols[type],False,False):
           return False,'badSymbols'
-        if findSub       (value,'?ysclid='    ,'bool'): return False,'yaTrack'
+        for tr in S.yTracks:
+          if findSub(value,tr,'bool'): return False,'yaTrack'
 
         index = findSub(value,'hh.ru/')
         if index > 0: return False,'hhCity'
