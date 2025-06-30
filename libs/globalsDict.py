@@ -90,6 +90,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'colors'     : 'sel',
         'formatSheet':  False
         },
+      'chkDates'   :_taskShared('chk',{'root':{'AStype':'date'}}),
       'fillBlanks' :{
         'cfg'        :['newSheet','saveAfter','---','strFiller'],
         'getOnLaunch':['strFiller'],  # считываем при запуске из self.wx['tcl:'+param]

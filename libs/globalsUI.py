@@ -123,6 +123,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
         {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
          'root' :{'stash'  :['il:rmRC',
                              'il:capitalize',
+                             'il:chkDates',
                              'il:fillBlanks',
                              'il:formatSheet']}}
         ),
@@ -139,6 +140,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il:chkWebsites' :_getShared('il:taskBtn'),
       'il:rmRC'        :_getShared('il:taskBtn'),
       'il:capitalize'  :_getShared('il:taskBtn'),
+      'il:chkDates'    :_getShared('il:taskBtn'),
       'il:fillBlanks'  :_getShared('il:taskBtn'),
       'il:formatSheet' :_getShared(
         'il:taskBtn',

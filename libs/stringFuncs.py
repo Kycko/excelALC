@@ -153,17 +153,18 @@ def trySplitDate(date:str):
 def validateDate(date:str):
   if not date: return True
   else:
+    print(date)
     parts = date.split('.')
+    print(parts)
     if len(parts) == 3:
       try:
         for i in range(len(parts)): parts[i] = int(parts[i])
       except: return False
 
       d,m,y = parts
-      y = y in range(2000,2100)
-      m = m in range(1,13)
-      d = d in range(1,G.dict.monthDays[m]+1)
-      if y and m and d: return True
+      if     y in range(2000,2100): # иначе получается или длинно, или сложно :)
+        if   m in range(1   ,  13):
+          if d in range(1,G.dict.monthDays[m]+1): return True
   return False
 
 # исправление регионов/городов; RC = region/city
