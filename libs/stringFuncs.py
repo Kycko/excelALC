@@ -168,7 +168,8 @@ def validateDate(date:str):
   return False
 
 # исправление регионов/городов; RC = region/city
-def ACcity(city:str,regLib,AClib):  # ошибка при импорте lib сюда, поэтому передаём аргументами
+def ACcity(city:str,regLib,AClib,forceDoubles:bool):
+  # ошибка при импорте lib сюда, поэтому передаём аргументами
   def _fixOblast(city:str):
     list = city.split()
     for i in range(len(list)):
@@ -203,22 +204,32 @@ def ACcity(city:str,regLib,AClib):  # ошибка при импорте lib с�
     for pair in pairs: _getVars(*pair)
 
     for var in vars:
-      if _check(var): return var
-      id = regLib.getID(var,region)
-      if id != var: return id
-  def _check    (string:str): return listF.inclStr(regLib.vListAC,string)
+      chk = _check(var)
+      if chk is not None: return chk
+  def _check    (string:str):
+    if listF.inclStr(regLib.vListAC,string): return string
+    else:
+      id = regLib.getID(string,region)
+      if id != string: return id
+      else:
+        try:
+          if forceDoubles and len(regLib.data[string.lower()]) > 1: return S.noRegion
+        except: return None
   def _return   (string:str):
     print ('autocorr final             : '+string)  # оставил для debug'а
     return string
 
   print('---------------------------------------------------')  # оставил для debug'а
   print('autocorr init              : '+city)                   # оставил для debug'а
-  city =  lat_toCyr(trimOverHyphens(fixDashes(joinSpaces(city))))
-  city = regTrimmer(_fixOblast(city))
-  if _check(city): return _return(city)
+  city   =  lat_toCyr(trimOverHyphens(fixDashes(joinSpaces(city))))
+  city   = regTrimmer(_fixOblast(city))
+  region = None
+  chk    = _check(city)
+  if chk is not None: return _return(chk)
 
   city,region = RCsplitRegion(city,regLib,AClib)
-  if _check(city): return _return(city)
+  chk = _check(city)
+  if chk is not None: return _return(chk)
 
   res = _try()
   return _return(city if res is None else res)
