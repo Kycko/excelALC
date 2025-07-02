@@ -48,7 +48,7 @@ def autocorrCell(type:str,value:str,params=None):
       list[i] = item  # для удобства именования внутри используем item
 
     list     =  listF.rmDoublesStr(listF.rmBlankStr(list))
-    if type == 'phone' and not list and params['noPhoneBlanks']: return G.dict.badPhone
+    if type == 'phone' and not list and params['phNoBlanks']: return G.dict.badPhone
     return ','.join(list).rstrip('/') # rstrip повторяется, иногда это необходимо
 
   value = value.replace(' ',' ').strip()
@@ -61,7 +61,7 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
     # возвращаем valid:True/False и ключ для S.errInput[type]
     match type:
       case 'phone':
-        pnb = params['noPhoneBlanks']
+        pnb = params['phNoBlanks']
         if not pnb and value    == ''             : return True,''
         if not pnb and value    == G.dict.badPhone: return False,'secNines'
         if         len(value)   != 11             : return False,'length'

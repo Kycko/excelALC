@@ -115,6 +115,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'il:chkCat',
                              'il:chkVert',
                              'il:chkSrc',
+                             'il:chkPhones',
                              'il:chkMails',
                              'il:chkWebsites']}}
         ),
@@ -136,6 +137,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il:chkCat'      :_getShared('il:taskBtn'),
       'il:chkVert'     :_getShared('il:taskBtn'),
       'il:chkSrc'      :_getShared('il:taskBtn'),
+      'il:chkPhones'   :_getShared('il:taskBtn'),
       'il:chkMails'    :_getShared('il:taskBtn'),
       'il:chkWebsites' :_getShared('il:taskBtn'),
       'il:rmRC'        :_getShared('il:taskBtn'),
@@ -288,6 +290,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'tc:ACverts'     :_getShared('ir:tc:cb',{'root':{'tVar':'ACverts'}}),
       'tc:vertBlanks'  :_getShared('ir:tc:cb',{'root':{'tVar':'vertBlanks'}}),
       'tc:reorder'     :_getShared('ir:tc:cb',{'root':{'tVar':'reorder'}}),
+      'tc:phNoBlanks'  :_getShared('ir:tc:cb',{'root':{'tVar':'phNoBlanks'}}),
       # ↓ в коде зашито self.wx['tcl:'+tVar]
       'tc:strFiller'   :_getShared('ir:tc:ent',{'root':{'tVar':'strFiller'}}),
       'tc:captMask'    :_getShared(

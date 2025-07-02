@@ -65,6 +65,11 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'forceCfg'   :{'suggErrors':False}
         },
       'chkSrc'     :_taskShared('chk',{'root':{'AStype':'source'}}),
+      'chkPhones'  :_taskShared(
+        'chk',{'root':{'cfg'     :['newSheet','saveAfter','---','phNoBlanks'],
+                       'AStype'  : 'phone',
+                       'forceCfg':{'suggErrors':False}}}
+        ),
       'chkMails'   :_taskShared('chk',{'root':{'AStype':'mail'}}),
       'chkWebsites':_taskShared('chk',{'root':{'AStype':'website'}}),
 
