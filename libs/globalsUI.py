@@ -93,20 +93,20 @@ class globUI(): # импортируется в G.UI (в глобальные п
       # il,ir = initLeft,initRight
       # tc = task cfg
       # rl,rr,re,rb = runLog,runRight:[runErrors,runButtons]
-      'init'           :_getShared('fRoot',{'root':{'stash':['il']}}),
-      'il'             :{
+      'init'              :_getShared('fRoot',{'root':{'stash':['il']}}),
+      'il'                :{
         'type' : 'fr',
         'pack' :{'fill':'both','side':'left','padx':7},
         'stash':['ilTabs','ilBottom']
         },
-      'ilTabs'         :{
+      'ilTabs'            :{
         'rules':{'final':('setFocus')},
         'type' : 'tbs',
         'wxKey': 'ilTabs',  # нужен для биндов PgUp/PgDown
         'pack' :{'fill':'both','expand':True,'pady':7},
         'stash':['ilTabMain','ilTabSec']
         },
-      'ilTabMain'      :_getShared(
+      'ilTabMain'         :_getShared(
         'ilTab',
         {'inner':{'packTab':{'text':S.UI['ilTabMain']}},
          'root' :{'stash'  :['il:reCalc',
@@ -119,7 +119,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'il:chkMails',
                              'il:chkWebsites']}}
         ),
-      'ilTabSec'       :_getShared(
+      'ilTabSec'          :_getShared(
         'ilTab',
         {'inner':{'packTab':{'text':S.UI['ilTabSec']}},
          'root' :{'stash'  :['il:rmRC',
@@ -128,67 +128,67 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'il:fillBlanks',
                              'il:formatSheet']}}
         ),
-      'il:reCalc'      :_getShared(
+      'il:reCalc'         :_getShared(
         'il:taskBtn',
         {'inner':{'build':{'bootstyle':'warning'}}}
         ),
-      'il:chkTitles'   :_getShared('il:taskBtn'),
-      'il:chkRegions'  :_getShared('il:taskBtn'),
-      'il:chkCat'      :_getShared('il:taskBtn'),
-      'il:chkVert'     :_getShared('il:taskBtn'),
-      'il:chkSrc'      :_getShared('il:taskBtn'),
-      'il:chkPhones'   :_getShared('il:taskBtn'),
-      'il:chkMails'    :_getShared('il:taskBtn'),
-      'il:chkWebsites' :_getShared('il:taskBtn'),
-      'il:rmRC'        :_getShared('il:taskBtn'),
-      'il:capitalize'  :_getShared('il:taskBtn'),
-      'il:chkDates'    :_getShared('il:taskBtn'),
-      'il:fillBlanks'  :_getShared('il:taskBtn'),
-      'il:formatSheet' :_getShared(
+      'il:chkTitles'      :_getShared('il:taskBtn'),
+      'il:chkRegions'     :_getShared('il:taskBtn'),
+      'il:chkCat'         :_getShared('il:taskBtn'),
+      'il:chkVert'        :_getShared('il:taskBtn'),
+      'il:chkSrc'         :_getShared('il:taskBtn'),
+      'il:chkPhones'      :_getShared('il:taskBtn'),
+      'il:chkMails'       :_getShared('il:taskBtn'),
+      'il:chkWebsites'    :_getShared('il:taskBtn'),
+      'il:rmRC'           :_getShared('il:taskBtn'),
+      'il:capitalize'     :_getShared('il:taskBtn'),
+      'il:chkDates'       :_getShared('il:taskBtn'),
+      'il:fillBlanks'     :_getShared('il:taskBtn'),
+      'il:formatSheet'    :_getShared(
         'il:taskBtn',
         {'inner':{'build':{'bootstyle':'warning'}}}
         ),
 
-      'ilBottom'       :{
+      'ilBottom'          :{
         'type' : 'fr',
         'pack' :{'fill':'x','side':'bottom','pady':5},
         'stash':['ilCfg','il:closeApp']
         },
-      'ilCfg'          :{
+      'ilCfg'             :{
         'type' : 'lfr',
         'build':{'text':S.UI['ilCfg:lfr']},
         'pack' :{'fill':'x','side':'left'},
         'stash':['il:cfgTheme','il:cfgZoom']
         },
-      'il:cfgTheme'    :{
+      'il:cfgTheme'       :{
         'type' : 'fr',
         'pack' :{'pady':3},
         'stash':['il:lblSun','il:lblMoon','il:cbTheme']
         },
-      'il:lblSun'      :{
+      'il:lblSun'         :{
         'type' : 'lbl',
         'build':{'text':self.icons['sun'],
                  'font':self.fonts['iconBig']},
         'pack' :{'side':'left','padx':4}
         },
-      'il:lblMoon'     :{
+      'il:lblMoon'        :{
         'type' : 'lbl',
         'build':{'text':self.icons['moon'],
                  'font':self.fonts['iconBig']},
         'pack' :{'side':'right','padx':0}
         },
-      'il:cbTheme'     :{
+      'il:cbTheme'        :{
         'type' : 'cb',
         'var'  : 'main:darkTheme',
         'build':{'bootstyle':'round-toggle'},
         'pack' :{'expand'   : True},
         'stash':['il:ttTheme']
         },
-      'il:ttTheme'     :{
+      'il:ttTheme'        :{
         'type' : 'tt',
         'build':{'text':S.UI['ilCfg:ttTheme']}
         },
-      'il:cfgZoom'     :{
+      'il:cfgZoom'        :{
         'rules':{'final':('build:zoomBtn')},
         'type' : 'btn',
         'wxKey': 'cfgZoom',
@@ -196,7 +196,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
         'build':{'bootstyle':'secondary'},
         'pack' :{'padx':4   ,'pady':4}
         },
-      'il:closeApp'    :{
+      'il:closeApp'       :{
         'type' : 'btn',
         'cmd'  :{'type'     :        'closeApp'},
         'build':{'text'     :S.UI['il:closeApp'],
@@ -205,60 +205,60 @@ class globUI(): # импортируется в G.UI (в глобальные п
         'pack' :{'side':'right','anchor':'s','padx':4,'pady':4}
         },
 
-      'ir'             :{
+      'ir'                :{
         'rules':{'start':('saveProps'),'final':('build:ir','bindLogs')},
         'type' : 'lfr',
         'wxKey': 'ir',
         'pack' :{'fill':'both','side':'right','expand':True,'padx':6},
         'stash':['irDesc','irCfg','irBottom']
         },
-      'irDesc'         :{
+      'irDesc'            :{
         'type' : 'lbl',
         'wxKey': 'irDesc',
         'build':{'wraplength':620},
         'pack' :{'fill':'x','padx':8,'pady':5}
         },
-      'irCfg'          :{
+      'irCfg'             :{
         'rules':{'final':('build:irCfg')},
         'type' : 'fr',
         'pack' :{'fill':'x','anchor':'nw','padx':8},
         'stash':['irSep']
         },
-      'irSep'          :{
+      'irSep'             :{
         'type': 'sep',
         'pack':{'fill':'x','padx':2,'pady':6}
         },
-      'irBottom'       :{
+      'irBottom'          :{
         'rules':{'final':('build:irBottom')},
         'type' : 'fr',
         'pack' :{'fill':'x','side':'bottom','padx':22},
         'stash':['ir:launchBtn','irFile']
         },
-      'irFile'         :{
+      'irFile'            :{
         'type' : 'fr',
         'pack' :{'side':'left'},
         'stash':['irFile:desc','irFile:upd']
         },
-      'irFile:desc'    :{
+      'irFile:desc'       :{
         'type' : 'fr',
         'pack' :{'side':'right'},
         'stash':['irFile:file','irFile:sheet']
         },
-      'irFile:file'    :_getShared(
+      'irFile:file'       :_getShared(
         'irFileLbl',
         {'root':{'wxKey':'irFile:file'}}
         ),
-      'irFile:sheet'   :_getShared(
+      'irFile:sheet'      :_getShared(
         'irFileLbl',
         {'root':{'wxKey':'irFile:sheet'}}
         ),
-      'irFile:upd'     :{ # норм. иконку в конпке не сделать
+      'irFile:upd'        :{ # норм. иконку в конпке не сделать
         'type' : 'btn',
         'cmd'  :{'type':'irFile:upd'},
         'build':{'text': S.UI['irFile:upd'],'bootstyle':'secondary'},
         'pack' :{'side':'right','fill':'both'}
         },
-      'ir:launchBtn'   :{
+      'ir:launchBtn'      :{
         'rules':{'final':('setFocus')},
         'type' : 'btn',
         'wxKey': 'ir:launchBtn',
@@ -267,88 +267,94 @@ class globUI(): # импортируется в G.UI (в глобальные п
         'pack' :{'fill':'x' ,'side':'bottom','pady':12}
         },
 
-      'tcEnt:lbl'      :{
+      'tcEnt:lbl'         :{
         'rules':{'final':('paramsConfig')},
         'type' : 'lbl',
         'pack' :{'side':'left','padx':4}
         },
-      'tcEnt:ent'      :{
+      'tcEnt:ent'         :{
         'rules':{'final':('fillEnt','returnWidget')},
         'type' : 'ent',
         'pack' :{'fill':'x'}
         },
-      'tc:radEntry'    :{
+      'tc:radEntry'       :{
         'rules':{'final':('tc:radio')},
         'type' : 'radEntry',
         'pack' :{'fill':'x','padx':4,'pady':3}
         },
 
-      'tc:newSheet'    :_getShared('ir:tc:cb',{'root':{'tVar':'newSheet'}}),  # tVar = task var
-      'tc:suggErrors'  :_getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
-      'tc:saveAfter'   :_getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
-      'tc:rmTitledCols':_getShared('ir:tc:cb',{'root':{'tVar':'rmTitledCols'}}),
-      'tc:ACverts'     :_getShared('ir:tc:cb',{'root':{'tVar':'ACverts'}}),
-      'tc:vertBlanks'  :_getShared('ir:tc:cb',{'root':{'tVar':'vertBlanks'}}),
-      'tc:reorder'     :_getShared('ir:tc:cb',{'root':{'tVar':'reorder'}}),
-      'tc:phNoBlanks'  :_getShared('ir:tc:cb',{'root':{'tVar':'phNoBlanks'}}),
+      # tVar = task var
+      'tc:newSheet'       :_getShared('ir:tc:cb',{'root':{'tVar':'newSheet'}}),
+      'tc:suggErrors'     :_getShared('ir:tc:cb',{'root':{'tVar':'suggErrors'}}),
+      'tc:saveAfter'      :_getShared('ir:tc:cb',{'root':{'tVar':'saveAfter'}}),
+      'tc:rmTitledCols'   :_getShared('ir:tc:cb',{'root':{'tVar':'rmTitledCols'}}),
+      'tc:ACverts'        :_getShared('ir:tc:cb',{'root':{'tVar':'ACverts'}}),
+      'tc:vertBlanks'     :_getShared('ir:tc:cb',{'root':{'tVar':'vertBlanks'}}),
+      'tc:reorder'        :_getShared('ir:tc:cb',{'root':{'tVar':'reorder'}}),
+      'tc:phNoBlanks'     :_getShared('ir:tc:cb',{'root':{'tVar':'phNoBlanks'}}),
+      'tc:forceDblRegions':_getShared(
+        'ir:tc:cb',
+        {'root' :{'tVar' : 'forceDblRegions'},
+         'inner':{'build':{'bootstyle':'danger-round-toggle'}}}
+        ),
       # ↓ в коде зашито self.wx['tcl:'+tVar]
-      'tc:strFiller'   :_getShared('ir:tc:ent',{'root':{'tVar':'strFiller'}}),
-      'tc:captMask'    :_getShared(
+      'tc:strFiller'      :_getShared('ir:tc:ent',{'root':{'tVar':'strFiller'}}),
+      'tc:captMask'       :_getShared(
         'ir:tc:rad',
         {'root':{'tVar':['Aa_Aa','Aa_aa','Aa_aA','AA_AA','aa_aa']}}
         ),
-      'tc:frmRange'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmRange'}}),
-      'tc:frmFont'     :_getShared('ir:tc:cb',{'root':{'tVar':'frmFont'}}),
-      'tc:frmBIU'      :_getShared('ir:tc:cb',{'root':{'tVar':'frmBIU'}}),
-      'tc:frmAlign'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmAlign'}}),
-      'tc:frmNewLines' :_getShared('ir:tc:cb',{'root':{'tVar':'frmNewLines'}}),
-      'tc:frmBorders'  :_getShared('ir:tc:cb',{'root':{'tVar':'frmBorders'}}),
-      'tc:frmBg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmBg'}}),
-      'tc:frmFg'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmFg'}}),
-      'tc:frmUnPin'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmUnPin'}}),
-      'tc:frmUnFilter' :_getShared('ir:tc:cb',{'root':{'tVar':'frmUnFilter'}}),
-      'tc:frmResetAll' :_getShared(
+      'tc:frmRange'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmRange'}}),
+      'tc:frmFont'        :_getShared('ir:tc:cb',{'root':{'tVar':'frmFont'}}),
+      'tc:frmBIU'         :_getShared('ir:tc:cb',{'root':{'tVar':'frmBIU'}}),
+      'tc:frmAlign'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmAlign'}}),
+      'tc:frmNewLines'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmNewLines'}}),
+      'tc:frmBorders'     :_getShared('ir:tc:cb',{'root':{'tVar':'frmBorders'}}),
+      'tc:frmBg'          :_getShared('ir:tc:cb',{'root':{'tVar':'frmBg'}}),
+      'tc:frmFg'          :_getShared('ir:tc:cb',{'root':{'tVar':'frmFg'}}),
+      'tc:frmUnPin'       :_getShared('ir:tc:cb',{'root':{'tVar':'frmUnPin'}}),
+      'tc:frmUnFilter'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmUnFilter'}}),
+      'tc:frmResetAll'    :_getShared(
         'ir:tc:cb',
         {'root' :{'tVar' : 'frmResetAll'},
          'inner':{'build':{'bootstyle':'danger-round-toggle'}}}
         ),
-      'tc:frmPinTitle' :_getShared('ir:tc:cb',{'root':{'tVar':'frmPinTitle'}}),
-      'tc:frmFilter'   :_getShared('ir:tc:cb',{'root':{'tVar':'frmFilter'}}),
+      'tc:frmPinTitle'    :_getShared('ir:tc:cb',{'root':{'tVar':'frmPinTitle'}}),
+      'tc:frmFilter'      :_getShared('ir:tc:cb',{'root':{'tVar':'frmFilter'}}),
 
-      'run'            :_getShared('fRoot'   ,{'root':{'stash':['rl','rr']}}),
-      'rl'             :{
+      'run'               :_getShared('fRoot'   ,{'root':{'stash':['rl','rr']}}),
+      'rl'                :{
         'type' : 'fr',
         'pack' :{'fill' :'both','expand':True,'side':'left'},
         'stash':['rlLbl','rlTabs']
         },
-      'rr'             :{
+      'rr'                :{
         'type' : 'fr',
         'pack' :{'fill':'y','side':'right','padx':5},
         'stash':['rb','re']
         },
-      'rlLbl'          :{
+      'rlLbl'             :{
         'type' : 'lbl',
         'build':{'text'  : S.UI['rl:lbl']},
         'pack' :{'anchor':'w','padx':10}
         },
-      'rlTabs'         :{
+      'rlTabs'            :{
         'type' : 'tbs',
         'wxKey': 'rlTabs',
         'pack' :{'fill':'both','expand':True,'padx':5,'pady':7},
         'stash':['rlTabMain'  ,'rlTabErrors']
         },
-      'rlTabMain'      :_getShared(
+      'rlTabMain'         :_getShared(
         'scrollTab',
         {'inner':{'packTab':{'text':S.UI['rl:main']}},
          'root' :{'wxKey'  : 'rl:main'}}
         ),
-      'rlTabErrors'    :_getShared(
+      'rlTabErrors'       :_getShared(
         'scrollTab',
         {'inner':{'packTab':{'text':S.UI['rl:errors']}},
          'root' :{'wxKey'  : 'rl:errors'}}
         ),
 
-      'rb'             :{
+      'rb'                :{
         'rules':{'final':('bind_rbCancel')},
         'type' : 'lfr',
         'wxKey': 'rbLfr',
@@ -356,166 +362,166 @@ class globUI(): # импортируется в G.UI (в глобальные п
         'pack' :{'fill':'both','expand':True},
         'stash':['rbRoot']
         },
-      'rbRoot'         :{
+      'rbRoot'            :{
         'type' : 'fr',
         'wxKey': 'rbRoot',
         'pack' :{'fill':'both','padx':10,'pady':2},
         'stash':['rbeEntry','rbe:sep','rbe:cur']  # e в rbe = errors (обработка ошибок)
         },
-      'rbeEntry'       :{
+      'rbeEntry'          :{
         'type' : 'fr',
         'pack' :{'fill':'x'   ,'anchor':'n'},
         'stash':['rbeEntry:up','rbe:curType','rbeEntry:bottom','rbeEntry:errMsg']
         },
-      'rbeEntry:up'    :{
+      'rbeEntry:up'       :{
         'type' : 'fr',
         'pack' :{'fill':'x','anchor':'n'},
         'stash':['rbeEntry:upLbl','rbeEntry:upBtns']
         },
-      'rbeEntry:upLbl' :{
+      'rbeEntry:upLbl'    :{
         'type' : 'lbl',
         'build':{'text': S.UI['rbeEntry:lbl']},
         'pack' :{'fill':'x','side':'left','padx':2}
         },
-      'rbeEntry:upBtns':{
+      'rbeEntry:upBtns'   :{
         'type' : 'fr',
         'pack' :{'side':'right'},
         'stash':['rbeEntry:upExit','rbeEntry:upCanc']
         },
-      'rbeEntry:upExit':{
+      'rbeEntry:upExit'   :{
         'type' : 'btn',
         'cmd'  :{'type':'rbExit'},
         'build':{'text':self.icons['back'],'bootstyle':'danger-outline'},
         'pack' :{'side':'left','padx':2},
         'stash':['rbeExit:tt']
         },
-      'rbeExit:tt'     :{
+      'rbeExit:tt'        :{
         'type' : 'tt',
         'build':{'text':S.UI['rbeExit:tt']}
         },
-      'rbeEntry:upCanc':{
+      'rbeEntry:upCanc'   :{
         'type' : 'btn',
         'cmd'  :{'type':'rbeEntry:upCanc'},
         'build':{'text': self.icons['rejectAll'],'bootstyle':'danger-outline'},
         'pack' :{'side':'right'},
         'stash':['rbeCanc:tt']
         },
-      'rbeCanc:tt'     :{
+      'rbeCanc:tt'        :{
         'type' : 'tt',
         'build':{'text':S.UI['rbeCanc:tt']}
         },
-      'rbe:curType'    :{
+      'rbe:curType'       :{
         'rules':{'final':('color:lightRed')},
         'type' : 'lbl',
         'wxKey': 'rbe:curType',
         'pack' :{'fill':'x','padx':2}
         },
-      'rbeEntry:bottom':{
+      'rbeEntry:bottom'   :{
         'type' : 'fr',
         'pack' :{'fill':'x'},
         'stash':['rbeEntry:entry','rbeEntry:ok','rbeEntry:cancel']
         },
-      'rbeEntry:entry' :{
+      'rbeEntry:entry'    :{
         'rules':{'final':('rbeEntry')},
         'type' : 'ent',
         'wxKey': 'rbeEntry',
         'pack' :{'fill':'x','expand':True,'side':'left','padx':4,'pady':7}
         },
-      'rbeEntry:ok'    :_getShared(
+      'rbeEntry:ok'       :_getShared(
         'rbeOkCancel',
         {'root':{'rules':{'final':('setFocus')},
                  'wxKey': 'rbeEntry:ok',
                  'cmd'  :{'type':'rbeEntry','lmb':'ok'},
                  'build':{'text': self.icons['done'],'bootstyle':'success'}}}
         ),
-      'rbeEntry:cancel':_getShared(
+      'rbeEntry:cancel'   :_getShared(
         'rbeOkCancel',
         {'root':{'cmd'  :{'type':'rbeEntry','lmb':'cancel'},
                  'build':{'text': self.icons['cancel'],'bootstyle':'danger'}}}
         ),
-      'rbeEntry:errMsg':{
+      'rbeEntry:errMsg'   :{
         'rules':{'final':('color:lightRed')},
         'type' : 'lbl',
         'wxKey': 'rbe:errMsg',
         'pack' :{'fill':'x'  ,'padx':2}
         },
-      'rbe:sep'        :{
+      'rbe:sep'           :{
         'type': 'sep',
         'pack':{'fill':'x','expand':True,'anchor':'n','padx':2,'pady':3}
         },
-      'rbe:cur'        :{
+      'rbe:cur'           :{
         'type' : 'fr',
         'pack' :{'fill':'x','expand':True,'anchor':'n','pady':4},
         'stash':['rbe:curVal']
         },
-      'rbe:curVal'     :{
+      'rbe:curVal'        :{
         'type' : 'fr',
         'pack' :{'fill':'x'},
         'stash':['rbe:curLbl','rbe:curBtn']
         },
-      'rbe:curLbl'     :{
+      'rbe:curLbl'        :{
         'type' : 'lbl',
         'build':{'text': S.UI['rbe:curLbl']},
         'pack' :{'side':'left'}
         },
-      'rbe:curBtn'     :{
+      'rbe:curBtn'        :{
         'type' : 'btn',
         'wxKey': 'rbe:curBtn',
         'build':{'bootstyle':'warning-outline'},
         'pack' :{'fill':'x' ,'side':'right'}
         },
-      'rbeVars'        :{
+      'rbeVars'           :{
         'type' : 'fr',
         'wxKey': 'rbeVars',
         'pack' :{'fill':'x'  ,'expand':True,'anchor':'nw'},
         'stash':['rbeVarsLbl','rbeVars:inner']
         },
-      'rbeVarsLbl'     :{
+      'rbeVarsLbl'        :{
         'type' : 'lbl',
         'build':{'text': S.UI['rbeVarsLbl']},
         'pack' :{'fill':'x'}
         },
-      'rbeVars:inner'  :{
+      'rbeVars:inner'     :{
         'rules':{'final':('addSuggList')},
         'type' : 'fr',
         'wxKey': 'rbeVars:inner',
         'pack' :{'fill':'x','pady':3}
         },
-      'rbeVars:item'   :{
+      'rbeVars:item'      :{
         'rules':{'final':('addSuggItem')},
         'type' : 'fr',
         'pack' :{'fill':'x','pady':2},
         'stash':['rbeVars:itemNum','rbeVars:itemBtn']
         },
-      'rbeVars:itemNum':{
+      'rbeVars:itemNum'   :{
         'type' : 'lbl',
         'wxKey': 'rbev:num',  # нужен только для правила 'addSuggItem'
         'pack' :{'side':'left','padx':1}
         },
-      'rbeVars:itemBtn':{
+      'rbeVars:itemBtn'   :{
         'type' : 'btn',
         'wxKey': 'rbev:btn',  # нужен только для правила 'addSuggItem'
         'build':{'bootstyle':'info-outline'},
         'pack' :{'side':'right','fill':'x','expand':True,'padx':4}
         },
-      'rbf'            :{
+      'rbf'               :{
         'rules':{'final':('bindLogs')},
         'type' : 'fr',  # f в rbf = finish
         'pack' :{'fill':'both','padx':10,'pady':2},
         'stash':['rbfLbl','rbfBtns']
         },
-      'rbfLbl'         :{
+      'rbfLbl'            :{
         'rules':{'final':('paramsConfig')},
         'wxKey': 'rbfLbl',
         'type' : 'lbl',
         'pack' :{'fill':'x','anchor':'w','padx':1,'pady':4}
         },
-      'rbfBtns'        :{
+      'rbfBtns'           :{
         'type' : 'fr',
         'pack' :{'anchor' :'w','padx':3,'pady':7},
         'stash':['rbfExit','rbfShowLog','rbfShowErrors']
         },
-      'rbfExit'        :{
+      'rbfExit'           :{
         'rules':{'final':('setFocus')},
         'type' : 'btn',
         'wxKey': 'rbfExit',
@@ -524,7 +530,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                  'bootstyle' :'success'},
         'pack' :{'anchor'    :'w','padx':2,'pady':3}
         },
-      'rbfShowLog'     :{
+      'rbfShowLog'        :{
         'rules':{'final':('rbfShowLog')},
         'type' : 'btn',
         'cmd'  :{'type':'rbfShowLog'},
@@ -532,7 +538,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                  'bootstyle':'info-outline'},
         'pack' :{'anchor'   :'w','padx':2,'pady':3}
         },
-      'rbfShowErrors'  :{
+      'rbfShowErrors'     :{
         'rules':{'final':('rbfShowErrors')},
         'type' : 'btn',
         'cmd'  :{'type':'rbfShowErrors'},
@@ -541,23 +547,23 @@ class globUI(): # импортируется в G.UI (в глобальные п
         'pack' :{'anchor'   :'w','padx':2,'pady':3}
         },
 
-      're'             :{
+      're'                :{
         'type' : 'lfr',
         'wxKey': 're',
         'pack' :{'fill':'both','expand':True,'pady':7},
         'stash':['reInner']
         },
-      'reInner'        :{
+      'reInner'           :{
         'type' : 'sfr',
         'wxKey': 'errQueue',
         'pack' :{'fill':'both','expand':True,'padx':8,'pady':6}
         },
-      're:item'        :_getShared(
+      're:item'           :_getShared(
         'log',
         {'root' :{'rules':{'final':('paramsConfig','returnWidget')}}}
         ),
 
-      'log'            :_getShared('log')
+      'log'               :_getShared('log')
       }
 
     # цвета журнала (выбираются по юниту)

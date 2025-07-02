@@ -49,7 +49,10 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'colors'     : 'sh:tit',
         'formatSheet':  False
         },
-      'chkRegions' :_taskShared('chk',{'root':{'AStype':'region'}}),
+      'chkRegions' :_taskShared(
+        'chk',{'root':{'cfg'   :['newSheet','suggErrors','saveAfter','---','forceDblRegions'],
+                       'AStype': 'region'}}
+        ),
       'chkCat'     :_taskShared('chk',{'root':{'AStype':'cat'}}),
       'chkVert'    :{
         'cfg'        :['newSheet','saveAfter','---','ACverts','vertBlanks'],
