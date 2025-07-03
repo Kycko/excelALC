@@ -16,13 +16,32 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'addHeader'  : False,
                        'launch'     :'chkRange',
                        'justVerify' : False,
-                       'colors'     :'sel',
-                       'formatSheet': False}}
+                       'colors'     :'sel'}}
         return dictF.update(dict[type],**upd)
     self.tasks = {
       # --- – это будет separator; rmRC_onRead работает только с toTD=True
-      # colors = sel(selection) либо sh(sheet); туда же добавляем :tit(hlTitles) и :vert(hlVerts)
-      # 'chkAll'  :,
+      # colors = sel(selection) либо sh(sheet)
+      # туда же добавляем :tit(hlTitles), :vert(hlVerts), frm(formatSheet) – требуется опция formatSheet
+      'chkAll'     :{
+        'cfg'        :['newSheet',
+                       'suggErrors',
+                       'saveAfter',
+                       '---',
+                       'forceDblRegions',
+                       'phNoBlanks',
+                       'reorder',
+                       'formatSheet'],
+        'read'       : 'shActive',
+        'rmRC_onRead':  True,
+        'toTD'       :  True,
+        'addHeader'  :  True,
+        'launch'     : 'chkAll',
+        'justVerify' :  False,
+        'colors'     : 'sh:frm:tit:vert',
+        'forceCfg'   :{'ACverts'     :True,
+                       'vertBlanks'  :False,
+                       'rmTitledCols':True}
+        },
       'reCalc'     :{
         'cfg'        :['newSheet','saveAfter'],
         'read'       : 'shActive',
@@ -32,7 +51,6 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'launch'     : 'reCalc',
         'justVerify' :  True,
         'colors'     : 'sh:tit',
-        'formatSheet':  True,
         'forceCfg'   :{'vertBlanks'   :False,
                        'noPhoneBlanks':False,
                        'reorder'      :False}
@@ -46,8 +64,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'launch'     : 'chkRange',
         'AStype'     : 'title',
         'justVerify' :  False,
-        'colors'     : 'sh:tit',
-        'formatSheet':  False
+        'colors'     : 'sh:tit'
         },
       'chkRegions' :_taskShared(
         'chk',{'root':{'cfg'   :['newSheet','suggErrors','saveAfter','---','forceDblRegions'],
@@ -63,7 +80,6 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'launch'     : 'chkVerts',
         'justVerify' :  False,
         'colors'     : 'sel:vert',
-        'formatSheet':  False,
         # ↓ добавляет в Root().cfg, но не в основные настройки и не в файл настроек
         'forceCfg'   :{'suggErrors':False}
         },
@@ -84,8 +100,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'addHeader'  :  False,
         'launch'     : 'rmRC',
         'justVerify' :  False,
-        'colors'     : 'sel',
-        'formatSheet':  False
+        'colors'     : 'sel'
         },
       'capitalize' :{
         'cfg'        :['newSheet','saveAfter','---','captMask'],
@@ -95,8 +110,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'addHeader'  :  False,
         'launch'     : 'capitalize',
         'justVerify' :  False,
-        'colors'     : 'sel',
-        'formatSheet':  False
+        'colors'     : 'sel'
         },
       'chkDates'   :_taskShared('chk',{'root':{'AStype':'date'}}),
       'fillBlanks' :{
@@ -108,8 +122,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'addHeader'  :  False,
         'launch'     : 'fillBlanks',
         'justVerify' :  False,
-        'colors'     : 'none',
-        'formatSheet':  False
+        'colors'     : 'none'
         },
       'formatSheet':{
         'cfg'        :['newSheet',
@@ -136,8 +149,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'addHeader'  :  False,
         'launch'     : 'formatSheet',
         'justVerify' :  False,
-        'colors'     : 'none',
-        'formatSheet':  True
+        'colors'     : 'none:frm',
+        'forceCfg'   :{'formatSheet':True}
         }
       }
 

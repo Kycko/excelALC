@@ -342,7 +342,7 @@ class Root():
     curCols[curKey].type = cLib[curKey]['type'] if curKey in cLib.keys() else None
 
   # финальные шаги (преобразование и запись)
-  def finish(self,forceNewSheet=False,forceFrm=False):
+  def finish(self,forceNewSheet=False):
     def _TDjoin():  # объединяем curTD и unkTD перед финальной записью
       for key in tuple(self.unkTD.columns.keys()): self.moveUnkTD_toCurTD(key,key)
     def _curTD_toTable():
@@ -399,10 +399,10 @@ class Root():
         _rmRC()
         self.file.write(self.shName)
       elif forceNewSheet: _copySheet()
-      if self.type == 'formatSheet': equal = False
 
+      if self.type == 'formatSheet': equal = False
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
-    def  _format():
+    def  _format(forceFrm:bool):  # forceFrm, вроде, исп. только для chkAll
       def _set(type:str=None,force=False):
         def _unPin   (): self.file.callPin(False)
         def _unFilter(): self.file. filter(False,frmSheet['sheet'])
@@ -497,7 +497,8 @@ class Root():
     if self.pr['toTD']: _TDjoin(); _curTD_toTable()
     _write()
     tRow = self.searchTitleRow(self.tObj)
-    if forceFrm or self.pr['formatSheet']: _format()
+    if 'frm' in self.pr['colors'] and self.cfg['formatSheet']:
+      _format(self.type == 'chkAll')
     _colors()
     if G.config.get(self.type+':saveAfter'):
       self.file.save()
