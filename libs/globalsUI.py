@@ -302,6 +302,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
         {'root' :{'tVar' : 'forceDblRegions'},
          'inner':{'build':{'bootstyle':'danger-round-toggle'}}}
         ),
+      'tc:formatSheet'    :_getShared('ir:tc:cb',{'root':{'tVar':'formatSheet'}}),
       # ↓ в коде зашито self.wx['tcl:'+tVar]
       'tc:strFiller'      :_getShared('ir:tc:ent',{'root':{'tVar':'strFiller'}}),
       'tc:captMask'       :_getShared(
@@ -573,6 +574,8 @@ class globUI(): # импортируется в G.UI (в глобальные п
 
     # цвета журнала (выбираются по юниту)
     self.log = {'core'      : None,
+                'stage+'    :'pink',
+                'stage-'    :'red',
                 'autocorr'  :'sand',
                 'capitalize':'sand',
                 'errors'    :'red',

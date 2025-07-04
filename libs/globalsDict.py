@@ -29,8 +29,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        '---',
                        'forceDblRegions',
                        'phNoBlanks',
-                       'reorder',
-                       'formatSheet'],
+                       'formatSheet',
+                       'reorder'],
         'read'       : 'shActive',
         'rmRC_onRead':  True,
         'toTD'       :  True,
@@ -40,7 +40,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'colors'     : 'sh:frm:tit:vert',
         'forceCfg'   :{'ACverts'     :True,
                        'vertBlanks'  :False,
-                       'rmTitledCols':True}
+                       'rmTitledCols':True,
+                       'frmRange'    :False}
         },
       'reCalc'     :{
         'cfg'        :['newSheet','saveAfter'],
@@ -48,12 +49,12 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'rmRC_onRead':  False,
         'toTD'       :  True,
         'addHeader'  :  True,
-        'launch'     : 'reCalc',
+        'launch'     : 'chkAll',
         'justVerify' :  True,
         'colors'     : 'sh:tit',
-        'forceCfg'   :{'vertBlanks'   :False,
-                       'noPhoneBlanks':False,
-                       'reorder'      :False}
+        'forceCfg'   :{'vertBlanks':False,
+                       'phNoBlanks':False,
+                       'reorder'   :False}
         },
       'chkTitles'  :{
         'cfg'        :['newSheet','suggErrors','saveAfter','---','reorder'],
@@ -171,6 +172,10 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'titlesReordered' :'titles',
                 'vertChanged'     :'warning',
                 'blanksFilled'    :'autocorr',
+
+                'stg+'            :'stage+',  # stg = stage
+                'stg-'            :'stage-',
+                'stgVert-'        :'stage-',
 
                 'frmSelRange'     :'formatting',
                 'frmSelSheet'     :'formatting',

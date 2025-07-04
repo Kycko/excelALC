@@ -65,11 +65,10 @@ class Root():
           _curTD()
         else: self.table = CellTable(tObj['table'])
     def _runType():
-      def    _runRange():
-        if self.pr['AStype'] == 'title':
-          data  = [[col.title for col in self.unkTD.columns.values()]]
-        else: data = self.table.data
-        self.rangeChecker(data,self.pr['AStype'])
+      def    _runRange(type:str):
+        if type == 'title': data = [[col.title for col in self.unkTD.columns.values()]]
+        else              : data =  self.table.data
+        self.rangeChecker(data,type)
       def    _runVerts():
         def _vertUpdData():
           # возвращает Table из тех же строк столбца с заголовком 'Категория'
@@ -86,17 +85,6 @@ class Root():
           cats = _vertUpdData()
           if cats is None: self.UI.launchErr('noCats')
           else           :  self.vertChecker(self.table.data,cats.data)
-      def      _reCalc():
-        cols  = self.curTD.columns
-        GASTk = G.dict.AStypes.keys()
-        for col in cols.values():
-          temp = col.type.split(':')
-          type = temp      .pop(0)
-          if len(temp)     : self.subtype = temp[0]
-          if type == 'vert':
-            if 'cat' in cols.keys(): self. vertChecker([col.cells],[cols['cat'].cells])
-          elif  type in GASTk      : self.rangeChecker([col.cells], type)
-        self.finish()
       def  _fillBlanks():
         count = 0
         for   row  in self.table.data:
@@ -127,17 +115,19 @@ class Root():
 
       match self.pr['launch']:
         case 'capitalize' :       _capitalize()
-        case 'chkRange'   :         _runRange()
+        case 'chkAll'     :         _runRange('title')
+        case 'chkRange'   :         _runRange(self.pr['AStype'])
         case 'chkVerts'   :         _runVerts()
         case 'fillBlanks' :       _fillBlanks()
         case 'formatSheet':      _formatSheet()
-        case 'reCalc'     :           _reCalc()
         case 'rmRC'       : self.rmRC_initial(self.table); self.finish()
 
-    self.type = type
-    self.pr   = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
+    self.type   = type
+    self.pr     = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
+    self.stages = None  # всегда сбрасываем для правильной работы chkAll
+
     _getCfg ()
-    _initLE ()
+    _initLE ()  # LE = log & errors
     _getData(rmRC=self.pr['rmRC_onRead'])
     _runType()
 
@@ -237,6 +227,32 @@ class Root():
       self.log.add('RCremoved_'+key,RC)
     self.RCremoved = tObj.rmEmptyRC('rc',self.cfg['rmTitledCols'])
     _log()
+  def nextStage   (self):
+    # запускает проверку следующего столбца для 'allChecks'
+    def _log(key:str,type:str=None):
+      if self.type == 'chkAll': # чтобы не выводить для reCalc
+        t = None if type is None else S.AStypes[type]
+        self.log.add(key,{'col':curCol.title.value,'type':t})
+
+    cols = self.curTD.columns
+    if self.stages is None: self.stages = list(cols.keys())
+    if self.stages:
+      # if 'cat' in self.stages:
+      curCol = cols[self.stages.pop(0)]
+      temp   = curCol.type.split(':')
+      type   = temp.pop(0)
+      if len(temp): self.subtype = temp[0]
+
+      if    type == 'vert':
+        if 'cat' in cols.keys():
+          _log('stg+',type)
+          self.vertChecker([curCol.cells],[cols['cat'].cells])
+        else:  _log('stgVert-')
+      elif  type in  G.dict.AStypes.keys():
+        _log('stg+',type)
+        self.rangeChecker([curCol.cells],type)
+      else: _log('stg-'); self.nextStage()
+    else: self.finish()
 
   # работа с ошибками
   def autocorr(self,type:str,value:str):
@@ -285,11 +301,11 @@ class Root():
       for i in range(len(queue)): self.errors.suggClicked(False,'',True)
     if queue and AST[queue[0].type]['showSugg']:
       self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:9])
-    elif self.type != 'chkAll': self.finalizeErrors()
+    else: self.finalizeErrors(self.type == 'chkAll')
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
     self.errors.suggClicked(OKclicked,newValue)
     self.nextSugg()
-  def   finalizeErrors(self):
+  def   finalizeErrors(self,forceTitles=False):
     def _processQueue ():
       for lng in range(len(self.errors.qStage)):
         errObj = self.errors.qStage.pop(0)
@@ -321,10 +337,10 @@ class Root():
       _fixed(); _add()
 
     _processQueue()
-    if   self.pr['read'] == 'selection': self.table.data = self.rTable
-    elif self.type       == 'chkTitles': _titles()
-    # if                  self.type ==   'allChecks': self.nextStage()
-    if   self.type       != 'reCalc'   : self.finish()
+    if                  self.pr['read'] == 'selection': self.table.data = self.rTable
+    elif forceTitles or self.type       == 'chkTitles': _titles()
+    if self.type in ('chkAll','reCalc'): self.nextStage()
+    else                               : self.finish()
 
   # чтение данных из таблицы
   def searchTitleRow   (self,table :Table):
