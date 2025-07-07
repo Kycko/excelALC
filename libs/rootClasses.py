@@ -232,7 +232,7 @@ class Root():
   def nextStage   (self):
     # запускает проверку следующего столбца для 'allChecks'
     def _log(key:str,type:str=None):
-      if self.type == 'chkAll': # чтобы не выводить для reCalc
+      if key == 'stgVert-' or self.type == 'chkAll':  # чтобы не выводить для reCalc
         t = None if type is None else S.AStypes[type]
         self.log.add(key,{'col':curCol.title.value,'type':t})
 
@@ -253,7 +253,7 @@ class Root():
         if 'cat' in cols.keys():
           _log('stg+',type)
           self.vertChecker([curCol.cells],[cols['cat'].cells])
-        else:  _log('stgVert-')
+        else:  _log('stgVert-'); self.nextStage()
       elif  type in  G.dict.AStypes.keys():
         _log('stg+',type)
         self.rangeChecker([curCol.cells],type)
