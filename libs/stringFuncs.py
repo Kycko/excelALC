@@ -1,4 +1,5 @@
 from   sys         import exit as SYSEXIT
+from   datetime    import datetime
 from   globalFuncs import getIB
 import globalsMain     as G
 import strings         as S
@@ -52,8 +53,11 @@ def autocorrCell(type:str,value:str,params=None):
     return ','.join(list).rstrip('/') # rstrip повторяется, иногда это необходимо
 
   value = value.replace(' ',' ').strip()
-  if   type ==  'cat':
+  if   type ==  'cat' :
     return ' '.join(strips(value,G.dict.strips[type]).split())
+  elif type ==  'date':
+    sList = getSuggList(type,value)
+    return sList[0]['val'] if len(sList) == 1 else value
   elif type in ('phone','mail','website'): return _autocorrPMW(value)
   else:                                    return  value
 def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'errKey':}
@@ -96,21 +100,6 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
         index = findSub(value,'hh.ru/')
         if index > 0: return False,'hhCity'
     return True,''
-  def _validateDate(date:str):
-    if not date: return True
-    else:
-      parts = date.split('.')
-      if len(parts) == 3:
-        try:
-          for i in range(len(parts)): parts[i] = int(parts[i])
-        except: return False
-
-        d,m,y = parts
-        if not y in range(2000,2100)              : return False
-        if not m in range(1   ,13)                : return False
-        if not d in range(1,G.dict.monthDays[m]+1): return False
-        return True
-
   if   vObj['type'] in ('phone','mail','website'):
     list = vObj['value'].split(',')
     if listF.inclDoublesStr(list,True):
@@ -124,21 +113,25 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
       if not        vObj['valid']: return
     if vObj['type'] in ('mail','website'): vObj['value'] = vObj['value'].lower()
   elif vObj['type'] == 'date':
-    vObj['valid'] = _validateDate(vObj['value'])
+    vObj['valid'] = validateDate(vObj['value'])
     if not vObj['valid']:
       vObj['errKey'] = 'format'
       return
   vObj['valid'] = True
 def  getSuggList(type:str ,value:str):
   final = []
-  if type in ('mail','website'):
+  if   type in ('mail','website'):
     new = value.replace(' ','').replace('|',',').lower()
     if new != value:
       vObj = {'type':type,'value':new,'valid':None,'errKey':''}
       validateCell(vObj)
       if vObj['valid']: final.append({'val':new,'btn':new})
   elif type ==  'date':
-    parts = trySplitDate(value.strip('00:00:00').strip())
+    value = value.strip()
+    if len(value) > 10:
+      tmp = value.split()
+      if len(tmp[0]) == 10: value = tmp[0]
+    parts = trySplitDate(value)
     if parts:
       for    i in range(3):
         for  j in range(3):
@@ -149,13 +142,12 @@ def  getSuggList(type:str ,value:str):
 def trySplitDate(date:str):
   for symb in G.dict.dateSplitters:
     parts = date.split(symb)
+    if len(parts) == 2: parts.append(str(datetime.now().year))
     if len(parts) == 3: return parts
 def validateDate(date:str):
   if not date: return True
   else:
-    print(date)
     parts = date.split('.')
-    print(parts)
     if len(parts) == 3:
       try:
         for i in range(len(parts)): parts[i] = int(parts[i])
