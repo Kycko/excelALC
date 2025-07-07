@@ -109,9 +109,9 @@ class Root():
             if key != 'frmRange' and key[:3] == 'frm' and val: return True
           return False
         if  _check():
-          self.log.add('frmSelRange' if [self.cfg['frmRange']] else 'frmSelSheet')
+          self.log.add('frmSelRange' if self.cfg['frmRange'] else 'frmSelSheet')
           self.finish(self.cfg['newSheet'])
-        else        : self.UI.launchErr   ('noOpts')
+        else        : self.UI.launchErr('noOpts')
 
       match self.pr['launch']:
         case 'capitalize' :       _capitalize()
@@ -428,25 +428,24 @@ class Root():
       self.log.add('finalWrite'+'+-'[equal],{'sheet':S.log['FWvars'][newSheet]})
     def  _format(forceFrm:bool):  # forceFrm, вроде, исп. только для chkAll
       def _set(type:str=None,force=False):
-        def _unPin   (): self.file.callPin(False)
-        def _unFilter(): self.file. filter(False,frmSheet['sheet'])
+        def _resetFg (range): range.font.color = clrs['blackFont']
+        def _unPin   ()     : self .file.callPin(False)
+        def _unFilter()     : self .file. filter(False,frmSheet['sheet'])
 
         cRng = self.cfg['frmRange']
 
         if force or type ==  'frmResetAll' :
-          fRange.clear_formats(); _unPin(); _unFilter()
+          fRange.clear_formats()
+          _resetFg      (fRange)
+          _unPin();  _unFilter()
           self.log.add('frmResetAll')
         elif    not self.cfg['frmResetAll']:
           if type == 'frmBorders' :
             fRange.api.Borders.Weight = 2
             fRange.api.Borders.Color  = clrs['borders']
             self.log.add(type)
-          if type == 'frmBg'      :
-            fRange.color = None
-            self.log.add(type)
-          if type == 'frmFg'      :
-            RF.color = clrs['blackFont']
-            self.log.add(type)
+          if type == 'frmBg'      : fRange.color = None; self.log.add(type)
+          if type == 'frmFg'      : _resetFg(RF)       ; self.log.add(type)
           if type == 'frmBIU'     :
             RF.bold   = False
             RF.italic = False
@@ -462,19 +461,15 @@ class Root():
           if type == 'frmNewLines':
             fRange.api.WrapText = False
             self.log.add(type)
-          if type == 'frmUnPin'    and not cRng:
-            _unPin()
-            self.log.add(type)
-          if type == 'frmUnFilter' and not cRng:
-            _unFilter()
-            self.log.add(type)
+          if type == 'frmUnPin'    and not cRng: _unPin()   ; self.log.add(type)
+          if type == 'frmUnFilter' and not cRng: _unFilter(); self.log.add(type)
 
         if force or (type == 'frmPinTitle' and not cRng):
           self.file.pinTitle(self.shName,tRow)
-          self.log.add('frmPinTitle')
+          self.log .add     ('frmPinTitle')
         if force or (type == 'frmFilter'   and not cRng):
           self.file.filter(True,frmSheet['sheet'].range((tRow+1,1),self.tObj.getSize()))
-          self.log.add('frmFilter')
+          self.log .add   ('frmFilter')
 
       glob     = G.dict.frmExcel
       clrs     = G.dict.exColors
