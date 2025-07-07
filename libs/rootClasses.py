@@ -137,8 +137,9 @@ class Root():
     # т. е. table – это всегда [[Cell,...],...]
     def _addError(): errors[low] = ErrorObj(type,cell.value,errPos)
 
-    self.rTable  = table  # range table, понадобится в self.finalizeErrors()
-    errors,fixed = {},{}  # {initLow:ErrorObj,...}, {fromLow:to,...}
+    self.pr['chkType'] = type
+    self.rTable        = table  # range table, понадобится в self.finalizeErrors()
+    errors,fixed       = {},{}  # {initLow:ErrorObj,...}, {fromLow:to,...}
     for   r in range(len(table)):
       for c in range(len(table[r])):
         cell   =   table[r][c]
@@ -301,7 +302,7 @@ class Root():
     queue = self.errors.queue
     JV    = self.pr['justVerify']
     AST   = G.dict.AStypes
-    if JV or not self.cfg['suggErrors']:
+    if JV or not self.cfg['suggErrors'] or not AST[self.pr['chkType']]['showSugg']:
       # после этого выполняется elif ниже
       for i in range(len(queue)): self.errors.suggClicked(False,'',True)
     if queue and AST[queue[0].type]['showSugg']:
