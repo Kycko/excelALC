@@ -147,21 +147,23 @@ class Root():
         low   = cell.value.lower()
         try   : cell.value = fixed[low]
         except:
-          JV      = self.pr['justVerify']
-          tempVal = cell.value
-          VAL     = self.validate_andCapitalize(type,tempVal)
-          if not VAL['valid'] and not JV:
-            tempVal = self.autocorr(type,tempVal)
+          try   : errors[low].addPos(errPos)
+          except:
+            JV      = self.pr['justVerify']
+            tempVal = cell.value
             VAL     = self.validate_andCapitalize(type,tempVal)
+            if not VAL['valid'] and not JV:
+              tempVal = self.autocorr(type,tempVal)
+              VAL     = self.validate_andCapitalize(type,tempVal)
 
-          if   VAL['valid']:
-            if VAL['value'] != cell.value:  # иначе ничего делать не надо (ошибки нет)
-              if JV: _addError()
-              else: # это только про autocorr?
-                self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
-                fixed[low] = VAL['value']
-                cell.value = VAL['value']
-          else: _addError()
+            if   VAL['valid']:
+              if VAL['value'] != cell.value:  # иначе ничего делать не надо (ошибки нет)
+                if JV: _addError()
+                else: # это только про autocorr?
+                  self.log.add('ACsuccess',{'type':type,'from':cell.value,'to':VAL['value']})
+                  fixed[low] = VAL['value']
+                  cell.value = VAL['value']
+            else: _addError()
 
     self.errors.addCur(errors)
     self.nextSugg()
@@ -216,8 +218,7 @@ class Root():
 
     if vertsChanged: self.log.add('vertChanged')
     self.errors.addCur(errors)
-    # if self.type == 'chkAll': self.nextStage()
-    self.nextSugg()
+    self     .nextSugg()
   def rmRC_initial(self,tObj):  # удаляет только в ОЗУ; потом ещё надо удалить в файле
     # tObj = CellTable либо TableDict
     def _log():
@@ -237,8 +238,12 @@ class Root():
     cols = self.curTD.columns
     if self.stages is None: self.stages = list(cols.keys())
     if self.stages:
-      # if 'cat' in self.stages:
-      curCol = cols[self.stages.pop(0)]
+      try:
+        kk = 'cat'
+        self.stages.remove(kk)  # возникнет ValueError, если такого в списке нет
+      except: kk = self.stages.pop(0)
+
+      curCol = cols[kk]
       temp   = curCol.type.split(':')
       type   = temp.pop(0)
       if len(temp): self.subtype = temp[0]
@@ -301,11 +306,11 @@ class Root():
       for i in range(len(queue)): self.errors.suggClicked(False,'',True)
     if queue and AST[queue[0].type]['showSugg']:
       self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:9])
-    else: self.finalizeErrors(self.type == 'chkAll')
+    else: self.finalizeErrors()
   def suggFinalClicked(self,OKclicked:bool,newValue=''):
     self.errors.suggClicked(OKclicked,newValue)
     self.nextSugg()
-  def   finalizeErrors(self,forceTitles=False):
+  def   finalizeErrors(self):
     def _processQueue ():
       for lng in range(len(self.errors.qStage)):
         errObj = self.errors.qStage.pop(0)
@@ -333,12 +338,13 @@ class Root():
             cTD .addEmptyColumn(key,params['title'],rows,cLib.data[key]['type'])
             cTD .columns[key].initPos = cnt; cnt += 1
             self.log.add('+column',{'title':params['title']})
-      cLib = lib.columns
-      _fixed(); _add()
+      if self.type == 'chkTitles' or (self.type == 'chkAll' and self.stages is None):
+        cLib = lib.columns
+        _fixed(); _add()
 
     _processQueue()
-    if                  self.pr['read'] == 'selection': self.table.data = self.rTable
-    elif forceTitles or self.type       == 'chkTitles': _titles()
+    if self.pr['read'] == 'selection'  : self.table.data = self.rTable
+    else                               : _titles()  # проверки внутри
     if self.type in ('chkAll','reCalc'): self.nextStage()
     else                               : self.finish()
 
@@ -413,6 +419,7 @@ class Root():
         shObj['table'] = self.tObj
         if newSheet: _copySheet()
         _rmRC()
+        if self.pr['read'] == 'shActive': self.file.clearData(self.shName)
         self.file.write(self.shName)
       elif forceNewSheet: _copySheet()
 

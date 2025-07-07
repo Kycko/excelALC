@@ -49,6 +49,7 @@ class Excel():  # общий класс, можно копировать без 
     shObj['range'].value         = shObj['table'].data
   def copySheet    (self,shName:str):
     self.data[shName]['sheet'] = self.data[shName]['sheet'].copy()  # возвращает новый лист
+  def clearData    (self,shName:str): self.data[shName]['sheet'].clear_contents()
   def resetBgColors(self,shName:str,type:str):
     if type != 'none':
       shObj  =  self.data[shName]
