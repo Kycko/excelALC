@@ -14,7 +14,7 @@ def ending_byCount(count:int):
   else:                                              return '2-4'
 
 # проверка и исправление разных пользовательских данных (общие)
-def autocorrCell(type:str,value:str,params=None):
+def autocorrCell(type:str ,value:str,params=None):
   def _autocorrPMW(value):  # phone,mail,website
     RPL = {'from':('​','\n','﻿','–','—','|',';',',,'),  # RPL=replace
            'to'  :('',',' ,''  ,'-','-',',',',',',')}
@@ -61,7 +61,7 @@ def autocorrCell(type:str,value:str,params=None):
   elif type in ('phone','mail','website'): return _autocorrPMW(value)
   else:                                    return  value
 def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'errKey':}
-  def _checkPMW(type:str,value:str):  # PMW = phone,mail,website
+  def _checkPMW (type:str ,value:str)  :  # PMW = phone,mail,website
     # возвращаем valid:True/False и ключ для S.errInput[type]
     match type:
       case 'phone':
@@ -112,11 +112,10 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
       vObj['valid'],vObj['errKey'] = _checkPMW(vObj['type'],item)
       if not        vObj['valid']: return
     if vObj['type'] in ('mail','website'): vObj['value'] = vObj['value'].lower()
-  elif vObj['type'] == 'date':
-    vObj['valid'] = validateDate(vObj['value'])
-    if not vObj['valid']:
-      vObj['errKey'] = 'format'
-      return
+  elif vObj['type'] ==  'date'    :
+    vObj  ['valid'] = validateDate(vObj['value'])
+    if not vObj['valid']: vObj['errKey'] = 'format'; return
+  elif vObj['type'] ==  'nonEmpty': vObj['valid'] = bool(vObj['value']); return
   vObj['valid'] = True
 def  getSuggList(type:str ,value:str):
   final = []

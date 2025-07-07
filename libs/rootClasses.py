@@ -122,9 +122,10 @@ class Root():
         case 'formatSheet':      _formatSheet()
         case 'rmRC'       : self.rmRC_initial(self.table); self.finish()
 
-    self.type   = type
-    self.pr     = deepcopy(G.dict.tasks[type])  # некоторые параметры меняются в процессе
-    self.stages = None  # всегда сбрасываем для правильной работы chkAll
+    self.   type = type
+    # self.subtype = None # при необходимости будет задано далее
+    self.pr      = deepcopy(G.dict.tasks[type]) # некоторые параметры меняются в процессе
+    self.stages  = None # всегда сбрасываем для правильной работы chkAll
 
     _getCfg ()
     _initLE ()  # LE = log & errors

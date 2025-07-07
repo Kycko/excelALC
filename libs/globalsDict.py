@@ -205,18 +205,19 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     #   showSugg: предлагать ли исправить
     # getLibSugg: варианты исправления надо прочитать из библиотеки; иначе берём из strF.getSuggList()
     # (не нужно?) acceptBlank: для диалога с предложением исправить (None означает, что надо прочитать из настроек)
-    # ↓ !БОЛЬШИНСТВО ЭТИХ ТИПОВ ДОЛЖНО БЫТЬ В S.suggMsg!
+    # ↓ !БОЛЬШИНСТВО ЭТИХ ТИПОВ ДОЛЖНО БЫТЬ В S.AStypes!
     self.AStypes = {
-      'title'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'region' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'cat'    :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'vert'   :{'readLib':False,'checkList':True ,'showSugg':False,'getLibSugg':True},
-      'source' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'manager':{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'phone'  :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
-      'mail'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
-      'website':{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
-      'date'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}
+      'title'   :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'region'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'cat'     :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'vert'    :{'readLib':False,'checkList':True ,'showSugg':False,'getLibSugg':True},
+      'source'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'manager' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'nonEmpty':{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
+      'phone'   :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
+      'mail'    :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
+      'website' :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
+      'date'    :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}
       }
 
     # разные мелочи
