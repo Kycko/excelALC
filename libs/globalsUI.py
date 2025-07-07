@@ -116,6 +116,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
                              'il:chkCat',
                              'il:chkVert',
                              'il:chkSrc',
+                             'il:chkManagers',
                              'il:chkPhones',
                              'il:chkMails',
                              'il:chkWebsites']}}
@@ -142,6 +143,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       'il:chkCat'         :_getShared('il:taskBtn'),
       'il:chkVert'        :_getShared('il:taskBtn'),
       'il:chkSrc'         :_getShared('il:taskBtn'),
+      'il:chkManagers'    :_getShared('il:taskBtn'),
       'il:chkPhones'      :_getShared('il:taskBtn'),
       'il:chkMails'       :_getShared('il:taskBtn'),
       'il:chkWebsites'    :_getShared('il:taskBtn'),

@@ -85,6 +85,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
         'forceCfg'   :{'suggErrors':False}
         },
       'chkSrc'     :_taskShared('chk',{'root':{'AStype':'source'}}),
+      'chkManagers':_taskShared('chk',{'root':{'AStype':'manager'}}),
       'chkPhones'  :_taskShared(
         'chk',{'root':{'cfg'     :['newSheet','saveAfter','---','phNoBlanks'],
                        'AStype'  : 'phone',
@@ -211,6 +212,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
       'cat'    :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
       'vert'   :{'readLib':False,'checkList':True ,'showSugg':False,'getLibSugg':True},
       'source' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'manager':{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
       'phone'  :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
       'mail'   :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
       'website':{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},

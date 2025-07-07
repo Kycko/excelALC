@@ -9,12 +9,13 @@ import stringFuncs     as strF
 # общие функции
 def get_vList(type:str):
   match type:
-    case 'title' : return columns.     vList
-    case 'title' : return columns.     vList
-    case 'region': return regions.     vList
-    case 'cat'   : return cat    . cat_vList
-    case 'vert'  : return cat    .vert_vList
-    case 'source': return sources.data
+    case 'title'  : return columns .     vList
+    case 'title'  : return columns .     vList
+    case 'region' : return regions .     vList
+    case 'cat'    : return cat     . cat_vList
+    case 'vert'   : return cat     .vert_vList
+    case 'source' : return sources .data
+    case 'manager': return managers.data
 
 # шаблоны классов
 class     AStemplate(): # autocorr & sugg
@@ -125,15 +126,15 @@ try:
     book      = xw.Book(G.files['lib'])
     raw       = Excel  (book,'shAll',('toStrings'))
     book.close()  # иначе останется пустое окно, если других Excel'ей не открыто
-  # columns     = Columns      (raw.data['columns']   ['table'])
-  columns     = Columns      (raw.data['columns']   ['table'])
-  autocorr    = Autocorr     (raw.data['autocorr']  ['table'],False)
-  sugg        = Sugg         (raw.data['sugg']      ['table'],True)
-  regions     = Regions      (raw.data['regions']   ['table'],
+  columns     = Columns      (raw.data['columns'] ['table'])
+  autocorr    = Autocorr     (raw.data['autocorr']['table'],False)
+  sugg        = Sugg         (raw.data['sugg']    ['table'],True)
+  regions     = Regions      (raw.data['regions'] ['table'],
                               raw.data['regionVars']['table'],
                               autocorr.data['region'])
-  cat         = Cat          (raw.data['cat']       ['table'])
-  sources     = oneCol_toList(raw.data['sources']   ['table'])
+  cat         = Cat          (raw.data['cat']     ['table'])
+  sources     = oneCol_toList(raw.data['sources'] ['table'])
+  managers    = oneCol_toList(raw.data['managers']['table'])
   del raw # удаляем из памяти
   ready       = True
 except: ready = False
