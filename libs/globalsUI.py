@@ -577,6 +577,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
     # цвета журнала (выбираются по юниту)
     self.log = {'core'      : None,
                 'stage+'    :'pink',
+                'stage%'    :'pink',
                 'stage-'    :'red',
                 'autocorr'  :'sand',
                 'capitalize':'sand',

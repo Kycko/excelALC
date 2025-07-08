@@ -175,6 +175,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'blanksFilled'    :'autocorr',
 
                 'stg+'            :'stage+',  # stg = stage
+                'stg%'            :'stage%',
                 'stg-'            :'stage-',
                 'stgVert-'        :'stage-',
 

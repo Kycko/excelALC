@@ -236,6 +236,7 @@ class Root():
       if key == 'stgVert-' or self.type == 'chkAll':  # чтобы не выводить для reCalc
         t = None if type is None else S.AStypes[type]
         self.log.add(key,{'col':curCol.title.value,'type':t})
+    def _skipWithLog (key:str): _log(key); self.nextStage()
 
     cols = self.curTD.columns
     if self.stages is None: self.stages = list(cols.keys())
@@ -250,15 +251,16 @@ class Root():
       type   = temp.pop(0)
       if len(temp): self.subtype = temp[0]
 
-      if    type == 'vert':
+      if    type == 'empty': _skipWithLog('stg%')
+      elif  type == 'vert' :
         if 'cat' in cols.keys():
           _log('stg+',type)
           self.vertChecker([curCol.cells],[cols['cat'].cells])
-        else:  _log('stgVert-'); self.nextStage()
+        else: _skipWithLog('stgVert-')
       elif  type in  G.dict.AStypes.keys():
         _log('stg+',type)
         self.rangeChecker([curCol.cells],type)
-      else: _log('stg-'); self.nextStage()
+      else: _skipWithLog('stg-')
     else: self.finish()
 
   # работа с ошибками
