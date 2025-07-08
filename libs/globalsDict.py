@@ -208,21 +208,23 @@ class globDicts():  # импортируется в G.dict (в глобальн�
     # (не нужно?) acceptBlank: для диалога с предложением исправить (None означает, что надо прочитать из настроек)
     # ↓ !БОЛЬШИНСТВО ЭТИХ ТИПОВ ДОЛЖНО БЫТЬ В S.AStypes!
     self.AStypes = {
-      'title'   :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'region'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'cat'     :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'vert'    :{'readLib':False,'checkList':True ,'showSugg':False,'getLibSugg':True},
-      'source'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'manager' :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
-      'nonEmpty':{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
-      'phone'   :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
-      'mail'    :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
-      'website' :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
-      'date'    :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False}
+      'title'    :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'region'   :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'cat'      :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'vert'     :{'readLib':False,'checkList':True ,'showSugg':False,'getLibSugg':True},
+      'source'   :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'manager'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'nonEmpty' :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
+      'phone'    :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
+      'mail'     :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
+      'website'  :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
+      'date'     :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
+      'leadOwner':{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True}
       }
 
     # разные мелочи
     self.colLetters =  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    self.numbers    =  '0123456789'
     self.exColors   = {'goodTitle':'#56E0AB', # ex = Excel
                        'hlChanged':'#E8E782', # hl = highlight (cell)
                        'hlError'  :'#F69A98',
@@ -230,10 +232,11 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                        'borders'  :rgb_to_int((191,191,191))}
     self.frmExcel   = {'font'     :{'name':'Calibri','size':11}}
 
-    # ↓ неподходящие для почты и сайта
+    # ↓ неподходящие для разных типов данных
     self.badSymbols   = {'mail'   :(':','|','/','’',' ','<','>','[',']','.@','@.','@-.'),
                          'website':(' ','@','|')}
-    self.badWebStarts = ('http://','https://','www.')
+    self.badWebStarts = ['http://','https://','www.']
+    self.rmManagers   = self.badWebStarts + ['crm-asd.avito.ru/company/personal/user','/']
     self.badPhone     =  '79999999999'
     self.rmSites      = ('facebook.','instagram.','twitter.')
 

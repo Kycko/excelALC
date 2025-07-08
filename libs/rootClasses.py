@@ -291,10 +291,13 @@ class Root():
     if params['checkList']:
       found          = listF.searchStr(extra,value,'item',True,not self.pr['justVerify'])
       final['valid'] = bool(found)
+
       if final['valid']:
         if not self.pr['justVerify']: final['value'] = found[0]
-      else: final['errKey'] = 'notInList'
-    else: strF.validateCell(final,self.cfg) # final обновляется внутри
+      else:
+        final['errKey'] = 'notInList'
+        if type == 'manager': strF.validateCell(final)  # возможно, указан ID менеджера
+    else: strF.validateCell(final,self.cfg)             # final обновляется внутри
     return final
   def nextSugg(self):
     def _getSuggList(errObj):

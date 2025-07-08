@@ -51,15 +51,15 @@ def autocorrCell(type:str ,value:str,params=None):
     list     =  listF.rmDoublesStr(listF.rmBlankStr(list))
     if type == 'phone' and not list and params['phNoBlanks']: return G.dict.badPhone
     return ','.join(list).rstrip('/') # rstrip повторяется, иногда это необходимо
-
   value = value.replace(' ',' ').strip()
-  if   type ==  'cat' :
-    return ' '.join(strips(value,G.dict.strips[type]).split())
-  elif type ==  'date':
+  if   type ==  'cat'    : return ' '.join(strips(value,G.dict.strips[type]).split())
+  elif type ==  'date'   :
     sList = getSuggList(type,value)
     return sList[0]['val'] if len(sList) == 1 else value
+  elif type ==  'manager':
+    for tmpl in G.dict.rmManagers: value = value.replace(tmpl,'')
   elif type in ('phone','mail','website'): return _autocorrPMW(value)
-  else:                                    return  value
+  return value
 def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'errKey':}
   def _checkPMW (type:str ,value:str)  :  # PMW = phone,mail,website
     # возвращаем valid:True/False и ключ для S.errInput[type]
@@ -115,6 +115,9 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
   elif vObj['type'] ==  'date'    :
     vObj  ['valid'] = validateDate(vObj['value'])
     if not vObj['valid']: vObj['errKey'] = 'format'; return
+  elif vObj['type'] ==  'manager' :
+    vObj  ['valid']  =   len(vObj['value']) < 7 and checkOnlyNumbers(vObj['value'])
+    return
   elif vObj['type'] ==  'nonEmpty': vObj['valid'] = bool(vObj['value']); return
   vObj['valid'] = True
 def  getSuggList(type:str ,value:str):
@@ -299,13 +302,17 @@ def findSub    (string:str,sub :str ,type='index',fullText=False,lower=True,stri
     sub    = sub   .lower()
 
   return getIB(type,string.find(sub))
-def checkStartList(string:str,list:list,type='item',lower=True,stripList=False):
+def checkStartList  (string:str,list:list,type='item',lower=True,stripList=False):
   # проверяет каждый элемент list[]: если он в начале строки, возвращает найденное или True/False
   # type может быть 'item' или 'bool'
   for item in list:
     if findSub(string,item,'index',False,lower,('','b')[stripList]) == 0:
       return string[:len(item)] if type == 'item' else True
   return (False,None)[type == 'item']
+def checkOnlyNumbers(string:str): # проверяет, что в строке только цифры 0-9
+  for  s in string:
+    if s not in G.dict.numbers: return False
+  return True
 
 # изменение (общие)
 def strips     (string:str,symbols:tuple):
