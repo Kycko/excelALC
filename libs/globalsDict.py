@@ -219,7 +219,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
       'mail'     :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
       'website'  :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
       'date'     :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},
-      'leadOwner':{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True}
+      'leadOwner':{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'Yes'      :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False}
       }
 
     # разные мелочи

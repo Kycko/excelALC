@@ -59,6 +59,7 @@ def autocorrCell(type:str ,value:str,params=None):
   elif type ==  'manager':
     for tmpl in G.dict.rmManagers: value = value.replace(tmpl,'')
   elif type in ('phone','mail','website'): return _autocorrPMW(value)
+  elif type ==  'Yes'    : return S.Yes
   return value
 def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'errKey':}
   def _checkPMW (type:str ,value:str)  :  # PMW = phone,mail,website
@@ -100,7 +101,14 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
         index = findSub(value,'hh.ru/')
         if index > 0: return False,'hhCity'
     return True,''
-  if   vObj['type'] in ('phone','mail','website'):
+  if   vObj['type'] ==  'date'    :
+    vObj  ['valid'] = validateDate(vObj['value'])
+    if not vObj['valid']: vObj['errKey'] = 'format'; return
+  elif vObj['type'] ==  'manager' :
+    vObj  ['valid']  =   len(vObj['value']) < 7 and checkOnlyNumbers(vObj['value'])
+    return
+  elif vObj['type'] ==  'nonEmpty': vObj['valid'] = bool(vObj['value'])   ; return
+  elif vObj['type'] in ('phone','mail','website'):
     list = vObj['value'].split(',')
     if listF.inclDoublesStr(list,True):
       vObj['valid'],vObj['errKey'] = False,'listDoubles'
@@ -112,13 +120,7 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
       vObj['valid'],vObj['errKey'] = _checkPMW(vObj['type'],item)
       if not        vObj['valid']: return
     if vObj['type'] in ('mail','website'): vObj['value'] = vObj['value'].lower()
-  elif vObj['type'] ==  'date'    :
-    vObj  ['valid'] = validateDate(vObj['value'])
-    if not vObj['valid']: vObj['errKey'] = 'format'; return
-  elif vObj['type'] ==  'manager' :
-    vObj  ['valid']  =   len(vObj['value']) < 7 and checkOnlyNumbers(vObj['value'])
-    return
-  elif vObj['type'] ==  'nonEmpty': vObj['valid'] = bool(vObj['value']); return
+  elif vObj['type'] ==  'Yes'     : vObj['valid'] = vObj['value'] == S.Yes; return
   vObj['valid'] = True
 def  getSuggList(type:str ,value:str):
   final = []
