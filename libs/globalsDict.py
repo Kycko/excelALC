@@ -214,6 +214,7 @@ class globDicts():  # импортируется в G.dict (в глобальн�
       'vert'     :{'readLib':False,'checkList':True ,'showSugg':False,'getLibSugg':True},
       'source'   :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
       'manager'  :{'readLib':True ,'checkList':True ,'showSugg':True ,'getLibSugg':True},
+      'numbers'  :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
       'nonEmpty' :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
       'phone'    :{'readLib':False,'checkList':False,'showSugg':False,'getLibSugg':False},
       'mail'     :{'readLib':False,'checkList':False,'showSugg':True ,'getLibSugg':False},

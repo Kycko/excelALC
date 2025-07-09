@@ -61,8 +61,8 @@ def autocorrCell(type:str ,value:str,params=None):
   elif type in ('phone','mail','website'): return _autocorrPMW(value)
   elif type ==  'Yes'    : return S.Yes
   return value
-def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'errKey':}
-  def _checkPMW (type:str ,value:str)  :  # PMW = phone,mail,website
+def validateCell(vObj:dict,params=None,subtype:str=None): # vObj={'type':,'value':,'valid':,'errKey':}
+  def _checkPMW   (type:str ,value:str):  # PMW = phone,mail,website
     # возвращаем valid:True/False и ключ для S.errInput[type]
     match type:
       case 'phone':
@@ -101,26 +101,40 @@ def validateCell(vObj:dict,params=None):  # vObj={'type':,'value':,'valid':,'err
         index = findSub(value,'hh.ru/')
         if index > 0: return False,'hhCity'
     return True,''
-  if   vObj['type'] ==  'date'    :
-    vObj  ['valid'] = validateDate(vObj['value'])
-    if not vObj['valid']: vObj['errKey'] = 'format'; return
-  elif vObj['type'] ==  'manager' :
-    vObj  ['valid']  =   len(vObj['value']) < 7 and checkOnlyNumbers(vObj['value'])
+  def _checkNumLen():
+    if subtype == 'any': return True
+    else:
+      sign,count = subtype[0],int(subtype[1:])
+      lng        = len(vObj['value'])
+      chk1       = sign == '<' and lng < count
+      chk2       = sign == '>' and lng > count
+      return chk1 or chk2
+
+  tp = vObj['type']
+  if   tp ==  'date'    :
+    vObj       ['valid'] = validateDate(vObj['value'])
+    if not vObj['valid']:  vObj['errKey'] = 'format'; return
+  elif tp ==  'manager' :
+    vObj['valid'] = len(vObj['value']) < 7 and checkOnlyNumbers(vObj['value'])
     return
-  elif vObj['type'] ==  'nonEmpty': vObj['valid'] = bool(vObj['value'])   ; return
-  elif vObj['type'] in ('phone','mail','website'):
+  elif tp ==  'nonEmpty': vObj['valid'] = bool(vObj['value']); return
+  elif tp ==  'numbers' :
+    if not _checkNumLen(): vObj['valid'] = False; return
+    vObj['valid'] = checkOnlyNumbers(vObj['value'])
+    return
+  elif tp in ('phone','mail','website'):
     list = vObj['value'].split(',')
     if listF.inclDoublesStr(list,True):
       vObj['valid'],vObj['errKey'] = False,'listDoubles'
       return
-    if vObj['type'] == 'phone' and len(list) > 1 and G.dict.badPhone in list:
+    if tp == 'phone' and len(list) > 1 and G.dict.badPhone in list:
       vObj['valid'],vObj['errKey'] = False,'nines_inMany'
       return
     for item in list:
-      vObj['valid'],vObj['errKey'] = _checkPMW(vObj['type'],item)
-      if not        vObj['valid']: return
-    if vObj['type'] in ('mail','website'): vObj['value'] = vObj['value'].lower()
-  elif vObj['type'] ==  'Yes'     : vObj['valid'] = vObj['value'] == S.Yes; return
+      vObj['valid'],vObj['errKey'] = _checkPMW(tp,item)
+      if  not       vObj['valid']: return
+    if tp in ('mail','website'): vObj['value'] = vObj['value'].lower()
+  elif tp ==  'Yes'     : vObj['valid'] = vObj['value'] == S.Yes; return
   vObj['valid'] = True
 def  getSuggList(type:str ,value:str):
   final = []

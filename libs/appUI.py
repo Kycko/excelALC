@@ -301,9 +301,10 @@ class Window     (TBS.Window):  # окно программы
     self.destroyWidget(('rbRoot'))
     self.wx['rbLfr'].config(text=S.UI['rbFinished'],bootstyle='success')
     self.set_reLfr(True)
-    self.buildUI  ('rbf' ,self.wx['rbLfr'],
-                {'text':replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)}),
-                 'foreground':G.UI.colors['red' if totalErrors else 'green']})
+    self.  buildUI('rbf',
+                   self.wx['rbLfr'],
+                   {'text'      :replaceVars(S.UI['rbfLbl'],{'count':str(totalErrors)}),
+                    'foreground':G.UI.colors['red' if totalErrors else 'green']})
   def launchErr    (self,type:str):
     self.finish(1)
     self.wx['rbLfr'  ].config(text=S.UI['rbf:lfrError'],bootstyle='danger')

@@ -258,7 +258,11 @@ class Root():
           self.vertChecker([curCol.cells],[cols['cat'].cells])
         else: _skipWithLog('stgVert-')
       elif  type in  G.dict.AStypes.keys():
-        _log('stg+',type)
+        lType    =  type
+        if type == 'numbers':
+          sub    = (self.subtype,S.anyCount)[self.subtype == 'any']
+          lType += ' ('+sub+')'
+        _log('stg+',lType)
         self.rangeChecker([curCol.cells],type)
       else: _skipWithLog('stg-')
     else: self.finish()
@@ -297,7 +301,9 @@ class Root():
       else:
         final['errKey'] = 'notInList'
         if type == 'manager': strF.validateCell(final)  # возможно, указан ID менеджера
-    else: strF.validateCell(final,self.cfg)             # final обновляется внутри
+    else:
+      st = self.subtype if type == 'numbers' else None
+      strF.validateCell(final,self.cfg,st)  # final обновляется внутри
     return final
   def nextSugg(self):
     def _getSuggList(errObj):
