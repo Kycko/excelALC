@@ -174,6 +174,8 @@ class globDicts():  # импортируется в G.dict (в глобальн�
                 'vertChanged'     :'warning',
                 'blanksFilled'    :'autocorr',
 
+                'errPin'          :'errors',
+
                 'stg+'            :'stage+',  # stg = stage
                 'stg%'            :'stage%',
                 'stg-'            :'stage-',

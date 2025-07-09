@@ -441,7 +441,9 @@ class Root():
     def  _format(forceFrm:bool):  # forceFrm, вроде, исп. только для chkAll
       def _set(type:str=None,force=False):
         def _resetFg (range): range.font.color = clrs['blackFont']
-        def _unPin   ()     : self .file.callPin(False)
+        def _unPin   ()     :
+          try   : self.file.callPin(False)
+          except: self.log .    add()
         def _unFilter()     : self .file. filter(False,frmSheet['sheet'])
 
         cRng = self.cfg['frmRange']
