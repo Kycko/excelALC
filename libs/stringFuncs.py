@@ -1,9 +1,25 @@
 from   sys         import exit as SYSEXIT
 from   datetime    import datetime
-from   globalFuncs import getIB
+from   globalFuncs import getIB,write_toFile
 import globalsMain     as G
 import strings         as S
 import listFuncs       as listF
+
+# для debug'а (в globalFuncs ошибка импорта globalsMain)
+def debugBoth     (string:str):
+  for   dKey  in  ('ACcity','cutRegion'):
+    res   = debug (dKey,string)
+    if res: break # чтобы не дублить одинаковые строки
+  return res
+def debug(type:str,string:str):
+  set,justAdd = True,type is not None
+  if  justAdd:
+    try   : set    =  G.debug[type]
+    except: string = 'bad type in debug'
+  if     set :
+    if justAdd          : print(string) # чтобы не печатать при сбросе файла (при запуске)
+    if G.debug['toFile']: write_toFile(string,G.files['debug'],justAdd)
+  return set
 
 # получение правильного окончания в зависимости от количества
 def ending_byCount(count:int):
@@ -226,11 +242,11 @@ def ACcity(city:str,regLib,AClib,forceDoubles:bool):
           if forceDoubles and len(regLib.data[string.lower()]) > 1: return S.noRegion
         except: return None
   def _return   (string:str):
-    print ('autocorr final             : '+string)  # оставил для debug'а
+    debug('ACcity','autocorr final             : '+string)
     return string
 
-  print('---------------------------------------------------')  # оставил для debug'а
-  print('autocorr init              : '+city)                   # оставил для debug'а
+  debug('ACcity', S.debugSplitter)
+  debug('ACcity','autocorr init              : ' + city)
   city   =  lat_toCyr(trimOverHyphens(fixDashes(joinSpaces(city))))
   city   = regTrimmer(_fixOblast(city))
   region = None
@@ -244,21 +260,28 @@ def ACcity(city:str,regLib,AClib,forceDoubles:bool):
   res = _try()
   return _return(city if res is None else res)
 def RCsplitRegion(string:str,regLib,AClib): # ищет в string регионы и возвращает отдельно город/регион
-  def   _find(st:str,reg:str,fr:str):
+  def _find     (st:str,reg:str,fr:str):
     reg = findSubList(st,regLib.regVars)
     if  reg is not None:
       if fr in (None,S.noRegion): fr = AClib.get('region',reg)['value']
       st = st.replace(reg.lower(),'')
       st = regTrimmer(st)
     return st,reg,fr
-  def _return( a:str,  b:str):
-    print('split final (string,region): '+str(a)+' | '+str(b))  # оставил для debug'а
+  def _debugStep():
+    debug('cutRegion','split step---------------')
+    debug('cutRegion','string left: '+     st)
+    debug('cutRegion','cur  region: '+str(reg))
+    debug('cutRegion','main region: '+str(fr))
+  def _return   (a:str,b:str):
+    debugBoth('split final (string,region): '+str(a)+' | '+str(b))
     return a,b
 
-  print('split init                 : '+string) # оставил для debug'а
+  if G.debug['cutRegion'] and not G.debug['ACcity']: debug('cutRegion',S.debugSplitter)
+  debugBoth ('split init                 : '+string)
   st,reg,fr = string.lower(),'',None  # string, region, final/found region
   while reg is not None:
     st,reg,fr = _find(st,reg,fr)
+    _debugStep()
     if not st: return _return(fr,fr)
   return              _return(st,fr)  # посмотреть реальные примеры
 def mRCtrims     (city  :str):        # main region/city trims

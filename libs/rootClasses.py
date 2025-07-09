@@ -30,6 +30,7 @@ class Root():
       initStr  = self.log.add('mainLaunch',{'time':curDateTime(),'file':book['file']})
       self.log.add           ('launchType',{'str' :S.UI['tasks'][type]['log']})
       self.errors = Errors(self.log,self.UI,initStr)
+      if G.debug['toFile']: strF.debug(None,[])
     def _getData(logging=True,rmRC=False):
       def _getLog():
         rng  = ('range','full')[self.pr['read'] == 'shActive']
@@ -188,10 +189,11 @@ class Root():
         AClogger.append( CVstr)
         self.log.add   ('ACsuccess',{'type':'vert','from':CVstr,'to':new})
 
-    AClogger     = []     # запоминаем autocorr'ы для журнала (например, Services -> Услуги)
-    errors       = {}     # {initLow:ErrorObj,...}
-    vertsChanged = False  # чтобы показать сообщение про changed только один раз
-    self.rTable = tVerts  # range table, понадобится в self.finalizeErrors()
+    self.pr['chkType'] = 'vert'
+    AClogger           =  []      # запоминаем autocorr'ы для журнала (например, Services -> Услуги)
+    errors             =  {}      # {initLow:ErrorObj,...}
+    vertsChanged       =  False   # чтобы показать сообщение про changed только один раз
+    self.rTable        =  tVerts  # range table, понадобится в self.finalizeErrors()
 
     for   r in range(len(tVerts)):
       for c in range(len(tVerts[r])):
@@ -258,11 +260,7 @@ class Root():
           self.vertChecker([curCol.cells],[cols['cat'].cells])
         else: _skipWithLog('stgVert-')
       elif  type in  G.dict.AStypes.keys():
-        lType    =  type
-        if type == 'numbers':
-          sub    = (self.subtype,S.anyCount)[self.subtype == 'any']
-          lType += ' ('+sub+')'
-        _log('stg+',lType)
+        _log('stg+',type)
         self.rangeChecker([curCol.cells],type)
       else: _skipWithLog('stg-')
     else: self.finish()
@@ -314,8 +312,11 @@ class Root():
     queue = self.errors.queue
     JV    = self.pr['justVerify']
     AST   = G.dict.AStypes
-    if JV or not self.cfg['suggErrors'] or not AST[self.pr['chkType']]['showSugg']:
-      # после этого выполняется elif ниже
+
+    SE    =     self.cfg['suggErrors']
+    chkT  =     self. pr['chkType'] == 'vert'
+    sS    = AST[self. pr['chkType']]['showSugg']
+    if JV or not SE or chkT or not sS: # после этого выполняется elif ниже
       for i in range(len(queue)): self.errors.suggClicked(False,'',True)
     if queue and AST[queue[0].type]['showSugg']:
       self.UI.suggInvalidUD(queue,_getSuggList(queue[0])[:9])

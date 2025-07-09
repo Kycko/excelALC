@@ -7,11 +7,20 @@ from globalsDict  import globDicts
 UI   = globUI   ()  # глобальные переменные интерфейса (UI)
 dict = globDicts()  # прочее (всякие списки с текстовыми данными)
 
+# здесь можно включить вывод в консоль для отладки
+# ACcity    – более общее: как autocorr раскладывает строку отдельно на город и регион
+# cutRegion – более узкая задача: как autocorr вычленяет регион из строки
+# toFile    – debug-вывод будет записан в файл files['debug']
+debug = {'ACcity'   :False,
+         'cutRegion':False,
+         'toFile'   :False}
+
 # файлы
 files = {'lib'   :'справочник excelALC.xlsx',
          'config': UI.app['name'] +  '.config',
          'log'   :    'main.log',
-         'errors':  'errors.log'}
+         'errors':  'errors.log',
+         'debug' :   'debug.log'}
 
 # настройки
 config = userCfg(files['config'])
