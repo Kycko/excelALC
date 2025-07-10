@@ -444,7 +444,7 @@ class Root():
         def _resetFg (range): range.font.color = clrs['blackFont']
         def _unPin   ()     :
           try   : self.file.callPin(False)
-          except: self.log .    add()
+          except: self.log .    add('errPin')
         def _unFilter()     : self .file. filter(False,frmSheet['sheet'])
 
         cRng = self.cfg['frmRange']

@@ -46,7 +46,7 @@ class globUI(): # импортируется в G.UI (в глобальные п
       return dictF.update(dict[type],**upd)
 
     # базовые переменные приложения
-    self.app = {'version':'v.233',  'name':'excelALC'}
+    self.app = {'version':'v.238',  'name':'excelALC'}
     self.app   ['title'] = self.app['name']+' '+self.app['version'] # название главного окна
 
     # стили оформления (темы, шрифты и т. п.)
